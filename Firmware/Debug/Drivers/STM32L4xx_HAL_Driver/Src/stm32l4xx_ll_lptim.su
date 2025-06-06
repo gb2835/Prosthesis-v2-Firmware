@@ -1,0 +1,15 @@
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:374:26:LL_LPTIM_IsEnabled	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:1148:22:LL_LPTIM_ClearFlag_CMPOK	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:1160:26:LL_LPTIM_IsActiveFlag_CMPOK	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:1171:22:LL_LPTIM_ClearFlag_ARROK	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:1183:26:LL_LPTIM_IsActiveFlag_ARROK	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h:1344:22:LL_APB1_GRP1_ForceReset	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h:1365:22:LL_APB1_GRP2_ForceReset	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h:1426:22:LL_APB1_GRP1_ReleaseReset	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h:1447:22:LL_APB1_GRP2_ReleaseReset	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_rcc.h:3031:22:LL_RCC_SetLPTIMClockSource	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_rcc.h:3378:26:LL_RCC_GetLPTIMClockSource	16	static
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_lptim.c:95:13:LL_LPTIM_DeInit	24	static
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_lptim.c:128:6:LL_LPTIM_StructInit	16	static
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_lptim.c:147:13:LL_LPTIM_Init	24	static
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_lptim.c:190:6:LL_LPTIM_Disable	72	static,ignoring_inline_asm

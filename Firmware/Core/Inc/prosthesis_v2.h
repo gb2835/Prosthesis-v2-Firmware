@@ -7,6 +7,10 @@
 #ifndef INC_PROSTHESIS_V2_H_
 #define INC_PROSTHESIS_V2_H_
 
+#include <stdint.h>
+
+extern uint8_t isProsthesisControlRequired;
+
 
 /*******************************************************************************
  * END

@@ -2,7 +2,7 @@
 *
 * TITLE: Application for Prosthesis v2
 *
-* NOTES
+* NOTES (check this??)
 * 1. Unless otherwise specified, units are
 * 		- Accelerometer	= g's
 * 		- Angle			= degrees
@@ -13,6 +13,16 @@
 * 		- Speed			= degrees/second
 *
 *******************************************************************************/
+
+#include "prosthesis_v2.h"
+#include <stdint.h>
+
+
+/*******************************************************************************
+* PUBLIC DEFINITIONS
+*******************************************************************************/
+
+uint8_t isProsthesisControlRequired = 0;
 
 
 /*******************************************************************************
