@@ -1,20 +1,19 @@
 /* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+
+/*******************************************************************************
+*
+* TITLE: Prosthesis v2 Firmware
+*
+* NOTES (check this??)
+* 1. The below lines can be used to measure PB2 on oscilloscope (#include main.h may need to be added to certain files):
+*		- LL_GPIO_SetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
+*		- LL_GPIO_ResetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
+*		- LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
+* 2. Search -> File on "* USER ADDED " will show code added to MX auto-generated files.
+*
+*******************************************************************************/
+
+
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -53,6 +52,14 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
+/*******************************************************************************
+* USER ADDED MAIN.C
+*******************************************************************************/
+
+
+/******************************************************************************/
+
 /* USER CODE END 0 */
 
 /**
@@ -88,8 +95,33 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+
+/*******************************************************************************
+* USER ADDED DEFINITIONS
+*******************************************************************************/
+
+
+/*******************************************************************************
+* USER ADDED INITIALIZATIONS
+*******************************************************************************/
+
+
+/*******************************************************************************
+* USER ADDED TEST PROGRAMS
+*******************************************************************************/
+
+
+/*******************************************************************************
+* USER ADDED MAIN LOOP
+*******************************************************************************/
+
   while (1)
   {
+
+
+/******************************************************************************/
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
