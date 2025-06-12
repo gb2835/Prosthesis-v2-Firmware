@@ -71,6 +71,9 @@ typedef struct
 
 static Prosthesis_Init_t Device;
 
+static uint8_t isFirst = 0;
+static uint8_t isSecond = 0;
+
 static IMU_Data_t CM_IMU_Data;
 static LoadCell_t CM_LoadCell;
 
@@ -92,6 +95,15 @@ void RunProsthesisControl(void)
 {
 	GetInputs();
 	ProcessInputs();
+
+	// Check for first and second executions, needed for derivatives, filters, etc.
+	if(isFirst)
+	{
+		isFirst = 0;
+		isSecond = 1;
+	}
+	else if(isSecond)
+		isSecond = 0;
 }
 
 
@@ -134,6 +146,43 @@ static void ProcessInputs(void)
 	CM_IMU_Data.Struct.yaw = yaw * RAD_TO_DEG;
 	CM_IMU_Data.Struct.pitch = pitch * RAD_TO_DEG;
 	CM_IMU_Data.Struct.roll = roll * RAD_TO_DEG;
+
+	// Filtering of load cells
+	if(isFirst)
+	{
+		CM_LoadCell.Raw.bot[2] = CM_LoadCell.Raw.bot[0];
+		CM_LoadCell.Raw.top[2] = CM_LoadCell.Raw.top[0];
+		CM_LoadCell.Filtered.bot[0] = CM_LoadCell.Raw.bot[0];
+		CM_LoadCell.Filtered.top[0] = CM_LoadCell.Raw.top[0];
+		CM_LoadCell.Filtered.bot[2] = CM_LoadCell.Filtered.bot[0];
+		CM_LoadCell.Filtered.top[2] = CM_LoadCell.Filtered.top[0];
+	}
+	else if(isSecond)
+	{
+		CM_LoadCell.Raw.bot[1] = CM_LoadCell.Raw.bot[0];
+		CM_LoadCell.Raw.top[1] = CM_LoadCell.Raw.top[0];
+		CM_LoadCell.Filtered.bot[0] = CM_LoadCell.Raw.bot[0];
+		CM_LoadCell.Filtered.top[0] = CM_LoadCell.Raw.top[0];
+		CM_LoadCell.Filtered.bot[1] = CM_LoadCell.Filtered.bot[0];
+		CM_LoadCell.Filtered.top[1] = CM_LoadCell.Filtered.top[0];
+	}
+	else
+	{
+		// 2nd order low-pass Butterworth (fc = 20 Hz)
+		CM_LoadCell.Filtered.bot[0] =   1.6556 * CM_LoadCell.Filtered.bot[1] - 0.7068 * CM_LoadCell.Filtered.bot[2]
+									  + 0.0128 * CM_LoadCell.Raw.bot[0] + 0.0256 * CM_LoadCell.Raw.bot[1] + 0.0128 * CM_LoadCell.Raw.bot[2];
+		CM_LoadCell.Filtered.top[0] =   1.6556 * CM_LoadCell.Filtered.top[1] - 0.7068 * CM_LoadCell.Filtered.top[2]
+									  + 0.0128 * CM_LoadCell.Raw.top[0] + 0.0256 * CM_LoadCell.Raw.top[1] + 0.0128 * CM_LoadCell.Raw.top[2];
+
+		CM_LoadCell.Raw.bot[2] = CM_LoadCell.Raw.bot[1];
+		CM_LoadCell.Raw.bot[1] = CM_LoadCell.Raw.bot[0];
+		CM_LoadCell.Raw.top[2] = CM_LoadCell.Raw.top[1];
+		CM_LoadCell.Raw.top[1] = CM_LoadCell.Raw.top[0];
+		CM_LoadCell.Filtered.bot[2] = CM_LoadCell.Filtered.bot[1];
+		CM_LoadCell.Filtered.bot[1] = CM_LoadCell.Filtered.bot[0];
+		CM_LoadCell.Filtered.top[2] = CM_LoadCell.Filtered.top[1];
+		CM_LoadCell.Filtered.top[1] = CM_LoadCell.Filtered.top[0];
+	}
 }
 
 
