@@ -1,0 +1,4 @@
+../Core/Src/prosthesis_v2.c:88:6:InitProsthesisControl	16	static
+../Core/Src/prosthesis_v2.c:93:6:RunProsthesisControl	8	static
+../Core/Src/prosthesis_v2.c:113:13:GetInputs	8	static
+../Core/Src/prosthesis_v2.c:138:13:ProcessInputs	32	static
