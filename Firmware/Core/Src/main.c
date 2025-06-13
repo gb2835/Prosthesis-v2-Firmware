@@ -137,6 +137,9 @@ int main(void)
 	LL_LPTIM_SetAutoReload(LPTIM2, LPTIM2_PERIOD);
 	LL_LPTIM_StartCounter(LPTIM2, LL_LPTIM_OPERATING_MODE_CONTINUOUS);
 
+	LL_ADC_Enable(ADC1);
+	LL_ADC_Enable(ADC2);
+
   	if(BNO08x_Init(0))
   		Error_Handler();
 

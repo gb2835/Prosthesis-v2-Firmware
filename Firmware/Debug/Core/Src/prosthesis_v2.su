@@ -1,4 +1,8 @@
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h:6134:22:LL_ADC_REG_StartConversion	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h:6210:26:LL_ADC_REG_ReadConversionData12	16	static
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h:6531:26:LL_ADC_IsActiveFlag_EOC	16	static
 ../Core/Src/prosthesis_v2.c:88:6:InitProsthesisControl	16	static
 ../Core/Src/prosthesis_v2.c:93:6:RunProsthesisControl	8	static
 ../Core/Src/prosthesis_v2.c:113:13:GetInputs	8	static
-../Core/Src/prosthesis_v2.c:138:13:ProcessInputs	32	static
+../Core/Src/prosthesis_v2.c:130:17:ReadLoadCell	16	static
+../Core/Src/prosthesis_v2.c:137:13:ProcessInputs	32	static
