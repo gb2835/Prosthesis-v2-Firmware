@@ -18,7 +18,7 @@
 #include "prosthesis_v2.h"
 #include <stdint.h>
 #include <string.h>
-#include "stm32l4xx_ll_adc.h"
+#include <stm32l4xx_ll_adc.h>
 #include "utilities.h"
 
 
@@ -77,7 +77,7 @@ static IMU_Data_t CM_IMU_Data;
 static LoadCell_t CM_LoadCell;
 
 static void GetInputs(void);
-//static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
+static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
 
 
@@ -123,17 +123,16 @@ static void GetInputs(void)
 
 	BNO08x_ReadSensors();
 
-//	CM_LoadCell.Raw.bot[0] = ReadLoadCell(ADC1);
-//	CM_LoadCell.Raw.top[0] = ReadLoadCell(ADC2);
+	CM_LoadCell.Raw.bot[0] = ReadLoadCell(ADC1);
+	CM_LoadCell.Raw.top[0] = ReadLoadCell(ADC2);
 }
 
-//static uint16_t ReadLoadCell(ADC_TypeDef *ADCx)
-//{
-//	LL_ADC_REG_StartConversion(ADCx);
-//	while (!LL_ADC_IsActiveFlag_EOC(ADCx));
-//	uint16_t data = LL_ADC_REG_ReadConversionData12(ADCx);
-//	return data;
-//}
+static uint16_t ReadLoadCell(ADC_TypeDef *ADCx)
+{
+	LL_ADC_REG_StartConversion(ADCx);
+	while (!LL_ADC_IsActiveFlag_EOC(ADCx));
+	return LL_ADC_REG_ReadConversionData12(ADCx);
+}
 
 static void ProcessInputs(void)
 {
