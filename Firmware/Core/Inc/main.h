@@ -29,6 +29,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal.h"
 
+#include "stm32l4xx_ll_adc.h"
 #include "stm32l4xx_ll_lptim.h"
 #include "stm32l4xx_ll_crs.h"
 #include "stm32l4xx_ll_rcc.h"
@@ -89,6 +90,7 @@ void Error_Handler(void);
 #define IMU_MOSI_GPIO_Port GPIOA
 #define ANKLE_IMU_INT_Pin LL_GPIO_PIN_8
 #define ANKLE_IMU_INT_GPIO_Port GPIOA
+#define ANKLE_IMU_INT_EXTI_IRQn EXTI9_5_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

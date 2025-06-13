@@ -4,7 +4,7 @@
 *
 * NOTES (check this??)
 * 1. Unless otherwise specified, units are
-* 		- Accelerometer	= g's
+* 		- Accelerometer	= m/s^2
 * 		- Angle			= degrees
 * 		- Current		= Amperes
 * 		- Gyroscope		= degrees/second
@@ -15,7 +15,6 @@
 *******************************************************************************/
 
 #include "bno08x_spi_hal.h"
-#include "euler.h"
 #include "prosthesis_v2.h"
 #include <stdint.h>
 #include <string.h>
@@ -138,6 +137,7 @@ static uint16_t ReadLoadCell(ADC_TypeDef *ADCx)
 
 static void ProcessInputs(void)
 {
+	// Get accel and gyro data
 	for(uint8_t i = 0; i < 6; i++)
 		CM_IMU_Data.array[i] = BNO08x_IMU_Data[i];
 

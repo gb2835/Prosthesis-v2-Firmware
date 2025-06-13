@@ -1,6 +1,5 @@
 Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
- ../Drivers/BNO08x/bno08x_spi_hal.h ../Drivers/SH2/euler.h \
- ../Core/Inc/prosthesis_v2.h \
+ ../Drivers/BNO08x/bno08x_spi_hal.h ../Core/Inc/prosthesis_v2.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h \
@@ -20,9 +19,6 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_cortex.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_adc.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_adc_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_exti.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ex.h \
@@ -38,7 +34,6 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
  ../Core/Inc/utilities.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h
 ../Drivers/BNO08x/bno08x_spi_hal.h:
-../Drivers/SH2/euler.h:
 ../Core/Inc/prosthesis_v2.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h:
@@ -59,9 +54,6 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_cortex.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_adc.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_adc_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_exti.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ex.h:
