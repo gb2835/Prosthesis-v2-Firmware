@@ -104,9 +104,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_LPTIM2_Init();
   MX_SPI1_Init();
   MX_TIM2_Init();
+  MX_LPTIM2_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
@@ -156,6 +156,7 @@ int main(void)
   {
 	  if(isProsthesisControlRequired)
 	  {
+		  LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 		  RunProsthesisControl();
 		  isProsthesisControlRequired = 0;
 	  }

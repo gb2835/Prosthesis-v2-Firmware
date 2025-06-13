@@ -77,7 +77,7 @@ static IMU_Data_t CM_IMU_Data;
 static LoadCell_t CM_LoadCell;
 
 static void GetInputs(void);
-static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
+//static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
 
 
@@ -123,17 +123,17 @@ static void GetInputs(void)
 
 	BNO08x_ReadSensors();
 
-	CM_LoadCell.Raw.bot[0] = ReadLoadCell(ADC1);
-	CM_LoadCell.Raw.top[0] = ReadLoadCell(ADC2);
+//	CM_LoadCell.Raw.bot[0] = ReadLoadCell(ADC1);
+//	CM_LoadCell.Raw.top[0] = ReadLoadCell(ADC2);
 }
 
-static uint16_t ReadLoadCell(ADC_TypeDef *ADCx)
-{
-	LL_ADC_REG_StartConversion(ADCx);
-	while (!LL_ADC_IsActiveFlag_EOC(ADCx));
-	uint16_t data = LL_ADC_REG_ReadConversionData12(ADCx);
-	return data;
-}
+//static uint16_t ReadLoadCell(ADC_TypeDef *ADCx)
+//{
+//	LL_ADC_REG_StartConversion(ADCx);
+//	while (!LL_ADC_IsActiveFlag_EOC(ADCx));
+//	uint16_t data = LL_ADC_REG_ReadConversionData12(ADCx);
+//	return data;
+//}
 
 static void ProcessInputs(void)
 {
@@ -168,7 +168,7 @@ static void ProcessInputs(void)
 	}
 	else
 	{
-		// 2nd order low-pass Butterworth (fc = 20 Hz)
+		// 2nd order low-pass Butterworth (fc = 20 Hz)  CHANGE THIS TO 500 HZ!!!??
 		CM_LoadCell.Filtered.bot[0] =   1.6556 * CM_LoadCell.Filtered.bot[1] - 0.7068 * CM_LoadCell.Filtered.bot[2]
 									  + 0.0128 * CM_LoadCell.Raw.bot[0] + 0.0256 * CM_LoadCell.Raw.bot[1] + 0.0128 * CM_LoadCell.Raw.bot[2];
 		CM_LoadCell.Filtered.top[0] =   1.6556 * CM_LoadCell.Filtered.top[1] - 0.7068 * CM_LoadCell.Filtered.top[2]
