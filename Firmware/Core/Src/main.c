@@ -128,8 +128,8 @@ int main(void)
 	Prosthesis_Init.Side = Left;
 
   	AKxx_x_Init_t Motor_Init[AKXX_X_NUMBER_OF_DEVICES];
-  	Motor_Init[0].canId = 1;
-  	Motor_Init[0].Motor = AK80_9;
+  	Motor_Init[AnkleIndex].canId = AnkleMotorCAN_ID;
+  	Motor_Init[AnkleIndex].Motor = AK80_9;
 
   	// how to use both fifos??
 	CAN_FilterTypeDef CAN1_FilterInit;
@@ -147,8 +147,6 @@ int main(void)
 /*******************************************************************************
 * USER ADDED INITIALIZATIONS
 *******************************************************************************/
-
-//	LL_SYSTICK_EnableIT(); do i actually need this??
 
 	LL_LPTIM_Enable(LPTIM2);
 	LL_LPTIM_EnableIT_ARRM(LPTIM2);

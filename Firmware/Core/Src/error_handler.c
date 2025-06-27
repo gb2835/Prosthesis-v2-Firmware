@@ -8,8 +8,6 @@
 *******************************************************************************/
 
 #include "error_handler.h"
-#include "main.h" //??
-#include "prosthesis_v2.h"
 
 static LED_Code_e CM_ledCode = NoError;
 
@@ -34,9 +32,6 @@ void ErrorHandler_Pv2(LED_Code_e code)
 	CM_ledCode = code;
 	ShutdownMotors();
 }
-
-
-//shut motors off??
 
 
 /*******************************************************************************

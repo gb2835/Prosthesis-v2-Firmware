@@ -1,0 +1,6 @@
+TITLE: SH2 Drivers for CEVA BNO085 and BNO086 IMU
+
+NOTES
+1. These drivers are directly from:
+	https://github.com/ceva-dsp/sh2-demo-nucleo/blob/main/app/demo_app.c
+2. No changes were made to these files.
