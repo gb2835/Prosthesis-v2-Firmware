@@ -88,6 +88,12 @@ void Error_Handler(void);
 #define IMU_MISO_GPIO_Port GPIOA
 #define IMU_MOSI_Pin GPIO_PIN_7
 #define IMU_MOSI_GPIO_Port GPIOA
+#define LED_GREEN_Pin GPIO_PIN_0
+#define LED_GREEN_GPIO_Port GPIOB
+#define LED_BLUE_Pin GPIO_PIN_1
+#define LED_BLUE_GPIO_Port GPIOB
+#define LED_RED_Pin GPIO_PIN_2
+#define LED_RED_GPIO_Port GPIOB
 #define ANKLE_IMU_INT_Pin GPIO_PIN_8
 #define ANKLE_IMU_INT_GPIO_Port GPIOA
 #define ANKLE_IMU_INT_EXTI_IRQn EXTI9_5_IRQn

@@ -11,6 +11,12 @@
 
 typedef enum
 {
+	AnkleIndex,
+	KneeIndex
+} DeviceIndex_e;
+
+typedef enum
+{
 	Ankle,
 	Combined,
 	Knee
@@ -22,6 +28,14 @@ typedef enum
 	Right
 } Side_e;
 
+typedef enum
+{
+	None,
+	ReadOnly,
+	ZeroMotorPosition,
+	ImpedanceControl
+} TestProgram_e;
+
 typedef struct
 {
 	Side_e Side;
@@ -31,7 +45,9 @@ typedef struct
 extern uint8_t isProsthesisControlRequired;
 
 void InitProsthesisControl(Prosthesis_Init_t *Device_Init);
+void RequireTestProgram(TestProgram_e option);
 void RunProsthesisControl(void);
+void ShutdownMotors(void);
 
 
 /*******************************************************************************

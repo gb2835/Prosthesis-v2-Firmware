@@ -1,0 +1,3 @@
+../Core/Src/error_handler.c:16:6:ErrorHandler_AKxx_x	16	static
+../Core/Src/error_handler.c:26:6:ErrorHandler_BNO08x	8	static
+../Core/Src/error_handler.c:32:6:ErrorHandler_Pv2	16	static
