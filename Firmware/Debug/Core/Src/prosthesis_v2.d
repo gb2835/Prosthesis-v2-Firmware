@@ -1,6 +1,5 @@
 Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
- ../Drivers/BNO08x/bno08x_spi_hal.h ../Core/Inc/prosthesis_v2.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h \
+ ../Drivers/AKxx-x/akxx-x.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h \
  ../Drivers/CMSIS/Include/core_cm4.h \
@@ -19,6 +18,7 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_cortex.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_can.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_exti.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ex.h \
@@ -31,11 +31,23 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
- ../Core/Inc/utilities.h \
+ ../Drivers/BNO08x/bno08x_spi_hal.h ../Core/Inc/error_handler.h \
+ ../Core/Inc/prosthesis_v2.h ../Core/Inc/main.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_crs.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_rcc.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_system.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_exti.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_cortex.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_utils.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_pwr.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_dma.h \
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_gpio.h \
+ ../Core/Inc/prosthesis_v2.h ../Core/Inc/utilities.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h
-../Drivers/BNO08x/bno08x_spi_hal.h:
-../Core/Inc/prosthesis_v2.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h:
+../Drivers/AKxx-x/akxx-x.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h:
 ../Drivers/CMSIS/Include/core_cm4.h:
@@ -54,6 +66,7 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_cortex.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_can.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_exti.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ex.h:
@@ -66,5 +79,22 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h:
+../Drivers/BNO08x/bno08x_spi_hal.h:
+../Core/Inc/error_handler.h:
+../Core/Inc/prosthesis_v2.h:
+../Core/Inc/main.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_crs.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_rcc.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_system.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_exti.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_cortex.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_utils.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_pwr.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_dma.h:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_gpio.h:
+../Core/Inc/prosthesis_v2.h:
 ../Core/Inc/utilities.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h:

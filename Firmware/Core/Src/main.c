@@ -4,12 +4,14 @@
 *
 * TITLE: Prosthesis v2 Firmware
 *
-* NOTES (check this??)
-* 1. The below lines can be used to measure on oscilloscope (#include main.h may need to be added to certain files):
+* NOTES
+* 1. IMPORTANT: Motor position must be re-zeroed whenever the motor is reassembled into the device.
+*    A test program is provided to zero the motors. ??
+* 2. The below lines can be used to measure on oscilloscope (#include main.h may need to be added to certain files):
 *		- LL_GPIO_SetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 *		- LL_GPIO_ResetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 *		- LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
-* 2. Search -> File on "* USER ADDED " will show code added to MX auto-generated files.
+* 3. Search -> File on "* USER ADDED " will show code added to MX auto-generated files.
 *
 *******************************************************************************/
 
@@ -18,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "can.h"
 #include "lptim.h"
 #include "spi.h"
 #include "tim.h"
@@ -59,10 +62,12 @@ void SystemClock_Config(void);
 
 
 /*******************************************************************************
-* USER ADDED MAIN.C
+* USER ADDED PRELIMINARIES
 *******************************************************************************/
 
+#include "akxx-x.h"
 #include "bno08x_spi_hal.h"
+#include "error_handler.h"
 #include "prosthesis_v2.h"
 
 #define LPTIM2_PERIOD	0x3F	// Timer frequency = timer clock frequency / (prescaler * (period + 1))
@@ -105,6 +110,7 @@ int main(void)
   MX_LPTIM2_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
+  MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -121,12 +127,28 @@ int main(void)
 	Prosthesis_Init.Joint = Combined;
 	Prosthesis_Init.Side = Left;
 
+  	AKxx_x_Init_t Motor_Init[AKXX_X_NUMBER_OF_DEVICES];
+  	Motor_Init[0].canId = 1;
+  	Motor_Init[0].Motor = AK80_9;
+
+  	// how to use both fifos??
+	CAN_FilterTypeDef CAN1_FilterInit;
+	CAN1_FilterInit.FilterActivation = ENABLE;
+	CAN1_FilterInit.FilterBank = 0; //??
+	CAN1_FilterInit.FilterFIFOAssignment = CAN_RX_FIFO0;
+	CAN1_FilterInit.FilterIdHigh = 0x0000;
+	CAN1_FilterInit.FilterIdLow = 0x0000;
+	CAN1_FilterInit.FilterMaskIdHigh = 0x0000;
+	CAN1_FilterInit.FilterMaskIdLow = 0x0000;
+	CAN1_FilterInit.FilterMode = CAN_FILTERMODE_IDMASK;
+	CAN1_FilterInit.FilterScale = CAN_FILTERSCALE_32BIT;//??
+
 
 /*******************************************************************************
 * USER ADDED INITIALIZATIONS
 *******************************************************************************/
 
-//	LL_SYSTICK_EnableIT(); do i actually need this?
+//	LL_SYSTICK_EnableIT(); do i actually need this??
 
 	LL_LPTIM_Enable(LPTIM2);
 	LL_LPTIM_EnableIT_ARRM(LPTIM2);
@@ -136,8 +158,19 @@ int main(void)
 	LL_ADC_Enable(ADC1);
 	LL_ADC_Enable(ADC2);
 
-  	if(BNO08x_Init(0))
-  		Error_Handler();
+	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit))
+		ErrorHandler_Pv2(CAN_Error);
+	if(HAL_CAN_Start(&hcan1))
+		ErrorHandler_Pv2(CAN_Error);
+
+  	if(BNO08x_Init())
+  		ErrorHandler_BNO08x();
+
+	if(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
+		ErrorHandler_AKxx_x(AnkleIndex);
+
+	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
+		ErrorHandler_Pv2(CAN_Error);
 
 	InitProsthesisControl(&Prosthesis_Init);
 
@@ -146,16 +179,17 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
+	RequireTestProgram(ImpedanceControl);
+
 
 /*******************************************************************************
 * USER ADDED MAIN LOOP
 *******************************************************************************/
 
-  while (1)
+  while(1)
   {
 	  if(isProsthesisControlRequired)
 	  {
-		  LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 		  RunProsthesisControl();
 		  isProsthesisControlRequired = 0;
 	  }
@@ -181,14 +215,13 @@ void SystemClock_Config(void)
   {
   }
   LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1);
-  LL_RCC_HSI_Enable();
+  LL_RCC_HSE_Enable();
 
-   /* Wait till HSI is ready */
-  while(LL_RCC_HSI_IsReady() != 1)
+   /* Wait till HSE is ready */
+  while(LL_RCC_HSE_IsReady() != 1)
   {
 
   }
-  LL_RCC_HSI_SetCalibTrimming(16);
   LL_RCC_LSI_Enable();
 
    /* Wait till LSI is ready */
@@ -196,7 +229,7 @@ void SystemClock_Config(void)
   {
 
   }
-  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI, LL_RCC_PLLM_DIV_1, 10, LL_RCC_PLLR_DIV_2);
+  LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_3, 10, LL_RCC_PLLR_DIV_2);
   LL_RCC_PLL_EnableDomain_SYS();
   LL_RCC_PLL_Enable();
 

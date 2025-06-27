@@ -9,8 +9,6 @@
 
 #include <stdint.h>
 
-#define BNO08X_NUMBER_OF_DEVICES 1
-
 typedef enum
 {
 	BNO08x_NoError,
@@ -21,7 +19,7 @@ typedef enum
 extern float BNO08x_IMU_Data[10];
 extern uint8_t BNO08x_resetOccurred;
 
-BNO08x_Error_e BNO08x_Init(uint8_t deviceIndex);
+BNO08x_Error_e BNO08x_Init(void);
 BNO08x_Error_e BNO08x_StartReports(void);
 void BNO08x_ReadSensors(void);
 

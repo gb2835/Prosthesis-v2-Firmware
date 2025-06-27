@@ -6,7 +6,8 @@
 * 1. This driver is based on:
 *		https://github.com/ceva-dsp/sh2-demo-nucleo/blob/main/app/demo_app.c
 * 2. #define BNO08X_NUMBER_OF_DEVICES must be updated to (at least) the number of devices used.
-* 3. User may add their desired reports to BNO08x_StartReports() and ReadEvent().
+* 3. User may add their desired reports to StartReports() and ReadEvent().
+* 4. This driver is setup to work on SPI1.
 *
 *******************************************************************************/
 
@@ -31,6 +32,9 @@ uint8_t BNO08x_resetOccurred = 0;
 * PRIVATE DEFINTIONS
 *******************************************************************************/
 
+static uint8_t isInit = 0;
+
+static BNO08x_Error_e StartReports(void);
 static void EventHandler(void * cookie, sh2_AsyncEvent_t *pEvent);
 static void ReadEvent(void * cookie, sh2_SensorEvent_t * event, int16_t *data);
 
@@ -39,11 +43,8 @@ static void ReadEvent(void * cookie, sh2_SensorEvent_t * event, int16_t *data);
 * PUBLIC FUNCTIONS
 *******************************************************************************/
 
-BNO08x_Error_e BNO08x_Init(uint8_t deviceIndex)
+BNO08x_Error_e BNO08x_Init(void)
 {
-	if(deviceIndex + 1 > BNO08X_NUMBER_OF_DEVICES)
-		while(1);
-
 	sh2_Hal_t *pSh2Hal = 0;
 	pSh2Hal = sh2_hal_init();
 	int status = sh2_open(pSh2Hal, EventHandler, NULL);
@@ -52,12 +53,36 @@ BNO08x_Error_e BNO08x_Init(uint8_t deviceIndex)
 
 	sh2_setSensorCallback(ReadEvent, NULL); // incompatible??
 
-  	BNO08x_StartReports();
+  	if(StartReports())
+  		return BNO08x_InitError;
+
+  	isInit = 1;
 
 	return BNO08x_NoError;
 }
 
 BNO08x_Error_e BNO08x_StartReports(void)
+{
+	if(!isInit)
+		while(1);
+
+	return StartReports();
+}
+
+
+void BNO08x_ReadSensors(void)
+{
+	if(!isInit)
+		while(1);
+
+	sh2_service();
+}
+
+/*******************************************************************************
+* PRIVATE FUNCTIONS
+*******************************************************************************/
+
+static BNO08x_Error_e StartReports(void)
 {
     static const struct
 	{
@@ -83,16 +108,6 @@ BNO08x_Error_e BNO08x_StartReports(void)
 
     return BNO08x_NoError;
 }
-
-
-void BNO08x_ReadSensors(void)
-{
-	sh2_service();
-}
-
-/*******************************************************************************
-* PRIVATE FUNCTIONS
-*******************************************************************************/
 
 static void EventHandler(void * cookie, sh2_AsyncEvent_t *pEvent)
 {
