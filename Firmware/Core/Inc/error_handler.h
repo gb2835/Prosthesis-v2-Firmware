@@ -19,7 +19,7 @@ typedef enum
 	CAN_Error,
 	KneeIMU_Error,
 	KneeMotorError,
-	MotorError
+	MotorReadError
 } LED_Code_e;
 
 void ErrorHandler_AKxx_x(DeviceIndex_e deviceIndex);

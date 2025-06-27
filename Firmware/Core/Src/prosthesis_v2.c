@@ -88,11 +88,11 @@ typedef struct
 	float intoStanceThreshold;
 } LoadCell_t;
 
-static AKxx_x_ReadData_t RxData_Float[AKXX_X_NUMBER_OF_DEVICES];
-static AKxx_x_WriteData_t TxData_Float;
+static AKxx_x_ReadData_t MotorRxData[AKXX_X_NUMBER_OF_DEVICES];
+static AKxx_x_WriteData_t MotorTxData;
 static Prosthesis_Init_t Device;
-static TestProgram_e testProgram;
 
+static TestProgram_e testProgram = None;
 static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
@@ -155,7 +155,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	CM_LoadCell.intoStanceThreshold = 1300; //??
 	CM_LoadCell.outOfStanceThreshold = 1300 + 50; //??
 
-
 	if(testProgram != ZeroMotorPosition)
 	{
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
@@ -163,7 +162,7 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 				ErrorHandler_AKxx_x(AnkleIndex);
 	}
 
-	// setup led pins??
+	// led green??
 }
 
 void RequireTestProgram(TestProgram_e option)
@@ -199,6 +198,8 @@ void RunProsthesisControl(void)
 
 void ShutdownMotors(void)
 {
+	// led red??
+
 	while(1)
 	{
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
@@ -235,7 +236,7 @@ static uint16_t ReadLoadCell(ADC_TypeDef *ADCx)
 
 static void ProcessInputs(void)
 {
-	// Filter of load cells
+	// Filter load cells
 	if(isFirst)
 	{
 		CM_LoadCell.Raw.bot[2] = CM_LoadCell.Raw.bot[0];
@@ -290,16 +291,17 @@ static void RunStateMachine(void)
 
 static void ServiceMotor(DeviceIndex_e deviceIndex)
 {
-	CM_Ankle.MotorReadData.position = RxData_Float[deviceIndex].position * RAD_TO_DEG;
-	CM_Ankle.MotorReadData.speed = RxData_Float[deviceIndex].speed * RAD_TO_DEG;
-	CM_Ankle.MotorReadData.torque = RxData_Float[deviceIndex].torque;
+	CM_Ankle.MotorReadData.position = MotorRxData[deviceIndex].position * RAD_TO_DEG;
+	CM_Ankle.MotorReadData.speed = MotorRxData[deviceIndex].speed * RAD_TO_DEG;
+	CM_Ankle.MotorReadData.torque = MotorRxData[deviceIndex].torque;
 
 	if((testProgram == None) || (testProgram == ImpedanceControl))
 	{
-		memcpy(&TxData_Float, &CM_Ankle.ProsCtrl, sizeof(AKxx_x_WriteData_t));
+		MotorTxData.position = CM_Ankle.ProsCtrl.position * DEG_TO_RAD;
+		MotorTxData.speed = CM_Ankle.ProsCtrl.speed * DEG_TO_RAD;
+		MotorTxData.torque = CM_Ankle.ProsCtrl.torque;
 
-		TxData_Float.position = CM_Ankle.ProsCtrl.position * DEG_TO_RAD;
-		if(AKxx_x_WriteMotor(deviceIndex, &TxData_Float))
+		if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData))
 			ErrorHandler_AKxx_x(deviceIndex);
 	}
 	else
@@ -327,7 +329,7 @@ static void RunTestProgram(void)
 			{
 				if(AKxx_x_ZeroMotorPosition(AnkleIndex))
 					ErrorHandler_AKxx_x(AnkleIndex);
-				if(AKxx_x_PollMotorReadWithTimeout(&RxData_Float[AnkleIndex]))
+				if(AKxx_x_PollMotorReadWithTimeout(&MotorRxData[AnkleIndex]))
 					ErrorHandler_AKxx_x(AnkleIndex);
 			}
 
@@ -355,30 +357,30 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	AKxx_x_ReadData_t temp;
 	if(AKxx_x_ReadMotor(CAN_RX_FIFO0, &temp))
-		ErrorHandler_Pv2(MotorError);
+		ErrorHandler_Pv2(MotorReadError);
 
 	if(temp.canId == 1)
 	{
 		CM_Ankle.motorDataReceived = 1;
-		memcpy(&RxData_Float[0], &temp, sizeof(AKxx_x_ReadData_t));
+		memcpy(&MotorRxData[AnkleIndex], &temp, sizeof(AKxx_x_ReadData_t));
 	}
 	else
-		ErrorHandler_Pv2(MotorError);
+		ErrorHandler_Pv2(MotorReadError);
 }
 
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	AKxx_x_ReadData_t temp;
 	if(AKxx_x_ReadMotor(CAN_RX_FIFO1, &temp))
-		ErrorHandler_Pv2(MotorError);
+		ErrorHandler_Pv2(MotorReadError);
 
 	if(temp.canId == 1)
 	{
 		CM_Ankle.motorDataReceived = 1;
-		memcpy(&RxData_Float[0], &temp, sizeof(AKxx_x_ReadData_t));
+		memcpy(&MotorRxData[AnkleIndex], &temp, sizeof(AKxx_x_ReadData_t));
 	}
 	else
-		ErrorHandler_Pv2(MotorError);
+		ErrorHandler_Pv2(MotorReadError);
 }
 
 
