@@ -11,6 +11,12 @@
 
 typedef enum
 {
+	AnkleMotorCAN_ID = 1,
+	KneeMotorCAN_ID
+} CAN_ID_e;
+
+typedef enum
+{
 	AnkleIndex,
 	KneeIndex
 } DeviceIndex_e;

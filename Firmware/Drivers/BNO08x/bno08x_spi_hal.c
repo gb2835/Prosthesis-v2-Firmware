@@ -5,19 +5,19 @@
 * NOTES
 * 1. This driver is based on:
 *		https://github.com/ceva-dsp/sh2-demo-nucleo/blob/main/app/demo_app.c
-* 2. #define BNO08X_NUMBER_OF_DEVICES must be updated to (at least) the number of devices used.
-* 3. User may add their desired reports to StartReports() and ReadEvent().
-* 4. This driver is setup to work on SPI1.
+* 2. User may add their desired reports to StartReports() and ReadEvent().
+* 3. This driver is setup to work on SPI1.
 *
 *******************************************************************************/
 
 #include "bno08x_spi_hal.h"
 #include "spi_hal.h"
-#include <string.h>
 #include "euler.h"
 #include "sh2_err.h"
 #include "sh2_SensorValue.h"
 #include "sh2_util.h"
+
+#include <string.h>
 
 
 /*******************************************************************************
@@ -92,9 +92,9 @@ static BNO08x_Error_e StartReports(void)
 
     sensorConfig[] =
     {
-		{SH2_ACCELEROMETER, {.reportInterval_us = 2000}},			// Max interval = 500 Hz = 2000 us
-		{SH2_GYROSCOPE_CALIBRATED, {.reportInterval_us = 2500}},	// Max interval = 400 Hz = 2500 us
-        {SH2_GAME_ROTATION_VECTOR, {.reportInterval_us = 2500}},	// Max interval = 400 Hz = 2500 us
+		{SH2_ACCELEROMETER, {.reportInterval_us = 2000}},			// m/s^2, max interval = 500 Hz = 2000 us
+		{SH2_GYROSCOPE_CALIBRATED, {.reportInterval_us = 2500}},	// rad/s, max interval = 400 Hz = 2500 us
+        {SH2_GAME_ROTATION_VECTOR, {.reportInterval_us = 2500}},	// quaternions, max interval = 400 Hz = 2500 us
     };
 
     for (int n = 0; n < ARRAY_LEN(sensorConfig); n++)

@@ -1,9 +1,13 @@
-/*
- * spi_hal.c
- *
- *  Created on: Feb 2, 2025
- *      Author: brett
- */
+/*******************************************************************************
+*
+* TITLE: SPI Driver for CEVA BNO085 and BNO086 IMU with HAL
+*
+* NOTES
+* 1. This driver is directly from:
+*		https://github.com/ceva-dsp/sh2-demo-nucleo/blob/main/app/demo_app.c
+* 2. Only pin names were changed in the appropriate locations.
+*
+*******************************************************************************/
 
 
 #include "spi_hal.h"

@@ -7,8 +7,6 @@
 #ifndef INC_ERROR_HANDLER_H_
 #define INC_ERROR_HANDLER_H_
 
-#include "akxx-x.h"
-#include "bno08x_spi_hal.h"
 #include "prosthesis_v2.h"
 
 typedef enum

@@ -125,30 +125,27 @@ int main(void)
 
   	Prosthesis_Init_t Prosthesis_Init;
 	Prosthesis_Init.Joint = Combined;
-	Prosthesis_Init.Side = Left;
+	Prosthesis_Init.Side = Left; //??
 
   	AKxx_x_Init_t Motor_Init[AKXX_X_NUMBER_OF_DEVICES];
-  	Motor_Init[0].canId = 1;
-  	Motor_Init[0].Motor = AK80_9;
+  	Motor_Init[AnkleIndex].canId = AnkleMotorCAN_ID;
+  	Motor_Init[AnkleIndex].Motor = AK80_9;
 
-  	// how to use both fifos??
 	CAN_FilterTypeDef CAN1_FilterInit;
 	CAN1_FilterInit.FilterActivation = ENABLE;
-	CAN1_FilterInit.FilterBank = 0; //??
+	CAN1_FilterInit.FilterBank = 0;
 	CAN1_FilterInit.FilterFIFOAssignment = CAN_RX_FIFO0;
 	CAN1_FilterInit.FilterIdHigh = 0x0000;
 	CAN1_FilterInit.FilterIdLow = 0x0000;
 	CAN1_FilterInit.FilterMaskIdHigh = 0x0000;
 	CAN1_FilterInit.FilterMaskIdLow = 0x0000;
 	CAN1_FilterInit.FilterMode = CAN_FILTERMODE_IDMASK;
-	CAN1_FilterInit.FilterScale = CAN_FILTERSCALE_32BIT;//??
+	CAN1_FilterInit.FilterScale = CAN_FILTERSCALE_32BIT;
 
 
 /*******************************************************************************
 * USER ADDED INITIALIZATIONS
 *******************************************************************************/
-
-//	LL_SYSTICK_EnableIT(); do i actually need this??
 
 	LL_LPTIM_Enable(LPTIM2);
 	LL_LPTIM_EnableIT_ARRM(LPTIM2);
@@ -169,7 +166,7 @@ int main(void)
 	if(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
 		ErrorHandler_AKxx_x(AnkleIndex);
 
-	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
+	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
 		ErrorHandler_Pv2(CAN_Error);
 
 	InitProsthesisControl(&Prosthesis_Init);

@@ -59,7 +59,8 @@ AKxx_x_Error_e AKxx_x_Init(uint8_t deviceIndex, AKxx_x_Init_t *Device_Init)
 
 	memcpy(&Device[deviceIndex], Device_Init, sizeof(AKxx_x_Init_t));
 
-	HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING);	// Polling is used for initialization
+	if(HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING))	// Polling is used for initialization
+		return AKxx_x_InitError;
 
 	if(EnterMotorCtrlMode(deviceIndex))
 		return AKxx_x_InitError;
@@ -306,8 +307,8 @@ static void UnpackData(uint8_t *rxData_uint, AKxx_x_ReadData_t *RxData_Float)
 
 static float UintToFloat(uint16_t x_uint, float xMin_float, float xMax_float, uint8_t nBits)
 {
-	float span = xMax_float - xMin_float;
 	float offset = xMin_float;
+	float span = xMax_float - xMin_float;
 	float x_float;
 	if(nBits == 12)
 		x_float = (((float)x_uint) * span / 4095.0f) + offset;
@@ -324,8 +325,8 @@ static uint16_t FloatToUint(float x_float, float xMin_float, float xMax_float, u
 	if(x_float > xMax_float)
 		x_float = xMax_float;
 
-	float span = xMax_float - xMin_float;
 	float offset = xMin_float;
+	float span = xMax_float - xMin_float;
 	uint16_t x_uint;
 	if(nBits == 12)
 		x_uint = (uint16_t)((x_float - offset) * 4095.0f / span);
