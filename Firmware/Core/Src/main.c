@@ -70,6 +70,8 @@ void SystemClock_Config(void);
 #include "error_handler.h"
 #include "prosthesis_v2.h"
 
+#include <string.h>
+
 #define LPTIM2_PERIOD	0x3F	// Timer frequency = timer clock frequency / (prescaler * (period + 1))
 
 
@@ -123,24 +125,32 @@ int main(void)
 * USER ADDED DEFINITIONS
 *******************************************************************************/
 
-  	Prosthesis_Init_t Prosthesis_Init;
-	Prosthesis_Init.Joint = Combined;
-	Prosthesis_Init.Side = Left; //??
-
   	AKxx_x_Init_t Motor_Init[AKXX_X_NUMBER_OF_DEVICES];
   	Motor_Init[AnkleIndex].canId = AnkleMotorCAN_ID;
   	Motor_Init[AnkleIndex].Motor = AK80_9;
 
-	CAN_FilterTypeDef CAN1_FilterInit;
-	CAN1_FilterInit.FilterActivation = ENABLE;
-	CAN1_FilterInit.FilterBank = 0;
-	CAN1_FilterInit.FilterFIFOAssignment = CAN_RX_FIFO0;
-	CAN1_FilterInit.FilterIdHigh = 0x0000;
-	CAN1_FilterInit.FilterIdLow = 0x0000;
-	CAN1_FilterInit.FilterMaskIdHigh = 0x0000;
-	CAN1_FilterInit.FilterMaskIdLow = 0x0000;
-	CAN1_FilterInit.FilterMode = CAN_FILTERMODE_IDMASK;
-	CAN1_FilterInit.FilterScale = CAN_FILTERSCALE_32BIT;
+	CAN_FilterTypeDef CAN1_FilterInit[AKXX_X_NUMBER_OF_DEVICES];
+	CAN1_FilterInit[AnkleIndex].FilterActivation = ENABLE;
+	CAN1_FilterInit[AnkleIndex].FilterBank = 0U;
+	CAN1_FilterInit[AnkleIndex].FilterFIFOAssignment = CAN_RX_FIFO0;
+	CAN1_FilterInit[AnkleIndex].FilterIdHigh = 1U << 5U;
+	CAN1_FilterInit[AnkleIndex].FilterIdLow = 1U << 5U;
+	CAN1_FilterInit[AnkleIndex].FilterMaskIdHigh = 1U << 5U;
+	CAN1_FilterInit[AnkleIndex].FilterMaskIdLow = 1U << 5U;
+	CAN1_FilterInit[AnkleIndex].FilterMode = CAN_FILTERMODE_IDLIST;
+	CAN1_FilterInit[AnkleIndex].FilterScale = CAN_FILTERSCALE_16BIT;
+
+	memcpy(&CAN1_FilterInit[KneeIndex], &CAN1_FilterInit[AnkleIndex], sizeof(CAN_FilterTypeDef));
+	CAN1_FilterInit[KneeIndex].FilterBank = 1;
+	CAN1_FilterInit[KneeIndex].FilterFIFOAssignment = CAN_RX_FIFO1;
+	CAN1_FilterInit[KneeIndex].FilterIdHigh = KneeMotorCAN_ID << 5;
+	CAN1_FilterInit[KneeIndex].FilterIdLow = KneeMotorCAN_ID << 5;
+	CAN1_FilterInit[KneeIndex].FilterMaskIdHigh = KneeMotorCAN_ID << 5;
+	CAN1_FilterInit[KneeIndex].FilterMaskIdLow = KneeMotorCAN_ID << 5;
+
+	Prosthesis_Init_t Prosthesis_Init;
+	Prosthesis_Init.Joint = Ankle;
+	Prosthesis_Init.Side = Right;
 
 
 /*******************************************************************************
@@ -155,18 +165,23 @@ int main(void)
 	LL_ADC_Enable(ADC1);
 	LL_ADC_Enable(ADC2);
 
-	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit))
+	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[AnkleIndex]))
+		ErrorHandler_Pv2(CAN_Error);
+	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[KneeIndex]))
 		ErrorHandler_Pv2(CAN_Error);
 	if(HAL_CAN_Start(&hcan1))
 		ErrorHandler_Pv2(CAN_Error);
 
-  	if(BNO08x_Init())
-  		ErrorHandler_BNO08x();
+	if((Prosthesis_Init.Joint == Ankle) || (Prosthesis_Init.Joint == Combined))
+	{
+	  	if(BNO08x_Init()) // move this to knee??
+	  		ErrorHandler_BNO08x();
 
-	if(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
-		ErrorHandler_AKxx_x(AnkleIndex);
+		if(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
+			ErrorHandler_AKxx_x(AnkleIndex);
+	}
 
-	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
 		ErrorHandler_Pv2(CAN_Error);
 
 	InitProsthesisControl(&Prosthesis_Init);

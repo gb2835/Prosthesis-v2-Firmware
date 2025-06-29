@@ -44,8 +44,8 @@ typedef enum
 
 typedef struct
 {
-	Side_e Side;
 	Joint_e Joint;
+	Side_e Side;
 } Prosthesis_Init_t;
 
 extern uint8_t isProsthesisControlRequired;
