@@ -65,7 +65,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init);
 void RequireTestProgram(TestProgram_e option);
 void RunProsthesisControl(void);
 void ErrorHandler(Error_e error);
-void ShutdownMotors(void);
 
 
 /*******************************************************************************

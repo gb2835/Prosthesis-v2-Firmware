@@ -226,13 +226,9 @@ void RunProsthesisControl(void)
 
 void ErrorHandler(Error_e error)
 {
-	CM_ledCode = error;
-	ShutdownMotors();
-}
-
-void ShutdownMotors(void)
-{
 	ActivateLED(Red);
+
+	CM_ledCode = error;
 
 	while(1)
 	{
