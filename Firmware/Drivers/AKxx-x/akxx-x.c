@@ -7,13 +7,15 @@
 *		- CubeMars AK Series Actuator Driver Manual
 *			- Version: 1.0.9
 * 2. Unless otherwise specified, units are
-* 		- Position	= radians
-* 		- Speed		= rad/s
-* 		- Torque	= Nm
+* 		- Position		= radians
+* 		- Speed			= rad/s
+* 		- Torque		= Nm
+* 		- Temperature	= Celcius
 * 3. #define AKK_X_NUMBER_OF_DEVICES must be updated to (at least) the number of devices used.
 * 4. Polling is used for initialization.
 *    If interrupts are desired then HAL_CAN_ActivateNotification() must be called after AKxx_x_Init() in user application.
 * 5. AKxx-x motors require 1 Mbit/s CAN rate.
+* 6. Only MIT mode is supported (Servo mode not present here).
 *
 *******************************************************************************/
 
@@ -206,6 +208,27 @@ AKxx_x_Error_e AKxx_x_PollTxMessagePendingWithTimeout(uint32_t txMailbox)
 	return AKxx_x_NoError;
 }
 
+AKxx_x_ErrorCode_e AKxx_x_DecodeError(uint8_t error)
+{
+	switch(error)
+	{
+	case 1:
+		return AKxx_x_OverTemperatureFault;
+	case 2:
+		return AKxx_x_OverCurrentFault;
+	case 3:
+		return AKxx_x_OverVoltageFault;
+	case 4:
+		return AKxx_x_UnderVoltageFault;
+	case 5:
+		return AKxx_x_EncoderFault;
+	case 6:
+		return AKxx_x_PhaseCurrentUnbalanceFault;
+	}
+
+	return AKxx_x_NoFault;
+}
+
 
 /*******************************************************************************
 * PRIVATE FUNCTIONS
@@ -287,18 +310,19 @@ static void PackData(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_Float, uint
 
 static void UnpackData(uint8_t *rxData_uint, AKxx_x_ReadData_t *RxData_Float)
 {
-	uint8_t canId = rxData_uint[0];
+	RxData_Float->canId = rxData_uint[0];
+
 	uint16_t position = (rxData_uint[1] << 8) | rxData_uint[2];
 	uint16_t speed = (rxData_uint[3] << 4) | (rxData_uint[4] >> 4);
 	uint16_t torque = ((rxData_uint[4] & 0x0F) << 8) | rxData_uint[5];
 
+	RxData_Float->temperature = rxData_uint[6];
+	RxData_Float->error = rxData_uint[7];
+
 	uint8_t i;
 	for(i = 0; i < AKXX_X_NUMBER_OF_DEVICES; i++)
-		if(Device[i].InitVals.canId == canId)
-		{
-			RxData_Float->canId = canId;
+		if(Device[i].InitVals.canId == RxData_Float->canId)
 			break;
-		}
 
 	RxData_Float->position = UintToFloat(position, -12.5, 12.5, 16);
 	RxData_Float->speed = UintToFloat(speed, Device[i].speedMin, Device[i].speedMax, 12);

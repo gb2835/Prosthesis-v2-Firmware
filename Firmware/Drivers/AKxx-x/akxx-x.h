@@ -27,6 +27,17 @@ typedef enum
 
 typedef enum
 {
+	AKxx_x_NoFault,
+	AKxx_x_OverTemperatureFault,
+	AKxx_x_OverCurrentFault,
+	AKxx_x_OverVoltageFault,
+	AKxx_x_UnderVoltageFault,
+	AKxx_x_EncoderFault,
+	AKxx_x_PhaseCurrentUnbalanceFault
+} AKxx_x_ErrorCode_e;
+
+typedef enum
+{
 	AK70_10,
 	AK80_9
 } AKxx_x_Motor_e;
@@ -37,6 +48,8 @@ typedef struct
 	float position;
 	float speed;
 	float torque;
+	int8_t temperature;
+	uint8_t error;
 } AKxx_x_ReadData_t;
 
 typedef struct
@@ -64,6 +77,7 @@ AKxx_x_Error_e AKxx_x_ExitMotorCtrlMode(uint8_t canId);
 AKxx_x_Error_e AKxx_x_ZeroMotorPosition(uint8_t deviceIndex);
 AKxx_x_Error_e AKxx_x_PollMotorReadWithTimeout(AKxx_x_ReadData_t *RxData_Float);
 AKxx_x_Error_e AKxx_x_PollTxMessagePendingWithTimeout(uint32_t txMailbox);
+AKxx_x_ErrorCode_e AKxx_x_DecodeError(uint8_t error);
 
 
 /*******************************************************************************

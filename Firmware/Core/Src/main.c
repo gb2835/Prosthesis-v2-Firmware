@@ -5,13 +5,11 @@
 * TITLE: Prosthesis v2 Firmware
 *
 * NOTES
-* 1. IMPORTANT: Motor position must be re-zeroed whenever the motor is reassembled into the device.
-*    A test program is provided to zero the motors. ??
-* 2. The below lines can be used to measure on oscilloscope (#include main.h may need to be added to certain files):
+* 1. The below lines can be used to measure on oscilloscope (#include main.h may need to be added to certain files):
 *		- LL_GPIO_SetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 *		- LL_GPIO_ResetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 *		- LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
-* 3. Search -> File on "* USER ADDED " will show code added to MX auto-generated files.
+* 2. Search -> File on "* USER ADDED " will show code added to MX auto-generated files.
 *
 *******************************************************************************/
 
@@ -67,7 +65,6 @@ void SystemClock_Config(void);
 
 #include "akxx-x.h"
 #include "bno08x_spi_hal.h"
-#include "error_handler.h"
 #include "prosthesis_v2.h"
 
 #include <string.h>
@@ -131,12 +128,12 @@ int main(void)
 
 	CAN_FilterTypeDef CAN1_FilterInit[AKXX_X_NUMBER_OF_DEVICES];
 	CAN1_FilterInit[AnkleIndex].FilterActivation = ENABLE;
-	CAN1_FilterInit[AnkleIndex].FilterBank = 0U;
+	CAN1_FilterInit[AnkleIndex].FilterBank = 0;
 	CAN1_FilterInit[AnkleIndex].FilterFIFOAssignment = CAN_RX_FIFO0;
-	CAN1_FilterInit[AnkleIndex].FilterIdHigh = 1U << 5U;
-	CAN1_FilterInit[AnkleIndex].FilterIdLow = 1U << 5U;
-	CAN1_FilterInit[AnkleIndex].FilterMaskIdHigh = 1U << 5U;
-	CAN1_FilterInit[AnkleIndex].FilterMaskIdLow = 1U << 5U;
+	CAN1_FilterInit[AnkleIndex].FilterIdHigh = AnkleMotorCAN_ID << 5;
+	CAN1_FilterInit[AnkleIndex].FilterIdLow = AnkleMotorCAN_ID << 5;
+	CAN1_FilterInit[AnkleIndex].FilterMaskIdHigh = AnkleMotorCAN_ID << 5;
+	CAN1_FilterInit[AnkleIndex].FilterMaskIdLow = AnkleMotorCAN_ID << 5;
 	CAN1_FilterInit[AnkleIndex].FilterMode = CAN_FILTERMODE_IDLIST;
 	CAN1_FilterInit[AnkleIndex].FilterScale = CAN_FILTERSCALE_16BIT;
 
@@ -166,23 +163,23 @@ int main(void)
 	LL_ADC_Enable(ADC2);
 
 	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[AnkleIndex]))
-		ErrorHandler_Pv2(CAN_Error);
+		ErrorHandler(CAN_Error);
 	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[KneeIndex]))
-		ErrorHandler_Pv2(CAN_Error);
+		ErrorHandler(CAN_Error);
 	if(HAL_CAN_Start(&hcan1))
-		ErrorHandler_Pv2(CAN_Error);
+		ErrorHandler(CAN_Error);
 
 	if((Prosthesis_Init.Joint == Ankle) || (Prosthesis_Init.Joint == Combined))
 	{
 	  	if(BNO08x_Init()) // move this to knee??
-	  		ErrorHandler_BNO08x();
+	  		ErrorHandler(AnkleIMU_Error);
 
 		if(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
-			ErrorHandler_AKxx_x(AnkleIndex);
+			ErrorHandler(AnkleMotorError);
 	}
 
 	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
-		ErrorHandler_Pv2(CAN_Error);
+		ErrorHandler(CAN_Error);
 
 	InitProsthesisControl(&Prosthesis_Init);
 

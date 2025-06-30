@@ -1,6 +1,5 @@
 "./Core/Src/adc.o"
 "./Core/Src/can.o"
-"./Core/Src/error_handler.o"
 "./Core/Src/gpio.o"
 "./Core/Src/lptim.o"
 "./Core/Src/main.o"

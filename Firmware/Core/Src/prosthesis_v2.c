@@ -3,9 +3,7 @@
 * TITLE: Application for Prosthesis v2
 *
 * NOTES
-* 1. IMPORTANT: Motor position must be re-zeroed whenever the motor is reassembled into the device.
-*    A test program is provided to zero the motors. ??
-* 2. Unless otherwise specified, units are
+* 1. Unless otherwise specified, units are
 * 		- Accelerometer	= m/s^2
 * 		- Angle			= degrees
 * 		- Gyroscope		= degrees/second
@@ -17,7 +15,6 @@
 
 #include "akxx-x.h"
 #include "bno08x_spi_hal.h"
-#include "error_handler.h"
 #include "main.h"
 #include "prosthesis_v2.h"
 #include "utilities.h"
@@ -38,7 +35,8 @@ uint8_t isProsthesisControlRequired = 0;
 * PRIVATE DEFINITIONS
 *******************************************************************************/
 
-#define ANKLE_GEAR_RATIO	1 / 1
+#define ANKLE_GEAR_RATIO	1.0f / 1.0f // 90.0f / 15.0f??
+#define KNEE_GEAR_RATIO		1.0f / 1.0f // 70.0f / 16.0f??
 #define DEG_TO_RAD			3.1416f / 180.0f
 #define RAD_TO_DEG			180.0f / 3.1416f
 
@@ -61,19 +59,15 @@ typedef enum
 
 typedef union
 {
-	float array[9];
-	struct
-	{
-		float ax;
-		float ay;
-		float az;
-		float gx;
-		float gy;
-		float gz;
-		float yaw;
-		float pitch;
-		float roll;
-	} Struct;
+	float ax;
+	float ay;
+	float az;
+	float gx;
+	float gy;
+	float gz;
+	float yaw;
+	float pitch;
+	float roll;
 } AnkleIMU_Data_t;
 
 typedef struct
@@ -122,6 +116,7 @@ static int16_t CM_state_speeds;
 static LoadCell_t CM_LoadCell;
 static uint16_t CM_state_loadCells;
 
+static Error_e CM_ledCode = NoError;
 static float CM_footSpeed = 0.0f;
 
 static void GetInputs(void);
@@ -130,7 +125,7 @@ static void ProcessInputs(void);
 static void RunStateMachine(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
 static void RunTestProgram(void);
-void ActivateLED(LED_Color_e color);
+static void ActivateLED(LED_Color_e color);
 
 
 /*******************************************************************************
@@ -183,7 +178,7 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	{
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			if(AKxx_x_EnterMotorCtrlMode(AnkleIndex))
-				ErrorHandler_AKxx_x(AnkleIndex);
+				ErrorHandler(AnkleMotorError);
 	}
 
 	ActivateLED(Blue);
@@ -206,11 +201,18 @@ void RunProsthesisControl(void)
 
 	RunStateMachine();
 
+	static uint8_t missedAnkleMotorCalls = 0;
 	if(CM_AnkleJoint.motorDataReceived)
 	{
+		missedAnkleMotorCalls = 0;
 		CM_AnkleJoint.motorDataReceived = 0;
 		ServiceMotor(AnkleIndex);
 	}
+	else
+		missedAnkleMotorCalls++;
+
+	if(missedAnkleMotorCalls >= 5)
+		ErrorHandler(AnkleMotorError);
 
 	// Check for first and second executions, needed for load cell filter
 	if(isFirst)
@@ -220,6 +222,12 @@ void RunProsthesisControl(void)
 	}
 	else if(isSecond)
 		isSecond = 0;
+}
+
+void ErrorHandler(Error_e error)
+{
+	CM_ledCode = error;
+	ShutdownMotors();
 }
 
 void ShutdownMotors(void)
@@ -249,7 +257,7 @@ static void GetInputs(void)
 		{
 			BNO08x_resetOccurred = 0;
 			if(BNO08x_StartReports())
-				ErrorHandler_BNO08x();
+				ErrorHandler(AnkleIMU_Error);
 		}
 
 		BNO08x_ReadSensors();
@@ -306,23 +314,23 @@ static void ProcessInputs(void)
 	{
 		if(Device.Side == Left)
 		{
-			CM_AnkleJoint.IMU_Data.Struct.ax = -BNO08x_IMU_Data[0];
-			CM_AnkleJoint.IMU_Data.Struct.ay = BNO08x_IMU_Data[1];
-			CM_AnkleJoint.IMU_Data.Struct.az = -BNO08x_IMU_Data[2];
-			CM_AnkleJoint.IMU_Data.Struct.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
-			CM_AnkleJoint.IMU_Data.Struct.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
-			CM_AnkleJoint.IMU_Data.Struct.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
+			CM_AnkleJoint.IMU_Data.ax = -BNO08x_IMU_Data[0];
+			CM_AnkleJoint.IMU_Data.ay = BNO08x_IMU_Data[1];
+			CM_AnkleJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
+			CM_AnkleJoint.IMU_Data.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
+			CM_AnkleJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
+			CM_AnkleJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
 		}
 		else
 			memcpy(&CM_AnkleJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(AnkleIMU_Data_t));
 
 		float yaw, pitch, roll;
 		QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
-		CM_AnkleJoint.IMU_Data.Struct.yaw = yaw * RAD_TO_DEG;
-		CM_AnkleJoint.IMU_Data.Struct.pitch = pitch * RAD_TO_DEG;
-		CM_AnkleJoint.IMU_Data.Struct.roll = roll * RAD_TO_DEG;
+		CM_AnkleJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+		CM_AnkleJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
+		CM_AnkleJoint.IMU_Data.roll = roll * RAD_TO_DEG;
 
-		CM_footSpeed = CM_AnkleJoint.IMU_Data.Struct.gz + CM_AnkleJoint.MotorReadData.speed;
+		CM_footSpeed = CM_AnkleJoint.IMU_Data.gz + CM_AnkleJoint.MotorReadData.speed;
 	}
 }
 
@@ -461,26 +469,31 @@ static void RunStateMachine(void)
 
 static void ServiceMotor(DeviceIndex_e deviceIndex)
 {
-	ActivateLED(Green);
+	static uint8_t firstCall = 1;
+	if(firstCall)
+	{
+		firstCall = 0;
+		ActivateLED(Green);
+	}
 
 	if(deviceIndex == AnkleIndex)
 	{
-		CM_AnkleJoint.MotorReadData.position = MotorRxData[deviceIndex].position * RAD_TO_DEG;
-		CM_AnkleJoint.MotorReadData.speed = MotorRxData[deviceIndex].speed * RAD_TO_DEG;
-		CM_AnkleJoint.MotorReadData.torque = MotorRxData[deviceIndex].torque;
+		CM_AnkleJoint.MotorReadData.position = -MotorRxData[deviceIndex].position / ANKLE_GEAR_RATIO * RAD_TO_DEG;
+		CM_AnkleJoint.MotorReadData.speed = -MotorRxData[deviceIndex].speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
+		CM_AnkleJoint.MotorReadData.torque = -MotorRxData[deviceIndex].torque * ANKLE_GEAR_RATIO ;
 
 		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
-			MotorTxData.position = CM_AnkleJoint.ProsCtrl.position * ANKLE_GEAR_RATIO * DEG_TO_RAD;
+			MotorTxData.position = -CM_AnkleJoint.ProsCtrl.position * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp;
 
 			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData))
-				ErrorHandler_AKxx_x(deviceIndex);
+				ErrorHandler(AnkleMotorError);
 		}
 		else
 			if(AKxx_x_EnterMotorCtrlMode(deviceIndex))
-				ErrorHandler_AKxx_x(deviceIndex);
+				ErrorHandler(AnkleMotorError);
 	}
 }
 
@@ -498,22 +511,22 @@ static void RunTestProgram(void)
 		if(isFirst)
 		{
 			if(HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
-				ErrorHandler_Pv2(CAN_Error);
+				ErrorHandler(CAN_Error);
 
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			{
 				if(AKxx_x_ZeroMotorPosition(AnkleIndex))
-					ErrorHandler_AKxx_x(AnkleIndex);
+					ErrorHandler(AnkleMotorError);
 				if(AKxx_x_PollMotorReadWithTimeout(&MotorRxData[AnkleIndex]))
-					ErrorHandler_AKxx_x(AnkleIndex);
+					ErrorHandler(AnkleMotorError);
 			}
 
 			if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
-				ErrorHandler_Pv2(CAN_Error);
+				ErrorHandler(CAN_Error);
 
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 				if(AKxx_x_EnterMotorCtrlMode(AnkleIndex))
-					ErrorHandler_AKxx_x(AnkleIndex);
+					ErrorHandler(AnkleMotorError);
 		}
 
 		break;
@@ -523,7 +536,7 @@ static void RunTestProgram(void)
 	}
 }
 
-void ActivateLED(LED_Color_e color)
+static void ActivateLED(LED_Color_e color)
 {
 	if(color == Blue)
 	{
@@ -554,22 +567,27 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	AKxx_x_ReadData_t temp;
 	if(AKxx_x_ReadMotor(CAN_RX_FIFO0, &temp))
-		ErrorHandler_Pv2(MotorReadError);
+		ErrorHandler(MotorReadError);
 
 	if(temp.canId == AnkleMotorCAN_ID)
 	{
-		CM_AnkleJoint.motorDataReceived = 1;
-		memcpy(&MotorRxData[AnkleIndex], &temp, sizeof(AKxx_x_ReadData_t));
+		if(temp.error)
+			ErrorHandler(AnkleMotorError);
+		else
+		{
+			CM_AnkleJoint.motorDataReceived = 1;
+			memcpy(&MotorRxData[AnkleIndex], &temp, sizeof(AKxx_x_ReadData_t));
+		}
 	}
 	else
-		ErrorHandler_Pv2(MotorReadError);
+		ErrorHandler(MotorReadError);
 }
 
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	AKxx_x_ReadData_t temp;
 	if(AKxx_x_ReadMotor(CAN_RX_FIFO1, &temp))
-		ErrorHandler_Pv2(MotorReadError);
+		ErrorHandler(MotorReadError);
 
 	if(temp.canId == KneeMotorCAN_ID)
 	{
@@ -577,7 +595,7 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
 //		memcpy(&MotorRxData[AnkleIndex], &temp, sizeof(AKxx_x_ReadData_t));
 	}
 	else
-		ErrorHandler_Pv2(MotorReadError);
+		ErrorHandler(MotorReadError);
 }
 
 

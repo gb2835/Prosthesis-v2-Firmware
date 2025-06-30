@@ -23,6 +23,17 @@ typedef enum
 
 typedef enum
 {
+	NoError,
+	AnkleIMU_Error,
+	AnkleMotorError,
+	CAN_Error,
+	KneeIMU_Error,
+	KneeMotorError,
+	MotorReadError
+} Error_e;
+
+typedef enum
+{
 	Ankle,
 	Combined,
 	Knee
@@ -53,6 +64,7 @@ extern uint8_t isProsthesisControlRequired;
 void InitProsthesisControl(Prosthesis_Init_t *Device_Init);
 void RequireTestProgram(TestProgram_e option);
 void RunProsthesisControl(void);
+void ErrorHandler(Error_e error);
 void ShutdownMotors(void);
 
 
