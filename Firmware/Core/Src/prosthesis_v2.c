@@ -228,6 +228,8 @@ void ErrorHandler(Error_e error)
 {
 	ActivateLED(Red);
 
+	HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING);
+
 	CM_ledCode = error;
 
 	while(1)
@@ -474,6 +476,9 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 
 	if(deviceIndex == AnkleIndex)
 	{
+		if(CM_AnkleJoint.MotorReadData.error)
+			ErrorHandler(AnkleMotorError);
+
 		CM_AnkleJoint.MotorReadData.position = -MotorRxData[deviceIndex].position / ANKLE_GEAR_RATIO * RAD_TO_DEG;
 		CM_AnkleJoint.MotorReadData.speed = -MotorRxData[deviceIndex].speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
 		CM_AnkleJoint.MotorReadData.torque = -MotorRxData[deviceIndex].torque * ANKLE_GEAR_RATIO ;
@@ -567,13 +572,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
 	if(temp.canId == AnkleMotorCAN_ID)
 	{
-		if(temp.error)
-			ErrorHandler(AnkleMotorError);
-		else
-		{
-			CM_AnkleJoint.motorDataReceived = 1;
-			memcpy(&MotorRxData[AnkleIndex], &temp, sizeof(AKxx_x_ReadData_t));
-		}
+		CM_AnkleJoint.motorDataReceived = 1;
+		memcpy(&MotorRxData[AnkleIndex], &temp, sizeof(AKxx_x_ReadData_t));
 	}
 	else
 		ErrorHandler(MotorReadError);

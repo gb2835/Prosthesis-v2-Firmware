@@ -9,7 +9,7 @@
 *		- LL_GPIO_SetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 *		- LL_GPIO_ResetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 *		- LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
-* 2. Search -> File on "* USER ADDED " will show code added to MX auto-generated files.
+* 2. Search -> File on "* USER ADDED " will show code added to MX auto-generated files external file resources.
 *
 *******************************************************************************/
 

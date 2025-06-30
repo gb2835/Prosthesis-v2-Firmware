@@ -10,12 +10,12 @@
 * 		- Position		= radians
 * 		- Speed			= rad/s
 * 		- Torque		= Nm
-* 		- Temperature	= Celcius
 * 3. #define AKK_X_NUMBER_OF_DEVICES must be updated to (at least) the number of devices used.
 * 4. Polling is used for initialization.
 *    If interrupts are desired then HAL_CAN_ActivateNotification() must be called after AKxx_x_Init() in user application.
 * 5. AKxx-x motors require 1 Mbit/s CAN rate.
 * 6. Only MIT mode is supported (Servo mode not present here).
+* 7. Temperature readings did not make sense, so they are not included here.
 *
 *******************************************************************************/
 
@@ -56,6 +56,8 @@ static uint16_t FloatToUint(float x_float, float xMin_float, float xMax_float, u
 
 AKxx_x_Error_e AKxx_x_Init(uint8_t deviceIndex, AKxx_x_Init_t *Device_Init)
 {
+	if(Device[deviceIndex].isInit)	// Can only init a device once
+		while(1);
 	if(deviceIndex >= AKXX_X_NUMBER_OF_DEVICES)
 		while(1);
 
@@ -131,9 +133,6 @@ AKxx_x_Error_e AKxx_x_ExitMotorCtrlMode(uint8_t deviceIndex)
 	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, &txMailbox) != HAL_OK)
 		return AKxx_x_ExitMotorCtrlModeError;
 
-	if(AKxx_x_PollTxMessagePendingWithTimeout(txMailbox)) //??
-		return AKxx_x_ExitMotorCtrlModeError;
-
 	return AKxx_x_NoError;
 }
 
@@ -155,17 +154,14 @@ AKxx_x_Error_e AKxx_x_ZeroMotorPosition(uint8_t deviceIndex)
 	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, &txMailbox) != HAL_OK)
 		return AKxx_x_ZeroMotorPositionError;
 
-	if(AKxx_x_PollTxMessagePendingWithTimeout(txMailbox)) //??
-		return AKxx_x_ZeroMotorPositionError;
-
 	return AKxx_x_NoError;
 }
 
 AKxx_x_Error_e AKxx_x_PollMotorReadWithTimeout(AKxx_x_ReadData_t *RxData_Float)
 {
 	uint8_t timeoutOccurred = 1;
-	uint32_t tickstart = HAL_GetTick();
-	while ((HAL_GetTick() - tickstart) < 10U)
+	uint32_t tickStart = HAL_GetTick();
+	while ((HAL_GetTick() - tickStart) < 10U)
 	{
 		if(HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0))
 		{
@@ -192,8 +188,8 @@ AKxx_x_Error_e AKxx_x_PollMotorReadWithTimeout(AKxx_x_ReadData_t *RxData_Float)
 AKxx_x_Error_e AKxx_x_PollTxMessagePendingWithTimeout(uint32_t txMailbox)
 {
 	uint8_t timeoutOccurred = 1;
-	uint32_t tickstart = HAL_GetTick();
-	while ((HAL_GetTick() - tickstart) < 10U)
+	uint32_t tickStart = HAL_GetTick();
+	while ((HAL_GetTick() - tickStart) < 10U)
 	{
 		if(!HAL_CAN_IsTxMessagePending(&hcan1,txMailbox))
 		{
@@ -263,9 +259,6 @@ static AKxx_x_Error_e WriteData(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_
 	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, &txMailbox) != HAL_OK)
 		return AKxx_x_WriteDataError;
 
-	if(AKxx_x_PollTxMessagePendingWithTimeout(txMailbox)) //??
-		return AKxx_x_WriteDataError;
-
 	return AKxx_x_NoError;
 }
 
@@ -282,9 +275,6 @@ static AKxx_x_Error_e EnterMotorCtrlMode(uint8_t deviceIndex)
 	uint8_t txData_uint[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0XFC};
 	uint32_t txMailbox;
 	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, &txMailbox) != HAL_OK)
-		return AKxx_x_EnterMotorCtrlModeError;
-
-	if(AKxx_x_PollTxMessagePendingWithTimeout(txMailbox)) //??
 		return AKxx_x_EnterMotorCtrlModeError;
 
 	return AKxx_x_NoError;
@@ -316,7 +306,6 @@ static void UnpackData(uint8_t *rxData_uint, AKxx_x_ReadData_t *RxData_Float)
 	uint16_t speed = (rxData_uint[3] << 4) | (rxData_uint[4] >> 4);
 	uint16_t torque = ((rxData_uint[4] & 0x0F) << 8) | rxData_uint[5];
 
-	RxData_Float->temperature = rxData_uint[6];
 	RxData_Float->error = rxData_uint[7];
 
 	uint8_t i;

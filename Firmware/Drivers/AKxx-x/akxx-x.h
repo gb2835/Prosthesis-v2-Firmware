@@ -48,7 +48,6 @@ typedef struct
 	float position;
 	float speed;
 	float torque;
-	int8_t temperature;
 	uint8_t error;
 } AKxx_x_ReadData_t;
 
