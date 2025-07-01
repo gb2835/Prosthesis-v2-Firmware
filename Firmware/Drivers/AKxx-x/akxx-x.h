@@ -70,12 +70,12 @@ extern CAN_HandleTypeDef hcan1;
 
 AKxx_x_Error_e AKxx_x_Init(uint8_t deviceIndex, AKxx_x_Init_t *Device_Init);
 AKxx_x_Error_e AKxx_x_ReadMotor(uint32_t rxFifo, AKxx_x_ReadData_t *RxData_Float);
-AKxx_x_Error_e AKxx_x_WriteMotor(uint8_t deviceIndex, AKxx_x_WriteData_t *txData);
-AKxx_x_Error_e AKxx_x_EnterMotorCtrlMode(uint8_t canId);
-AKxx_x_Error_e AKxx_x_ExitMotorCtrlMode(uint8_t canId);
-AKxx_x_Error_e AKxx_x_ZeroMotorPosition(uint8_t deviceIndex);
-AKxx_x_Error_e AKxx_x_PollMotorReadWithTimeout(AKxx_x_ReadData_t *RxData_Float);
-AKxx_x_Error_e AKxx_x_PollTxMessagePendingWithTimeout(uint32_t txMailbox);
+AKxx_x_Error_e AKxx_x_WriteMotor(uint8_t deviceIndex, AKxx_x_WriteData_t *txData, uint32_t *txMailbox);
+AKxx_x_Error_e AKxx_x_EnterMotorCtrlMode(uint8_t deviceIndex, uint32_t *txMailbox);
+AKxx_x_Error_e AKxx_x_ExitMotorCtrlMode(uint8_t deviceIndex, uint32_t *txMailbox);
+AKxx_x_Error_e AKxx_x_ZeroMotorPosition(uint8_t deviceIndex, uint32_t *txMailbox);
+AKxx_x_Error_e AKxx_x_PollTxMessagePendingWith10msTimeout(uint32_t txMailbox);
+AKxx_x_Error_e AKxx_x_PollMotorReadWith10msTimeout(AKxx_x_ReadData_t *RxData_Float);
 AKxx_x_ErrorCode_e AKxx_x_DecodeError(uint8_t error);
 
 

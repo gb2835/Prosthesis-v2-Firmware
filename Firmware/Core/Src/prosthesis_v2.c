@@ -174,10 +174,11 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 
 	CM_footSpeedThreshold = 0.0f;
 
+	uint32_t txMailbox;
 	if(testProgram != ZeroMotorPosition)
 	{
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			if(AKxx_x_EnterMotorCtrlMode(AnkleIndex))
+			if(AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox))
 				ErrorHandler(AnkleMotorError);
 	}
 
@@ -234,8 +235,9 @@ void ErrorHandler(Error_e error)
 
 	while(1)
 	{
+		uint32_t txMailbox;
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			AKxx_x_ExitMotorCtrlMode(AnkleIndex);
+			AKxx_x_ExitMotorCtrlMode(AnkleIndex, &txMailbox);
 	}
 }
 
@@ -483,17 +485,18 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_AnkleJoint.MotorReadData.speed = -MotorRxData[deviceIndex].speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
 		CM_AnkleJoint.MotorReadData.torque = -MotorRxData[deviceIndex].torque * ANKLE_GEAR_RATIO ;
 
+		uint32_t txMailbox;
 		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
 			MotorTxData.position = -CM_AnkleJoint.ProsCtrl.position * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp;
 
-			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData))
+			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
 				ErrorHandler(AnkleMotorError);
 		}
 		else
-			if(AKxx_x_EnterMotorCtrlMode(deviceIndex))
+			if(AKxx_x_EnterMotorCtrlMode(deviceIndex, &txMailbox))
 				ErrorHandler(AnkleMotorError);
 	}
 }
@@ -514,11 +517,12 @@ static void RunTestProgram(void)
 			if(HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
 				ErrorHandler(CAN_Error);
 
+			uint32_t txMailbox;
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			{
-				if(AKxx_x_ZeroMotorPosition(AnkleIndex))
+				if(AKxx_x_ZeroMotorPosition(AnkleIndex, &txMailbox))
 					ErrorHandler(AnkleMotorError);
-				if(AKxx_x_PollMotorReadWithTimeout(&MotorRxData[AnkleIndex]))
+				if(AKxx_x_PollMotorReadWith10msTimeout(&MotorRxData[AnkleIndex]))
 					ErrorHandler(AnkleMotorError);
 			}
 
@@ -526,7 +530,7 @@ static void RunTestProgram(void)
 				ErrorHandler(CAN_Error);
 
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-				if(AKxx_x_EnterMotorCtrlMode(AnkleIndex))
+				if(AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox))
 					ErrorHandler(AnkleMotorError);
 		}
 
