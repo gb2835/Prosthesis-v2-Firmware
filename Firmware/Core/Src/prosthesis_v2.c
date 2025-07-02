@@ -526,7 +526,7 @@ static void RunStateMachine(void)
 		}
 
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.outOfStanceThreshold)
-			state = SwingExtension; //SwingFlexion;??
+			state = SwingFlexion;
 
 		break;
 
