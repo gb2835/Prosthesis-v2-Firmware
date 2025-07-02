@@ -166,6 +166,8 @@ int main(void)
 	LL_ADC_Enable(ADC1);
 	LL_ADC_Enable(ADC2);
 
+	LL_mDelay(5000);	// Significant delay when powering on AK motor
+
 	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[AnkleIndex]))
 		ErrorHandler(CAN_Error);
 	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[KneeIndex]))
