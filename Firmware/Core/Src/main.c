@@ -180,7 +180,13 @@ int main(void)
 	  	if(BNO08x_Init()) // move this to knee??
 	  		ErrorHandler(AnkleIMU_Error);
 
+		uint32_t txMailbox;
+		AKxx_x_ReadData_t RxData_Float;
 		if(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
+			ErrorHandler(AnkleMotorError);
+		if(AKxx_x_ZeroMotorPosition(AnkleIndex, &txMailbox))
+			ErrorHandler(AnkleMotorError);
+		if(AKxx_x_PollMotorReadWith10msTimeout(&RxData_Float))
 			ErrorHandler(AnkleMotorError);
 	}
 	if((Prosthesis_Init.Joint == Knee) || (Prosthesis_Init.Joint == Combined))
@@ -188,8 +194,14 @@ int main(void)
 	  	if(BNO08x_Init())
 	  		ErrorHandler(KneeIMU_Error);
 
+		uint32_t txMailbox;
+		AKxx_x_ReadData_t RxData_Float;
 		if(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
 			ErrorHandler(KneeMotorError);
+		if(AKxx_x_ZeroMotorPosition(KneeIndex, &txMailbox))
+			ErrorHandler(AnkleMotorError);
+		if(AKxx_x_PollMotorReadWith10msTimeout(&RxData_Float))
+			ErrorHandler(AnkleMotorError);
 	}
 
 	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)

@@ -36,10 +36,12 @@ uint8_t isProsthesisControlRequired = 0;
 * PRIVATE DEFINITIONS
 *******************************************************************************/
 
-#define ANKLE_GEAR_RATIO	1.0f / 1.0f // 90.0f / 15.0f??
-#define KNEE_GEAR_RATIO		1.0f / 1.0f // 70.0f / 16.0f??
-#define DEG_TO_RAD			3.1416f / 180.0f
-#define RAD_TO_DEG			180.0f / 3.1416f
+#define ANKLE_GEAR_RATIO								(90.0f / 15.0f)
+#define KNEE_GEAR_RATIO									(70.0f / 16.0f)
+#define ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER	31.0f
+#define KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER		0.0f
+#define DEG_TO_RAD										(3.1416f / 180.0f)
+#define RAD_TO_DEG										(180.0f / 3.1416f)
 
 typedef enum
 {
@@ -246,8 +248,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 			if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
 				ErrorHandler(KneeMotorError);
 	}
-
-	ActivateLED(Blue);
 }
 
 void RequireTestProgram(TestProgram_e option)
@@ -316,14 +316,13 @@ void ErrorHandler(Error_e error)
 
 	CM_ledCode = error;
 
-	while(1)
-	{
-		uint32_t txMailbox;
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			AKxx_x_ExitMotorCtrlMode(AnkleIndex, &txMailbox);
-		if((Device.Joint == Knee) || (Device.Joint == Combined))
-			AKxx_x_ExitMotorCtrlMode(KneeIndex, &txMailbox);
-	}
+	uint32_t txMailbox;
+	if((Device.Joint == Ankle) || (Device.Joint == Combined))
+		AKxx_x_ExitMotorCtrlMode(AnkleIndex, &txMailbox);
+	if((Device.Joint == Knee) || (Device.Joint == Combined))
+		AKxx_x_ExitMotorCtrlMode(KneeIndex, &txMailbox);
+
+	while(1);
 }
 
 
@@ -635,14 +634,14 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		if(CM_AnkleJoint.MotorReadData.error)
 			ErrorHandler(AnkleMotorError);
 
-		CM_AnkleJoint.MotorReadData.position = -MotorRxData[deviceIndex].position / ANKLE_GEAR_RATIO * RAD_TO_DEG;
+		CM_AnkleJoint.MotorReadData.position = -MotorRxData[deviceIndex].position / ANKLE_GEAR_RATIO * RAD_TO_DEG - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER;
 		CM_AnkleJoint.MotorReadData.speed = -MotorRxData[deviceIndex].speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
 		CM_AnkleJoint.MotorReadData.torque = -MotorRxData[deviceIndex].torque * ANKLE_GEAR_RATIO ;
 
 		uint32_t txMailbox;
 		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
-			MotorTxData.position = -CM_AnkleJoint.ProsCtrl.position * ANKLE_GEAR_RATIO * DEG_TO_RAD;
+			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp;
 
@@ -658,14 +657,14 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		if(CM_KneeJoint.MotorReadData.error)
 			ErrorHandler(KneeMotorError);
 
-		CM_KneeJoint.MotorReadData.position = MotorRxData[deviceIndex].position / KNEE_GEAR_RATIO * RAD_TO_DEG;
+		CM_KneeJoint.MotorReadData.position = MotorRxData[deviceIndex].position / KNEE_GEAR_RATIO * RAD_TO_DEG - KNEE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER;
 		CM_KneeJoint.MotorReadData.speed = MotorRxData[deviceIndex].speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
 		CM_KneeJoint.MotorReadData.torque = MotorRxData[deviceIndex].torque * KNEE_GEAR_RATIO ;
 
 		uint32_t txMailbox;
 		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
-			MotorTxData.position = CM_KneeJoint.ProsCtrl.position * KNEE_GEAR_RATIO * DEG_TO_RAD;
+			MotorTxData.position = (CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp;
 
