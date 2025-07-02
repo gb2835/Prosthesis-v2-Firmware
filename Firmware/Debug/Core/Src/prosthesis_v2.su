@@ -10,9 +10,9 @@
 ../Core/Src/prosthesis_v2.c:334:13:GetInputs	8	static
 ../Core/Src/prosthesis_v2.c:363:17:ReadLoadCell	16	static
 ../Core/Src/prosthesis_v2.c:370:13:ProcessInputs	40	static
-../Core/Src/prosthesis_v2.c:456:13:RunStateMachine	4	static
-../Core/Src/prosthesis_v2.c:625:13:ServiceMotor	24	static
-../Core/Src/prosthesis_v2.c:682:13:RunTestProgram	16	static
-../Core/Src/prosthesis_v2.c:733:13:ActivateLED	16	static
-../Core/Src/prosthesis_v2.c:760:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
-../Core/Src/prosthesis_v2.c:770:6:HAL_CAN_RxFifo1MsgPendingCallback	48	static
+../Core/Src/prosthesis_v2.c:455:13:RunStateMachine	4	static
+../Core/Src/prosthesis_v2.c:624:13:ServiceMotor	24	static
+../Core/Src/prosthesis_v2.c:681:13:RunTestProgram	16	static
+../Core/Src/prosthesis_v2.c:732:13:ActivateLED	16	static
+../Core/Src/prosthesis_v2.c:759:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
+../Core/Src/prosthesis_v2.c:769:6:HAL_CAN_RxFifo1MsgPendingCallback	48	static

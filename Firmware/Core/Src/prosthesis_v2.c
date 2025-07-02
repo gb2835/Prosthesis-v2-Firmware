@@ -417,7 +417,7 @@ static void ProcessInputs(void)
 			CM_AnkleJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
 			CM_AnkleJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
 		}
-		else
+		else if(Device.Side == Right)
 			memcpy(&CM_AnkleJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(AnkleIMU_Data_t));
 
 		float yaw, pitch, roll;
@@ -428,7 +428,6 @@ static void ProcessInputs(void)
 
 		CM_footSpeed = CM_AnkleJoint.MotorReadData.speed + CM_AnkleJoint.IMU_Data.gz;
 	}
-
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
 		if(Device.Side == Left)
@@ -440,7 +439,7 @@ static void ProcessInputs(void)
 			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
 		}
-		else
+		else if(Device.Side == Right)
 			memcpy(&CM_KneeJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(KneeIMU_Data_t));
 
 		float yaw, pitch, roll;
@@ -654,7 +653,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 			if(AKxx_x_EnterMotorCtrlMode(deviceIndex, &txMailbox))
 				ErrorHandler(AnkleMotorError);
 	}
-	if(deviceIndex == KneeIndex)
+	else if(deviceIndex == KneeIndex)
 	{
 		if(CM_KneeJoint.MotorReadData.error)
 			ErrorHandler(KneeMotorError);
@@ -744,7 +743,7 @@ static void ActivateLED(LED_Color_e color)
 		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 		LL_GPIO_SetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
 	}
-	else
+	else if(color == Red)
 	{
 		LL_GPIO_SetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
 		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
