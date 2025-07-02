@@ -51,6 +51,8 @@
 									<listOptionValue builtIn="false" value="../Drivers/SH2"/>
 									<listOptionValue builtIn="false" value="../Drivers/BNO08x"/>
 									<listOptionValue builtIn="false" value="../Drivers/AKxx-x"/>
+									<listOptionValue builtIn="false" value="../Drivers/MPU-925x"/>
+									<listOptionValue builtIn="false" value="../Drivers/LL_Drivers"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.290977148" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>

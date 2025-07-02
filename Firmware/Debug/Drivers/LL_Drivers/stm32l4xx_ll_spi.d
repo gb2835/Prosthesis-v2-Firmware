@@ -1,5 +1,6 @@
-Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
- ../Drivers/AKxx-x/akxx-x.h \
+Drivers/LL_Drivers/stm32l4xx_ll_spi.o: \
+ ../Drivers/LL_Drivers/stm32l4xx_ll_spi.c \
+ ../Drivers/LL_Drivers/stm32l4xx_ll_spi.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h \
  ../Drivers/CMSIS/Include/core_cm4.h \
@@ -31,24 +32,8 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
- ../Drivers/BNO08x/bno08x_spi_hal.h ../Core/Inc/main.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_crs.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_rcc.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_system.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_exti.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_cortex.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_utils.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_pwr.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_dma.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_gpio.h \
- ../Drivers/MPU-925x/mpu925x_spi.h \
- ../Drivers/LL_Drivers/stm32l4xx_ll_spi.h ../Core/Inc/prosthesis_v2.h \
- ../Core/Inc/utilities.h \
- ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h
-../Drivers/AKxx-x/akxx-x.h:
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h
+../Drivers/LL_Drivers/stm32l4xx_ll_spi.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h:
 ../Drivers/CMSIS/Include/core_cm4.h:
@@ -80,22 +65,4 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h:
-../Drivers/BNO08x/bno08x_spi_hal.h:
-../Core/Inc/main.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_crs.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_rcc.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_system.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_exti.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_cortex.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_utils.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_pwr.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_dma.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_gpio.h:
-../Drivers/MPU-925x/mpu925x_spi.h:
-../Drivers/LL_Drivers/stm32l4xx_ll_spi.h:
-../Core/Inc/prosthesis_v2.h:
-../Core/Inc/utilities.h:
-../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h:

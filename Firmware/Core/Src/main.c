@@ -65,6 +65,7 @@ void SystemClock_Config(void);
 
 #include "akxx-x.h"
 #include "bno08x_spi_hal.h"
+#include "mpu925x_spi.h" // add pins??
 #include "prosthesis_v2.h"
 
 #include <string.h>
@@ -126,6 +127,9 @@ int main(void)
   	Motor_Init[AnkleIndex].canId = AnkleMotorCAN_ID;
   	Motor_Init[AnkleIndex].Motor = AK80_9;
 
+  	Motor_Init[KneeIndex].canId = KneeMotorCAN_ID;
+  	Motor_Init[KneeIndex].Motor = AK70_10;
+
 	CAN_FilterTypeDef CAN1_FilterInit[AKXX_X_NUMBER_OF_DEVICES];
 	CAN1_FilterInit[AnkleIndex].FilterActivation = ENABLE;
 	CAN1_FilterInit[AnkleIndex].FilterBank = 0;
@@ -176,6 +180,14 @@ int main(void)
 
 		if(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
 			ErrorHandler(AnkleMotorError);
+	}
+	if((Prosthesis_Init.Joint == Knee) || (Prosthesis_Init.Joint == Combined))
+	{
+	  	if(BNO08x_Init())
+	  		ErrorHandler(KneeIMU_Error);
+
+		if(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
+			ErrorHandler(KneeMotorError);
 	}
 
 	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
