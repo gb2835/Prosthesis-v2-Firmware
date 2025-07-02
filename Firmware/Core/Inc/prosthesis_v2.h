@@ -49,7 +49,6 @@ typedef enum
 {
 	None,
 	ReadOnly,
-	ZeroMotorPosition,
 	ImpedanceControl
 } TestProgram_e;
 

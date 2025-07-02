@@ -156,7 +156,6 @@ static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
 static void RunStateMachine(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
-static void RunTestProgram(void);
 static void ActivateLED(LED_Color_e color);
 
 
@@ -237,17 +236,14 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 
 	CM_footSpeedThreshold = 0.0f;
 
-	if(testProgram != ZeroMotorPosition)
-	{
-		uint32_t txMailbox;
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			if(AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox))
-				ErrorHandler(AnkleMotorError);
+	uint32_t txMailbox;
+	if((Device.Joint == Ankle) || (Device.Joint == Combined))
+		if(AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox))
+			ErrorHandler(AnkleMotorError);
 
-		if((Device.Joint == Knee) || (Device.Joint == Combined))
-			if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
-				ErrorHandler(KneeMotorError);
-	}
+	if((Device.Joint == Knee) || (Device.Joint == Combined))
+		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
+			ErrorHandler(KneeMotorError);
 }
 
 void RequireTestProgram(TestProgram_e option)
@@ -261,9 +257,6 @@ void RunProsthesisControl(void)
 {
 	GetInputs();
 	ProcessInputs();
-
-	if(isTestProgramRequired)
-		RunTestProgram();
 
 	RunStateMachine();
 
@@ -657,14 +650,14 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		if(CM_KneeJoint.MotorReadData.error)
 			ErrorHandler(KneeMotorError);
 
-		CM_KneeJoint.MotorReadData.position = MotorRxData[deviceIndex].position / KNEE_GEAR_RATIO * RAD_TO_DEG - KNEE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER;
+		CM_KneeJoint.MotorReadData.position = MotorRxData[deviceIndex].position / KNEE_GEAR_RATIO * RAD_TO_DEG - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER;
 		CM_KneeJoint.MotorReadData.speed = MotorRxData[deviceIndex].speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
 		CM_KneeJoint.MotorReadData.torque = MotorRxData[deviceIndex].torque * KNEE_GEAR_RATIO ;
 
 		uint32_t txMailbox;
 		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
-			MotorTxData.position = (CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
+			MotorTxData.position = (CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp;
 
@@ -674,57 +667,6 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		else
 			if(AKxx_x_EnterMotorCtrlMode(deviceIndex, &txMailbox))
 				ErrorHandler(KneeMotorError);
-	}
-}
-
-static void RunTestProgram(void)
-{
-	switch(testProgram)
-	{
-	case None:
-		break;
-
-	case ReadOnly:
-		break;
-
-	case ZeroMotorPosition:
-		if(isFirst)
-		{
-			if(HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
-				ErrorHandler(CAN_Error);
-
-			uint32_t txMailbox;
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			{
-				if(AKxx_x_ZeroMotorPosition(AnkleIndex, &txMailbox))
-					ErrorHandler(AnkleMotorError);
-				if(AKxx_x_PollMotorReadWith10msTimeout(&MotorRxData[AnkleIndex]))
-					ErrorHandler(AnkleMotorError);
-			}
-			if((Device.Joint == Knee) || (Device.Joint == Combined))
-			{
-				if(AKxx_x_ZeroMotorPosition(KneeIndex, &txMailbox))
-					ErrorHandler(KneeMotorError);
-				if(AKxx_x_PollMotorReadWith10msTimeout(&MotorRxData[KneeIndex]))
-					ErrorHandler(KneeMotorError);
-			}
-
-			if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
-				ErrorHandler(CAN_Error);
-
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-				if(AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox))
-					ErrorHandler(AnkleMotorError);
-
-			if((Device.Joint == Knee) || (Device.Joint == Combined))
-				if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
-					ErrorHandler(KneeMotorError);
-		}
-
-		break;
-
-	case ImpedanceControl:
-		break;
 	}
 }
 
