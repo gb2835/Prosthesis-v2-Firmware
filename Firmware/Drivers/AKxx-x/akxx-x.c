@@ -7,13 +7,15 @@
 *		- CubeMars AK Series Actuator Driver Manual
 *			- Version: 1.0.9
 * 2. Unless otherwise specified, units are
-* 		- Position	= radians
-* 		- Speed		= rad/s
-* 		- Torque	= Nm
+* 		- Position		= radians
+* 		- Speed			= rad/s
+* 		- Torque		= Nm
 * 3. #define AKK_X_NUMBER_OF_DEVICES must be updated to (at least) the number of devices used.
 * 4. Polling is used for initialization.
 *    If interrupts are desired then HAL_CAN_ActivateNotification() must be called after AKxx_x_Init() in user application.
 * 5. AKxx-x motors require 1 Mbit/s CAN rate.
+* 6. Only MIT mode is supported (Servo mode not present here).
+* 7. Temperature readings did not make sense, so they are not included here.
 *
 *******************************************************************************/
 
@@ -40,8 +42,8 @@ typedef struct
 static Device_t Device[AKXX_X_NUMBER_OF_DEVICES];
 
 static AKxx_x_Error_e ReadData(uint32_t rxFifo, AKxx_x_ReadData_t *RxData_Float);
-static AKxx_x_Error_e WriteData(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_Float);
-static AKxx_x_Error_e EnterMotorCtrlMode(uint8_t deviceIndex);
+static AKxx_x_Error_e WriteData(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_Float, uint32_t *txMailbox);
+static AKxx_x_Error_e EnterMotorCtrlMode(uint8_t deviceIndex, uint32_t *txMailbox);
 static void PackData(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_Float, uint8_t *txData_uint);
 static void UnpackData(uint8_t *rxData_uint, AKxx_x_ReadData_t *RxData_Float);
 static float UintToFloat(uint16_t x_uint, float xMin_float, float xMax_float, uint8_t nBits);
@@ -54,6 +56,8 @@ static uint16_t FloatToUint(float x_float, float xMin_float, float xMax_float, u
 
 AKxx_x_Error_e AKxx_x_Init(uint8_t deviceIndex, AKxx_x_Init_t *Device_Init)
 {
+	if(Device[deviceIndex].isInit)	// Can only init a device once
+		while(1);
 	if(deviceIndex >= AKXX_X_NUMBER_OF_DEVICES)
 		while(1);
 
@@ -62,11 +66,14 @@ AKxx_x_Error_e AKxx_x_Init(uint8_t deviceIndex, AKxx_x_Init_t *Device_Init)
 	if(HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING))	// Polling is used for initialization
 		return AKxx_x_InitError;
 
-	if(EnterMotorCtrlMode(deviceIndex))
+	uint32_t txMailbox;
+	if(EnterMotorCtrlMode(deviceIndex, &txMailbox))
+		return AKxx_x_InitError;
+	if(AKxx_x_PollTxMessagePendingWith10msTimeout(txMailbox))
 		return AKxx_x_InitError;
 
 	AKxx_x_ReadData_t RxData_Float;
-	if(AKxx_x_PollMotorReadWithTimeout(&RxData_Float))
+	if(AKxx_x_PollMotorReadWith10msTimeout(&RxData_Float))
 		return AKxx_x_InitError;
 
 	switch(Device[deviceIndex].InitVals.Motor)
@@ -95,23 +102,23 @@ AKxx_x_Error_e AKxx_x_ReadMotor(uint32_t rxFifo, AKxx_x_ReadData_t *RxData_Float
 	return ReadData(rxFifo, RxData_Float);
 }
 
-AKxx_x_Error_e AKxx_x_WriteMotor(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_Float)
+AKxx_x_Error_e AKxx_x_WriteMotor(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_Float, uint32_t *txMailbox)
 {
 	if(!Device[deviceIndex].isInit)
 		while(1);
 
-	return WriteData(deviceIndex, TxData_Float);
+	return WriteData(deviceIndex, TxData_Float, txMailbox);
 }
 
-AKxx_x_Error_e AKxx_x_EnterMotorCtrlMode(uint8_t deviceIndex)
+AKxx_x_Error_e AKxx_x_EnterMotorCtrlMode(uint8_t deviceIndex, uint32_t *txMailbox)
 {
 	if(!Device[deviceIndex].isInit)
 		while(1);
 
-	return EnterMotorCtrlMode(deviceIndex);
+	return EnterMotorCtrlMode(deviceIndex, txMailbox);
 }
 
-AKxx_x_Error_e AKxx_x_ExitMotorCtrlMode(uint8_t deviceIndex)
+AKxx_x_Error_e AKxx_x_ExitMotorCtrlMode(uint8_t deviceIndex, uint32_t *txMailbox)
 {
 	if(!Device[deviceIndex].isInit)
 		while(1);
@@ -125,17 +132,13 @@ AKxx_x_Error_e AKxx_x_ExitMotorCtrlMode(uint8_t deviceIndex)
 	TxHeader.TransmitGlobalTime = DISABLE;
 
 	uint8_t txData_uint[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0XFD};
-	uint32_t txMailbox;
-	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, &txMailbox) != HAL_OK)
-		return AKxx_x_ExitMotorCtrlModeError;
-
-	if(AKxx_x_PollTxMessagePendingWithTimeout(txMailbox)) //??
+	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, txMailbox) != HAL_OK)
 		return AKxx_x_ExitMotorCtrlModeError;
 
 	return AKxx_x_NoError;
 }
 
-AKxx_x_Error_e AKxx_x_ZeroMotorPosition(uint8_t deviceIndex)
+AKxx_x_Error_e AKxx_x_ZeroMotorPosition(uint8_t deviceIndex, uint32_t *txMailbox)
 {
 	if(!Device[deviceIndex].isInit)
 		while(1);
@@ -149,21 +152,36 @@ AKxx_x_Error_e AKxx_x_ZeroMotorPosition(uint8_t deviceIndex)
 	TxHeader.TransmitGlobalTime = DISABLE;
 
 	uint8_t txData_uint[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0XFE};
-	uint32_t txMailbox;
-	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, &txMailbox) != HAL_OK)
-		return AKxx_x_ZeroMotorPositionError;
-
-	if(AKxx_x_PollTxMessagePendingWithTimeout(txMailbox)) //??
+	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, txMailbox) != HAL_OK)
 		return AKxx_x_ZeroMotorPositionError;
 
 	return AKxx_x_NoError;
 }
 
-AKxx_x_Error_e AKxx_x_PollMotorReadWithTimeout(AKxx_x_ReadData_t *RxData_Float)
+AKxx_x_Error_e AKxx_x_PollTxMessagePendingWith10msTimeout(uint32_t txMailbox)
 {
 	uint8_t timeoutOccurred = 1;
-	uint32_t tickstart = HAL_GetTick();
-	while ((HAL_GetTick() - tickstart) < 10U)
+	uint32_t tickStart = HAL_GetTick();
+	while ((HAL_GetTick() - tickStart) < 10U)
+	{
+		if(!HAL_CAN_IsTxMessagePending(&hcan1, txMailbox))
+		{
+			timeoutOccurred = 0;
+			break;
+		}
+	}
+
+	if(timeoutOccurred)
+		return AKxx_x_PollTxMessagePendingWithTimeoutError;
+
+	return AKxx_x_NoError;
+}
+
+AKxx_x_Error_e AKxx_x_PollMotorReadWith10msTimeout(AKxx_x_ReadData_t *RxData_Float)
+{
+	uint8_t timeoutOccurred = 1;
+	uint32_t tickStart = HAL_GetTick();
+	while ((HAL_GetTick() - tickStart) < 10U)
 	{
 		if(HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0))
 		{
@@ -187,23 +205,25 @@ AKxx_x_Error_e AKxx_x_PollMotorReadWithTimeout(AKxx_x_ReadData_t *RxData_Float)
 	return AKxx_x_NoError;
 }
 
-AKxx_x_Error_e AKxx_x_PollTxMessagePendingWithTimeout(uint32_t txMailbox)
+AKxx_x_ErrorCode_e AKxx_x_DecodeError(uint8_t error)
 {
-	uint8_t timeoutOccurred = 1;
-	uint32_t tickstart = HAL_GetTick();
-	while ((HAL_GetTick() - tickstart) < 10U)
+	switch(error)
 	{
-		if(!HAL_CAN_IsTxMessagePending(&hcan1,txMailbox))
-		{
-			timeoutOccurred = 0;
-			break;
-		}
+	case 1:
+		return AKxx_x_OverTemperatureFault;
+	case 2:
+		return AKxx_x_OverCurrentFault;
+	case 3:
+		return AKxx_x_OverVoltageFault;
+	case 4:
+		return AKxx_x_UnderVoltageFault;
+	case 5:
+		return AKxx_x_EncoderFault;
+	case 6:
+		return AKxx_x_PhaseCurrentUnbalanceFault;
 	}
 
-	if(timeoutOccurred)
-		return AKxx_x_PollTxMessagePendingWithTimeoutError;
-
-	return AKxx_x_NoError;
+	return AKxx_x_NoFault;
 }
 
 
@@ -223,7 +243,7 @@ static AKxx_x_Error_e ReadData(uint32_t rxFifo, AKxx_x_ReadData_t *RxData_Float)
 	return AKxx_x_NoError;
 }
 
-static AKxx_x_Error_e WriteData(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_Float)
+static AKxx_x_Error_e WriteData(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_Float, uint32_t *txMailbox)
 {
 	CAN_TxHeaderTypeDef TxHeader;
 	TxHeader.DLC = 8;
@@ -236,17 +256,13 @@ static AKxx_x_Error_e WriteData(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_
 	uint8_t txData_uint[8];
 	PackData(deviceIndex, TxData_Float, txData_uint);
 
-	uint32_t txMailbox;
-	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, &txMailbox) != HAL_OK)
-		return AKxx_x_WriteDataError;
-
-	if(AKxx_x_PollTxMessagePendingWithTimeout(txMailbox)) //??
+	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, txMailbox) != HAL_OK)
 		return AKxx_x_WriteDataError;
 
 	return AKxx_x_NoError;
 }
 
-static AKxx_x_Error_e EnterMotorCtrlMode(uint8_t deviceIndex)
+static AKxx_x_Error_e EnterMotorCtrlMode(uint8_t deviceIndex, uint32_t *txMailbox)
 {
 	CAN_TxHeaderTypeDef TxHeader;
 	TxHeader.DLC = 8;
@@ -257,11 +273,7 @@ static AKxx_x_Error_e EnterMotorCtrlMode(uint8_t deviceIndex)
 	TxHeader.TransmitGlobalTime = DISABLE;
 
 	uint8_t txData_uint[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0XFC};
-	uint32_t txMailbox;
-	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, &txMailbox) != HAL_OK)
-		return AKxx_x_EnterMotorCtrlModeError;
-
-	if(AKxx_x_PollTxMessagePendingWithTimeout(txMailbox)) //??
+	if(HAL_CAN_AddTxMessage(&hcan1, &TxHeader, txData_uint, txMailbox) != HAL_OK)
 		return AKxx_x_EnterMotorCtrlModeError;
 
 	return AKxx_x_NoError;
@@ -287,18 +299,18 @@ static void PackData(uint8_t deviceIndex, AKxx_x_WriteData_t *TxData_Float, uint
 
 static void UnpackData(uint8_t *rxData_uint, AKxx_x_ReadData_t *RxData_Float)
 {
-	uint8_t canId = rxData_uint[0];
+	RxData_Float->canId = rxData_uint[0];
+
 	uint16_t position = (rxData_uint[1] << 8) | rxData_uint[2];
 	uint16_t speed = (rxData_uint[3] << 4) | (rxData_uint[4] >> 4);
 	uint16_t torque = ((rxData_uint[4] & 0x0F) << 8) | rxData_uint[5];
 
+	RxData_Float->error = rxData_uint[7];
+
 	uint8_t i;
 	for(i = 0; i < AKXX_X_NUMBER_OF_DEVICES; i++)
-		if(Device[i].InitVals.canId == canId)
-		{
-			RxData_Float->canId = canId;
+		if(Device[i].InitVals.canId == RxData_Float->canId)
 			break;
-		}
 
 	RxData_Float->position = UintToFloat(position, -12.5, 12.5, 16);
 	RxData_Float->speed = UintToFloat(speed, Device[i].speedMin, Device[i].speedMax, 12);

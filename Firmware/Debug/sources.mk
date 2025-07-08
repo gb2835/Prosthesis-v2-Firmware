@@ -25,6 +25,8 @@ Core/Src \
 Core/Startup \
 Drivers/AKxx-x \
 Drivers/BNO08x \
+Drivers/LL_Drivers \
+Drivers/MPU-925x \
 Drivers/SH2 \
 Drivers/STM32L4xx_HAL_Driver/Src \
 

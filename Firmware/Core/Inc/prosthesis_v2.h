@@ -23,6 +23,17 @@ typedef enum
 
 typedef enum
 {
+	NoError,
+	AnkleIMU_Error,
+	AnkleMotorError,
+	CAN_Error,
+	KneeIMU_Error,
+	KneeMotorError,
+	MotorReadError
+} Error_e;
+
+typedef enum
+{
 	Ankle,
 	Combined,
 	Knee
@@ -38,14 +49,13 @@ typedef enum
 {
 	None,
 	ReadOnly,
-	ZeroMotorPosition,
 	ImpedanceControl
 } TestProgram_e;
 
 typedef struct
 {
-	Side_e Side;
 	Joint_e Joint;
+	Side_e Side;
 } Prosthesis_Init_t;
 
 extern uint8_t isProsthesisControlRequired;
@@ -53,7 +63,7 @@ extern uint8_t isProsthesisControlRequired;
 void InitProsthesisControl(Prosthesis_Init_t *Device_Init);
 void RequireTestProgram(TestProgram_e option);
 void RunProsthesisControl(void);
-void ShutdownMotors(void);
+void ErrorHandler(Error_e error);
 
 
 /*******************************************************************************

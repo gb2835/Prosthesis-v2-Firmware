@@ -31,8 +31,7 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
- ../Drivers/BNO08x/bno08x_spi_hal.h ../Core/Inc/error_handler.h \
- ../Core/Inc/prosthesis_v2.h ../Core/Inc/main.h \
+ ../Drivers/BNO08x/bno08x_spi_hal.h ../Core/Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_crs.h \
@@ -45,7 +44,9 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_pwr.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_dma.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_gpio.h \
- ../Core/Inc/prosthesis_v2.h ../Core/Inc/utilities.h \
+ ../Drivers/MPU-925x/mpu925x_spi.h \
+ ../Drivers/LL_Drivers/stm32l4xx_ll_spi.h ../Core/Inc/prosthesis_v2.h \
+ ../Core/Inc/utilities.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h
 ../Drivers/AKxx-x/akxx-x.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h:
@@ -80,8 +81,6 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h:
 ../Drivers/BNO08x/bno08x_spi_hal.h:
-../Core/Inc/error_handler.h:
-../Core/Inc/prosthesis_v2.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:
@@ -95,6 +94,8 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_pwr.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_dma.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_gpio.h:
+../Drivers/MPU-925x/mpu925x_spi.h:
+../Drivers/LL_Drivers/stm32l4xx_ll_spi.h:
 ../Core/Inc/prosthesis_v2.h:
 ../Core/Inc/utilities.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h:

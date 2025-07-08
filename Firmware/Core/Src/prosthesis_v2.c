@@ -3,9 +3,7 @@
 * TITLE: Application for Prosthesis v2
 *
 * NOTES
-* 1. IMPORTANT: Motor position must be re-zeroed whenever the motor is reassembled into the device.
-*    A test program is provided to zero the motors. ??
-* 2. Unless otherwise specified, units are
+* 1. Unless otherwise specified, units are
 * 		- Accelerometer	= m/s^2
 * 		- Angle			= degrees
 * 		- Gyroscope		= degrees/second
@@ -17,8 +15,8 @@
 
 #include "akxx-x.h"
 #include "bno08x_spi_hal.h"
-#include "error_handler.h"
 #include "main.h"
+#include "mpu925x_spi.h"
 #include "prosthesis_v2.h"
 #include "utilities.h"
 
@@ -38,8 +36,12 @@ uint8_t isProsthesisControlRequired = 0;
 * PRIVATE DEFINITIONS
 *******************************************************************************/
 
-#define DEG_TO_RAD	(3.1416f / 180.0f)
-#define RAD_TO_DEG	(180.0f / 3.1416f)
+#define ANKLE_GEAR_RATIO								(90.0f / 15.0f)
+#define KNEE_GEAR_RATIO									(70.0f / 16.0f)
+#define ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER	31.0f
+#define KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER		0.0f
+#define DEG_TO_RAD										(3.1416f / 180.0f)
+#define RAD_TO_DEG										(180.0f / 3.1416f)
 
 typedef enum
 {
@@ -60,19 +62,15 @@ typedef enum
 
 typedef union
 {
-	float array[9];
-	struct
-	{
-		float ax;
-		float ay;
-		float az;
-		float gx;
-		float gy;
-		float gz;
-		float yaw;
-		float pitch;
-		float roll;
-	} Struct;
+	float ax;
+	float ay;
+	float az;
+	float gx;
+	float gy;
+	float gz;
+	float yaw;
+	float pitch;
+	float roll;
 } AnkleIMU_Data_t;
 
 typedef struct
@@ -86,9 +84,35 @@ typedef struct
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t SwingDescCtrl;
 	AnkleIMU_Data_t IMU_Data;
-	uint8_t motorCanId;
 	uint8_t motorDataReceived;
 } AnkleJoint_t;
+
+typedef union
+{
+	float ax;
+	float ay;
+	float az;
+	float gx;
+	float gy;
+	float gz;
+	float yaw;
+	float pitch;
+	float roll;
+} KneeIMU_Data_t;
+
+typedef struct
+{
+	AKxx_x_ReadData_t MotorReadData;
+	AKxx_x_WriteData_t ProsCtrl;
+	AKxx_x_WriteData_t EarlyStanceCtrl;
+	AKxx_x_WriteData_t MidStanceCtrl;
+	AKxx_x_WriteData_t LateStanceCtrl;
+	AKxx_x_WriteData_t SwingFlexCtrl;
+	AKxx_x_WriteData_t SwingExtCtrl;
+	AKxx_x_WriteData_t SwingDescCtrl;
+	KneeIMU_Data_t IMU_Data;
+	uint8_t motorDataReceived;
+} KneeJoint_t;
 
 typedef struct
 {
@@ -116,19 +140,23 @@ static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
 
 static AnkleJoint_t CM_AnkleJoint;
-static float CM_footSpeed, CM_footSpeedThreshold;
+static float CM_footSpeedThreshold;
 static int8_t CM_state_angles, CM_state_torques;
 static int16_t CM_state_speeds;
+static KneeJoint_t CM_KneeJoint;
 static LoadCell_t CM_LoadCell;
 static uint16_t CM_state_loadCells;
+
+static Error_e CM_ledCode = NoError;
+static float CM_footSpeed = 0.0f;
+static float CM_hipAngle = 0.0f;
 
 static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
 static void RunStateMachine(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
-static void RunTestProgram(void);
-void ActivateLED(LED_Color_e color);
+static void ActivateLED(LED_Color_e color);
 
 
 /*******************************************************************************
@@ -140,6 +168,7 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	memcpy(&Device, Device_Init, sizeof(Device));
 
 	memset(&CM_AnkleJoint, 0, sizeof(CM_AnkleJoint));
+	memset(&CM_KneeJoint, 0, sizeof(CM_KneeJoint));
 
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
@@ -171,20 +200,50 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_AnkleJoint.SwingDescCtrl.kd = startKd;
 		CM_AnkleJoint.SwingDescCtrl.kp = startKp;
 	}
+	if((Device.Joint == Knee) || (Device.Joint == Combined))
+	{
+		float startPosition = 0.0f;
+		float startKd = 0.0f;
+		float startKp = 0.0f;
+
+		CM_KneeJoint.EarlyStanceCtrl.position = startPosition;
+		CM_KneeJoint.EarlyStanceCtrl.kd = startKd;
+		CM_KneeJoint.EarlyStanceCtrl.kp = startKp;
+
+		CM_KneeJoint.MidStanceCtrl.position = startPosition;
+		CM_KneeJoint.MidStanceCtrl.kd = startKd;
+		CM_KneeJoint.MidStanceCtrl.kp = startKp;
+
+		CM_KneeJoint.LateStanceCtrl.position = startPosition;
+		CM_KneeJoint.LateStanceCtrl.kd = startKd;
+		CM_KneeJoint.LateStanceCtrl.kp = startKp;
+
+		CM_KneeJoint.SwingFlexCtrl.position = startPosition;
+		CM_KneeJoint.SwingFlexCtrl.kd = startKd;
+		CM_KneeJoint.SwingFlexCtrl.kp = startKp;
+
+		CM_KneeJoint.SwingExtCtrl.position = startPosition;
+		CM_KneeJoint.SwingExtCtrl.kd = startKd;
+		CM_KneeJoint.SwingExtCtrl.kp = startKp;
+
+		CM_KneeJoint.SwingDescCtrl.position = startPosition;
+		CM_KneeJoint.SwingDescCtrl.kd = startKd;
+		CM_KneeJoint.SwingDescCtrl.kp = startKp;
+	}
 
 	CM_LoadCell.intoStanceThreshold = 1300; //??
 	CM_LoadCell.outOfStanceThreshold = 1300 + 50; //??
 
 	CM_footSpeedThreshold = 0.0f;
 
-	if(testProgram != ZeroMotorPosition)
-	{
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			if(AKxx_x_EnterMotorCtrlMode(AnkleIndex))
-				ErrorHandler_AKxx_x(AnkleIndex);
-	}
+	uint32_t txMailbox;
+	if((Device.Joint == Ankle) || (Device.Joint == Combined))
+		if(AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox))
+			ErrorHandler(AnkleMotorError);
 
-	ActivateLED(Blue);
+	if((Device.Joint == Knee) || (Device.Joint == Combined))
+		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
+			ErrorHandler(KneeMotorError);
 }
 
 void RequireTestProgram(TestProgram_e option)
@@ -199,15 +258,37 @@ void RunProsthesisControl(void)
 	GetInputs();
 	ProcessInputs();
 
-	if(isTestProgramRequired)
-		RunTestProgram();
-
 	RunStateMachine();
 
-	if(CM_AnkleJoint.motorDataReceived)
+	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
-		CM_AnkleJoint.motorDataReceived = 0;
-		ServiceMotor(AnkleIndex);
+		static uint8_t missedAnkleMotorCalls = 0;
+		if(CM_AnkleJoint.motorDataReceived)
+		{
+			missedAnkleMotorCalls = 0;
+			CM_AnkleJoint.motorDataReceived = 0;
+			ServiceMotor(AnkleIndex);
+		}
+		else
+			missedAnkleMotorCalls++;
+
+		if(missedAnkleMotorCalls >= 5)
+			ErrorHandler(AnkleMotorError);
+	}
+	if((Device.Joint == Knee) || (Device.Joint == Combined))
+	{
+		static uint8_t missedKneeMotorCalls = 0;
+		if(CM_KneeJoint.motorDataReceived)
+		{
+			missedKneeMotorCalls = 0;
+			CM_KneeJoint.motorDataReceived = 0;
+			ServiceMotor(KneeIndex);
+		}
+		else
+			missedKneeMotorCalls++;
+
+		if(missedKneeMotorCalls >= 5)
+			ErrorHandler(KneeMotorError);
 	}
 
 	// Check for first and second executions, needed for load cell filter
@@ -220,15 +301,21 @@ void RunProsthesisControl(void)
 		isSecond = 0;
 }
 
-void ShutdownMotors(void)
+void ErrorHandler(Error_e error)
 {
 	ActivateLED(Red);
 
-	while(1)
-	{
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			AKxx_x_ExitMotorCtrlMode(AnkleIndex);
-	}
+	HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING);
+
+	CM_ledCode = error;
+
+	uint32_t txMailbox;
+	if((Device.Joint == Ankle) || (Device.Joint == Combined))
+		AKxx_x_ExitMotorCtrlMode(AnkleIndex, &txMailbox);
+	if((Device.Joint == Knee) || (Device.Joint == Combined))
+		AKxx_x_ExitMotorCtrlMode(KneeIndex, &txMailbox);
+
+	while(1);
 }
 
 
@@ -241,14 +328,28 @@ static void GetInputs(void)
 	CM_LoadCell.Raw.bot[0] = ReadLoadCell(ADC1);
 	CM_LoadCell.Raw.top[0] = ReadLoadCell(ADC2);
 
-	if(BNO08x_resetOccurred)
+	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
-		BNO08x_resetOccurred = 0;
-		if(BNO08x_StartReports())
-			ErrorHandler_BNO08x();
-	}
+		if(BNO08x_resetOccurred) //move to knee??
+		{
+			BNO08x_resetOccurred = 0;
+			if(BNO08x_StartReports())
+				ErrorHandler(AnkleIMU_Error);
+		}
 
-	BNO08x_ReadSensors();
+		BNO08x_ReadSensors();
+	}
+	if((Device.Joint == Knee) || (Device.Joint == Combined))
+	{
+		if(BNO08x_resetOccurred)
+		{
+			BNO08x_resetOccurred = 0;
+			if(BNO08x_StartReports())
+				ErrorHandler(KneeIMU_Error);
+		}
+
+		BNO08x_ReadSensors();
+	}
 }
 
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx)
@@ -297,19 +398,50 @@ static void ProcessInputs(void)
 		CM_LoadCell.Filtered.top[1] = CM_LoadCell.Filtered.top[0];
 	}
 
-	// Get accelerometer and gyroscope data
-	for(uint8_t i = 0; i < 3; i++)
-		CM_AnkleJoint.IMU_Data.array[i] = BNO08x_IMU_Data[i];
-	for(uint8_t i = 3; i < 6; i++)
-		CM_AnkleJoint.IMU_Data.array[i] = BNO08x_IMU_Data[i] * RAD_TO_DEG;
+	if((Device.Joint == Ankle) || (Device.Joint == Combined))
+	{
+		if(Device.Side == Left)
+		{
+			CM_AnkleJoint.IMU_Data.ax = -BNO08x_IMU_Data[0];
+			CM_AnkleJoint.IMU_Data.ay = BNO08x_IMU_Data[1];
+			CM_AnkleJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
+			CM_AnkleJoint.IMU_Data.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
+			CM_AnkleJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
+			CM_AnkleJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
+		}
+		else if(Device.Side == Right)
+			memcpy(&CM_AnkleJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(AnkleIMU_Data_t));
 
-	float yaw, pitch, roll;
-	QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
-	CM_AnkleJoint.IMU_Data.Struct.yaw = yaw * RAD_TO_DEG;
-	CM_AnkleJoint.IMU_Data.Struct.pitch = pitch * RAD_TO_DEG;
-	CM_AnkleJoint.IMU_Data.Struct.roll = roll * RAD_TO_DEG;
+		float yaw, pitch, roll;
+		QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
+		CM_AnkleJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+		CM_AnkleJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
+		CM_AnkleJoint.IMU_Data.roll = roll * RAD_TO_DEG;
 
-	CM_footSpeed = CM_AnkleJoint.IMU_Data.Struct.gz + CM_AnkleJoint.MotorReadData.speed;
+		CM_footSpeed = CM_AnkleJoint.MotorReadData.speed + CM_AnkleJoint.IMU_Data.gz;
+	}
+	if((Device.Joint == Knee) || (Device.Joint == Combined))
+	{
+		if(Device.Side == Left)
+		{
+			CM_KneeJoint.IMU_Data.ax = -BNO08x_IMU_Data[0];
+			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[1];
+			CM_KneeJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
+			CM_KneeJoint.IMU_Data.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
+		}
+		else if(Device.Side == Right)
+			memcpy(&CM_KneeJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(KneeIMU_Data_t));
+
+		float yaw, pitch, roll;
+		QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
+		CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+		CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
+		CM_KneeJoint.IMU_Data.roll = roll * RAD_TO_DEG;
+
+		CM_hipAngle = CM_KneeJoint.MotorReadData.speed - CM_KneeJoint.IMU_Data.pitch;
+	}
 }
 
 static void RunStateMachine(void)
@@ -330,6 +462,12 @@ static void RunStateMachine(void)
 				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.EarlyStanceCtrl.position;
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.EarlyStanceCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.EarlyStanceCtrl.kp;
+			}
+			if((Device.Joint == Knee) || (Device.Joint == Combined))
+			{
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.EarlyStanceCtrl.position;
+				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.EarlyStanceCtrl.kd;
+				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.EarlyStanceCtrl.kp;
 			}
 		}
 
@@ -352,6 +490,12 @@ static void RunStateMachine(void)
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.MidStanceCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.MidStanceCtrl.kp;
 			}
+			if((Device.Joint == Knee) || (Device.Joint == Combined))
+			{
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.MidStanceCtrl.position;
+				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.MidStanceCtrl.kd;
+				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.MidStanceCtrl.kp;
+			}
 		}
 
 		if(CM_AnkleJoint.MotorReadData.speed < 0)
@@ -373,10 +517,16 @@ static void RunStateMachine(void)
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.LateStanceCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.LateStanceCtrl.kp;
 			}
+			if((Device.Joint == Knee) || (Device.Joint == Combined))
+			{
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.LateStanceCtrl.position;
+				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.LateStanceCtrl.kd;
+				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.LateStanceCtrl.kp;
+			}
 		}
 
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.outOfStanceThreshold)
-			state = SwingExtension; //SwingFlexion;??
+			state = SwingFlexion;
 
 		break;
 
@@ -394,10 +544,16 @@ static void RunStateMachine(void)
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingFlexCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingFlexCtrl.kp;
 			}
+			if((Device.Joint == Knee) || (Device.Joint == Combined))
+			{
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingFlexCtrl.position;
+				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingFlexCtrl.kd;
+				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingFlexCtrl.kp;
+			}
 		}
 
-//		if(CM_KneeJoint.jointSpeed < 0)??
-//			state = SwingExtension;
+		if(CM_KneeJoint.MotorReadData.speed < 0)
+			state = SwingExtension;
 
 		break;
 
@@ -414,6 +570,12 @@ static void RunStateMachine(void)
 				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingExtCtrl.position;
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingExtCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingExtCtrl.kp;
+			}
+			if((Device.Joint == Knee) || (Device.Joint == Combined))
+			{
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingExtCtrl.position;
+				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingExtCtrl.kd;
+				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingExtCtrl.kp;
 			}
 		}
 
@@ -436,6 +598,12 @@ static void RunStateMachine(void)
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingDescCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingDescCtrl.kp;
 			}
+			if((Device.Joint == Knee) || (Device.Joint == Combined))
+			{
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingDescCtrl.position;
+				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingDescCtrl.kd;
+				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingDescCtrl.kp;
+			}
 		}
 
 		if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoStanceThreshold)
@@ -447,69 +615,62 @@ static void RunStateMachine(void)
 
 static void ServiceMotor(DeviceIndex_e deviceIndex)
 {
-	ActivateLED(Green);
+	static uint8_t firstCall = 1;
+	if(firstCall)
+	{
+		firstCall = 0;
+		ActivateLED(Green);
+	}
 
 	if(deviceIndex == AnkleIndex)
 	{
-		CM_AnkleJoint.MotorReadData.position = MotorRxData[deviceIndex].position * RAD_TO_DEG;
-		CM_AnkleJoint.MotorReadData.speed = MotorRxData[deviceIndex].speed * RAD_TO_DEG;
-		CM_AnkleJoint.MotorReadData.torque = MotorRxData[deviceIndex].torque;
+		if(CM_AnkleJoint.MotorReadData.error)
+			ErrorHandler(AnkleMotorError);
 
+		CM_AnkleJoint.MotorReadData.position = -MotorRxData[deviceIndex].position / ANKLE_GEAR_RATIO * RAD_TO_DEG - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER;
+		CM_AnkleJoint.MotorReadData.speed = -MotorRxData[deviceIndex].speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
+		CM_AnkleJoint.MotorReadData.torque = -MotorRxData[deviceIndex].torque * ANKLE_GEAR_RATIO ;
+
+		uint32_t txMailbox;
 		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
-			MotorTxData.position = CM_AnkleJoint.ProsCtrl.position * DEG_TO_RAD;
+			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp;
 
-			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData))
-				ErrorHandler_AKxx_x(deviceIndex);
+			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
+				ErrorHandler(AnkleMotorError);
 		}
 		else
-			if(AKxx_x_EnterMotorCtrlMode(deviceIndex))
-				ErrorHandler_AKxx_x(deviceIndex);
+			if(AKxx_x_EnterMotorCtrlMode(deviceIndex, &txMailbox))
+				ErrorHandler(AnkleMotorError);
 	}
-}
-
-static void RunTestProgram(void)
-{
-	switch(testProgram)
+	else if(deviceIndex == KneeIndex)
 	{
-	case None:
-		break;
+		if(CM_KneeJoint.MotorReadData.error)
+			ErrorHandler(KneeMotorError);
 
-	case ReadOnly:
-		break;
+		CM_KneeJoint.MotorReadData.position = MotorRxData[deviceIndex].position / KNEE_GEAR_RATIO * RAD_TO_DEG - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER;
+		CM_KneeJoint.MotorReadData.speed = MotorRxData[deviceIndex].speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
+		CM_KneeJoint.MotorReadData.torque = MotorRxData[deviceIndex].torque * KNEE_GEAR_RATIO ;
 
-	case ZeroMotorPosition:
-		if(isFirst)
+		uint32_t txMailbox;
+		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
-			if(HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
-				ErrorHandler_Pv2(CAN_Error);
+			MotorTxData.position = (CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
+			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd;
+			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp;
 
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			{
-				if(AKxx_x_ZeroMotorPosition(AnkleIndex))
-					ErrorHandler_AKxx_x(AnkleIndex);
-				if(AKxx_x_PollMotorReadWithTimeout(&MotorRxData[AnkleIndex]))
-					ErrorHandler_AKxx_x(AnkleIndex);
-			}
-
-			if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
-				ErrorHandler_Pv2(CAN_Error);
-
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-				if(AKxx_x_EnterMotorCtrlMode(AnkleIndex))
-					ErrorHandler_AKxx_x(AnkleIndex);
+			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
+				ErrorHandler(KneeMotorError);
 		}
-
-		break;
-
-	case ImpedanceControl:
-		break;
+		else
+			if(AKxx_x_EnterMotorCtrlMode(deviceIndex, &txMailbox))
+				ErrorHandler(KneeMotorError);
 	}
 }
 
-void ActivateLED(LED_Color_e color)
+static void ActivateLED(LED_Color_e color)
 {
 	if(color == Blue)
 	{
@@ -523,7 +684,7 @@ void ActivateLED(LED_Color_e color)
 		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 		LL_GPIO_SetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
 	}
-	else
+	else if(color == Red)
 	{
 		LL_GPIO_SetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
 		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
@@ -540,15 +701,20 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	AKxx_x_ReadData_t temp;
 	if(AKxx_x_ReadMotor(CAN_RX_FIFO0, &temp))
-		ErrorHandler_Pv2(MotorReadError);
+		ErrorHandler(MotorReadError);
 
-	if(temp.canId == AnkleMotorCAN_ID)
-	{
-		CM_AnkleJoint.motorDataReceived = 1;
-		memcpy(&MotorRxData[AnkleIndex], &temp, sizeof(AKxx_x_ReadData_t));
-	}
-	else
-		ErrorHandler_Pv2(MotorReadError);
+	CM_AnkleJoint.motorDataReceived = 1;
+	memcpy(&MotorRxData[AnkleIndex], &temp, sizeof(AKxx_x_ReadData_t));
+}
+
+void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+	AKxx_x_ReadData_t temp;
+	if(AKxx_x_ReadMotor(CAN_RX_FIFO1, &temp))
+		ErrorHandler(MotorReadError);
+
+	CM_KneeJoint.motorDataReceived = 1;
+	memcpy(&MotorRxData[KneeIndex], &temp, sizeof(AKxx_x_ReadData_t));
 }
 
 

@@ -24,6 +24,16 @@
 
 #include <string.h>
 
+
+/*******************************************************************************
+* USER ADDED CODE
+*******************************************************************************/
+
+#include <stm32l4xx.h>
+
+
+/******************************************************************************/
+
 // ------------------------------------------------------------------------
 // Private types
 
@@ -156,12 +166,41 @@ static int txProcess(shtp_t *pShtp, uint8_t chan, const uint8_t* pData, uint32_t
 
         // Transmit (try repeatedly while HAL write returns 0)
         status = pShtp->pHal->write(pShtp->pHal, pShtp->outTransfer, lenField);
-        while (status == 0)
+
+
+/*******************************************************************************
+* USER ADDED COMMENT OUT
+*******************************************************************************/
+
+//        while (status == 0)
+//        {
+//            shtp_service(pShtp);
+//            status = pShtp->pHal->write(pShtp->pHal, pShtp->outTransfer, lenField);
+//        }
+
+
+/*******************************************************************************
+* USER ADDED CODE
+*******************************************************************************/
+
+        uint8_t timeoutOccurred = 1;
+        uint32_t tickStart = HAL_GetTick();
+        while((HAL_GetTick() - tickStart) < 10U)
         {
-            shtp_service(pShtp);
-            status = pShtp->pHal->write(pShtp->pHal, pShtp->outTransfer, lenField);
+			shtp_service(pShtp);
+			status = pShtp->pHal->write(pShtp->pHal, pShtp->outTransfer, lenField);
+			if(status)
+			{
+				timeoutOccurred = 0;
+				break;
+			}
         }
-        
+
+        if(timeoutOccurred)
+        	return SH2_ERR_TIMEOUT;
+
+/******************************************************************************/
+
         if (status < 0)
         {
             // Error, throw away this cargo
