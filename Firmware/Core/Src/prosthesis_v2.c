@@ -15,8 +15,7 @@
 
 #include "akxx-x.h"
 #include "bno08x_spi_hal.h"
-#include "main.h"
-#include "mpu925x_spi.h"
+#include "mpu925x_spi_hal.h"
 #include "prosthesis_v2.h"
 #include "utilities.h"
 

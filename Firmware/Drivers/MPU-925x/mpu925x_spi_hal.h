@@ -7,7 +7,9 @@
 #ifndef INC_MPU925X_SPI_H_
 #define INC_MPU925X_SPI_H_
 
-#include "stm32l4xx_ll_spi.h"
+#include <stdint.h>
+#include <stm32l4xx_hal.h>
+#include <stm32l4xx_ll_gpio.h>
 
 #define MPU9250_DEVICE_ID	0x71
 #define MPU9255_DEVICE_ID	0x73
@@ -106,7 +108,7 @@ typedef union
 
 typedef struct
 {
-	SPI_TypeDef *SPI_Handle;
+	SPI_HandleTypeDef *SPI_Handle;
 	GPIO_TypeDef *CS_GPIOx;
 	uint16_t csPin;
 } MPU925x_Init_t;
@@ -118,8 +120,15 @@ void MPU925x_SetAccelDlpfBandwidth(uint8_t deviceIndex, MPU925x_AccelDLPF_BandWi
 void MPU925x_SetGyroDlpfBandwidth(uint8_t deviceIndex, MPU925x_GyroDLPF_BandWidth_e bandwidth);
 void MPU925x_SetSampleRateDiv(uint8_t deviceIndex, uint8_t divider);
 MPU925x_IMU_Data_t MPU925x_ReadIMU(uint8_t deviceIndex);
+void MPU925x_StartReadIMU_IT(uint8_t deviceIndex);
+void MPU925x_ReadIMU_IT(uint8_t deviceIndex, uint8_t *data);
 void MPU925x_ReadRegData(uint8_t deviceIndex, uint8_t startAddress, uint8_t *data, uint8_t nBytes);
+void MPU925x_ReadData_IT(uint8_t deviceIndex, uint8_t *data, uint8_t nBytes);
 void MPU925x_WriteRegData(uint8_t deviceIndex, uint8_t startAddress, uint8_t *data, uint8_t nBytes);
+void MPU925x_WriteData_IT(uint8_t deviceIndex, uint8_t *data, uint8_t nBytes);
+MPU925x_IMU_Data_t MPU925x_ConvertIMU_Data(uint8_t *data);
+void MPU925x_ClearChipSelect(uint8_t deviceIndex);
+void MPU925x_SetChipSelect(uint8_t deviceIndex);
 
 
 /*******************************************************************************

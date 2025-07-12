@@ -5144,13 +5144,13 @@ static void RunStateMachine(void)
  8002686:	eeb4 7ae7 	vcmpe.f32	s14, s15
  800268a:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
  800268e:	dc00      	bgt.n	8002692 <RunStateMachine+0x1da>
-			state = SwingExtension; //SwingFlexion;??
+			state = SwingFlexion;
 
 		break;
  8002690:	e0f9      	b.n	8002886 <RunStateMachine+0x3ce>
-			state = SwingExtension; //SwingFlexion;??
+			state = SwingFlexion;
  8002692:	4b02      	ldr	r3, [pc, #8]	; (800269c <RunStateMachine+0x1e4>)
- 8002694:	2204      	movs	r2, #4
+ 8002694:	2203      	movs	r2, #3
  8002696:	701a      	strb	r2, [r3, #0]
 		break;
  8002698:	e0f5      	b.n	8002886 <RunStateMachine+0x3ce>

@@ -65,7 +65,7 @@ void SystemClock_Config(void);
 
 #include "akxx-x.h"
 #include "bno08x_spi_hal.h"
-#include "mpu925x_spi.h" // add pins??
+#include "mpu925x_spi_hal.h" // add pins??
 #include "prosthesis_v2.h"
 
 #include <string.h>
