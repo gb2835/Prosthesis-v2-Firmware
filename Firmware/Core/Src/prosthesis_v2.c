@@ -29,7 +29,7 @@
 * PUBLIC DEFINITIONS
 *******************************************************************************/
 
-uint8_t isProsthesisControlRequired = 0;
+uint8_t isProsthesisControlRequired = 0; // move to main??
 
 
 /*******************************************************************************
@@ -74,7 +74,7 @@ typedef struct
 	uint8_t motorDataReceived;
 } AnkleJoint_t;
 
-typedef union
+typedef struct
 {
 	float ax;
 	float ay;
