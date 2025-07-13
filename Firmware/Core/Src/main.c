@@ -149,6 +149,11 @@ int main(void)
 	CAN1_FilterInit[KneeIndex].FilterMaskIdHigh = KneeMotorCAN_ID << 5;
 	CAN1_FilterInit[KneeIndex].FilterMaskIdLow = KneeMotorCAN_ID << 5;
 
+  	MPU925x_Init_t AnkleIMU_Init;
+  	AnkleIMU_Init.SPI_Handle = &hspi1;
+  	AnkleIMU_Init.CS_GPIOx = ANKLE_IMU_CS_GPIO_Port;
+  	AnkleIMU_Init.csPin = ANKLE_IMU_CS_Pin;
+
 	Prosthesis_Init_t Prosthesis_Init;
 	Prosthesis_Init.Joint = Ankle;
 	Prosthesis_Init.Side = Right;
@@ -177,8 +182,10 @@ int main(void)
 
 	if((Prosthesis_Init.Joint == Ankle) || (Prosthesis_Init.Joint == Combined))
 	{
-	  	if(BNO08x_Init()) // move this to knee??
+	  	if(MPU925x_Init(0, &AnkleIMU_Init))
 	  		ErrorHandler(AnkleIMU_Error);
+		MPU925x_SetAccelSensitivity(0, MPU925x_AccelSensitivity_8g);
+		MPU925x_SetGyroSensitivity(0, MPU925x_GyroSensitivity_1000dps);
 
 		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
@@ -191,17 +198,17 @@ int main(void)
 	}
 	if((Prosthesis_Init.Joint == Knee) || (Prosthesis_Init.Joint == Combined))
 	{
-	  	if(BNO08x_Init())
-	  		ErrorHandler(KneeIMU_Error);
+//	  	if(BNO08x_Init())
+//	  		ErrorHandler(KneeIMU_Error);	source files for knee imu removed from build??
 
 		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
 		if(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
 			ErrorHandler(KneeMotorError);
 		if(AKxx_x_ZeroMotorPosition(KneeIndex, &txMailbox))
-			ErrorHandler(AnkleMotorError);
+			ErrorHandler(KneeMotorError);
 		if(AKxx_x_PollMotorReadWith10msTimeout(&RxData_Float))
-			ErrorHandler(AnkleMotorError);
+			ErrorHandler(KneeMotorError);
 	}
 
 	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
@@ -214,7 +221,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(ImpedanceControl);
+	RequireTestProgram(ReadOnly);
 
 
 /*******************************************************************************

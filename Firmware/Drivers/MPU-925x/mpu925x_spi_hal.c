@@ -36,8 +36,8 @@ typedef struct
 } Device_t;
 
 static Device_t Device[MPU925X_NUMBER_OF_DEVICES];
-static float accelSensitivity = MPU925X_ACCEL_SENSITIVITY_2G;	// ±2 g is default
-static float gyroSensitivity = MPU925X_GYRO_SENSITIVITY_250DPS;	// ±250 degrees/second is default
+static double accelSensitivity = MPU925X_ACCEL_SENSITIVITY_2G;		// ±2 g is default
+static double gyroSensitivity = MPU925X_GYRO_SENSITIVITY_250DPS;	// ±250 degrees/second is default
 
 static void ReadRegData(uint8_t deviceIndex, uint8_t startAddress, uint8_t *data, uint8_t nBytes);
 static void ReadData_IT(uint8_t deviceIndex, uint8_t *data, uint8_t nBytes);
@@ -248,6 +248,27 @@ void MPU925x_SetGyroDlpfBandwidth(uint8_t deviceIndex, MPU925x_GyroDLPF_BandWidt
 		WriteRegData(deviceIndex, MPU925X_REG_CONFIG, &data, 1);
 		break;
 	}
+}
+
+void MPU925x_GetGyroOffsets(uint8_t deviceIndex, double *offsets)
+{
+	if(!Device[deviceIndex].isInit)
+		while(1);
+
+	double sumGx = 0.0;
+	double sumGy = 0.0;
+	double sumGz = 0.0;
+	for(uint16_t i = 0; i < 1000; i++)
+	{
+		MPU925x_IMU_Data_t IMU_Data = MPU925x_ReadIMU(deviceIndex);
+		sumGx += IMU_Data.Struct.gx;
+		sumGy += IMU_Data.Struct.gy;
+		sumGz += IMU_Data.Struct.gz;
+	}
+
+	offsets[0] = sumGx / 1000.0;
+	offsets[1] = sumGy / 1000.0;
+	offsets[2] = sumGz / 1000.0;
 }
 
 // Only applies when sample frequency = 1 kHz

@@ -35,15 +35,15 @@
 #define MPU925X_REG_GYRO_ZOUT_L		0x48
 #define MPU925X_REG_WHO_AM_I		0X75
 
-#define MPU925X_ACCEL_SENSITIVITY_2G		16384
-#define MPU925X_ACCEL_SENSITIVITY_4G		8192
-#define MPU925X_ACCEL_SENSITIVITY_8G		4096
-#define MPU925X_ACCEL_SENSITIVITY_16G		2048
-#define MPU925X_GYRO_SENSITIVITY_250DPS		131
+#define MPU925X_ACCEL_SENSITIVITY_2G		16384.0
+#define MPU925X_ACCEL_SENSITIVITY_4G		8192.0
+#define MPU925X_ACCEL_SENSITIVITY_8G		4096.0
+#define MPU925X_ACCEL_SENSITIVITY_16G		2048.0
+#define MPU925X_GYRO_SENSITIVITY_250DPS		131.0
 #define MPU925X_GYRO_SENSITIVITY_500DPS		65.5
 #define MPU925X_GYRO_SENSITIVITY_1000DPS	32.8
 #define MPU925X_GYRO_SENSITIVITY_2000DPS	16.4
-#define MPU925X_TEMP_ROOMTEMP				21
+#define MPU925X_TEMP_ROOMTEMP				21.0
 #define MPU925X_TEMP_SENSITIVITY			333.87
 
 #define MPU925X_NUMBER_OF_DEVICES	1
@@ -118,6 +118,7 @@ void MPU925x_SetAccelSensitivity(uint8_t deviceIndex, MPU925x_AccelSensitivity_e
 void MPU925x_SetGyroSensitivity(uint8_t deviceIndex, MPU925x_GyroSensitivity_e sensitivity);
 void MPU925x_SetAccelDlpfBandwidth(uint8_t deviceIndex, MPU925x_AccelDLPF_BandWidth_e bandwidth);
 void MPU925x_SetGyroDlpfBandwidth(uint8_t deviceIndex, MPU925x_GyroDLPF_BandWidth_e bandwidth);
+void MPU925x_GetGyroOffsets(uint8_t deviceIndex, double *offsets);
 void MPU925x_SetSampleRateDiv(uint8_t deviceIndex, uint8_t divider);
 MPU925x_IMU_Data_t MPU925x_ReadIMU(uint8_t deviceIndex);
 void MPU925x_StartReadIMU_IT(uint8_t deviceIndex);

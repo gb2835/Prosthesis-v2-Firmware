@@ -15,6 +15,7 @@
 
 #include "akxx-x.h"
 #include "bno08x_spi_hal.h"
+#include "main.h"
 #include "mpu925x_spi_hal.h"
 #include "prosthesis_v2.h"
 #include "utilities.h"
@@ -59,19 +60,6 @@ typedef enum
 	SwingDescension
 } StateMachine_e;
 
-typedef union
-{
-	float ax;
-	float ay;
-	float az;
-	float gx;
-	float gy;
-	float gz;
-	float yaw;
-	float pitch;
-	float roll;
-} AnkleIMU_Data_t;
-
 typedef struct
 {
 	AKxx_x_ReadData_t MotorReadData;
@@ -82,7 +70,7 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t SwingDescCtrl;
-	AnkleIMU_Data_t IMU_Data;
+	MPU925x_IMU_Data_t IMU_Data;
 	uint8_t motorDataReceived;
 } AnkleJoint_t;
 
@@ -131,9 +119,12 @@ typedef struct
 
 static AKxx_x_ReadData_t MotorRxData[AKXX_X_NUMBER_OF_DEVICES];
 static AKxx_x_WriteData_t MotorTxData;
+static MPU925x_IMU_Data_t IMU_Data;
 static Prosthesis_Init_t Device;
 
 static TestProgram_e testProgram = None;
+static uint8_t imuReadStarted = 0;
+static uint8_t imuDataReceived = 0;
 static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
@@ -237,8 +228,13 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
+	{
+		MPU925x_SetChipSelect(0);
+		MPU925x_StartReadIMU_IT(0);
+
 		if(AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox))
 			ErrorHandler(AnkleMotorError);
+	}
 
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
@@ -329,25 +325,38 @@ static void GetInputs(void)
 
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
-		if(BNO08x_resetOccurred) //move to knee??
+		static uint8_t tempImuData[14];
+		if(imuReadStarted)
 		{
-			BNO08x_resetOccurred = 0;
-			if(BNO08x_StartReports())
-				ErrorHandler(AnkleIMU_Error);
+			imuReadStarted = 0;
+			MPU925x_ReadIMU_IT(0, tempImuData);
 		}
+		if(imuDataReceived)
+		{
+			imuDataReceived = 0;
+			MPU925x_ClearChipSelect(0);
 
-		BNO08x_ReadSensors();
+			MPU925x_SetChipSelect(0);
+			MPU925x_StartReadIMU_IT(0);
+
+			IMU_Data = MPU925x_ConvertIMU_Data(tempImuData);
+
+			// Gyro offsets previously found
+			IMU_Data.Struct.gx -= 3.1266768292682952;
+			IMU_Data.Struct.gy -= 0.59624999999999995;
+			IMU_Data.Struct.gz -= -1.578993902439024;
+		}
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-		if(BNO08x_resetOccurred)
-		{
-			BNO08x_resetOccurred = 0;
-			if(BNO08x_StartReports())
-				ErrorHandler(KneeIMU_Error);
-		}
-
-		BNO08x_ReadSensors();
+//		if(BNO08x_resetOccurred)
+//		{
+//			BNO08x_resetOccurred = 0;
+//			if(BNO08x_StartReports())
+//				ErrorHandler(KneeIMU_Error);
+//		}
+//
+//		BNO08x_ReadSensors();
 	}
 }
 
@@ -401,45 +410,40 @@ static void ProcessInputs(void)
 	{
 		if(Device.Side == Left)
 		{
-			CM_AnkleJoint.IMU_Data.ax = -BNO08x_IMU_Data[0];
-			CM_AnkleJoint.IMU_Data.ay = BNO08x_IMU_Data[1];
-			CM_AnkleJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
-			CM_AnkleJoint.IMU_Data.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
-			CM_AnkleJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
-			CM_AnkleJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
+			CM_AnkleJoint.IMU_Data.Struct.ax = -IMU_Data.Struct.ax;
+			CM_AnkleJoint.IMU_Data.Struct.ay = IMU_Data.Struct.ay;
+			CM_AnkleJoint.IMU_Data.Struct.az = -IMU_Data.Struct.az;
+			CM_AnkleJoint.IMU_Data.Struct.gx = -IMU_Data.Struct.gx;
+			CM_AnkleJoint.IMU_Data.Struct.gy = IMU_Data.Struct.gy;
+			CM_AnkleJoint.IMU_Data.Struct.gz = -IMU_Data.Struct.gz;
 		}
 		else if(Device.Side == Right)
-			memcpy(&CM_AnkleJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(AnkleIMU_Data_t));
+			memcpy(&CM_AnkleJoint.IMU_Data, &IMU_Data, sizeof(MPU925x_IMU_Data_t));
 
-		float yaw, pitch, roll;
-		QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
-		CM_AnkleJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
-		CM_AnkleJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
-		CM_AnkleJoint.IMU_Data.roll = roll * RAD_TO_DEG;
-
-		CM_footSpeed = CM_AnkleJoint.MotorReadData.speed + CM_AnkleJoint.IMU_Data.gz;
+		CM_footSpeed = CM_AnkleJoint.MotorReadData.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
 	}
+
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-		if(Device.Side == Left)
-		{
-			CM_KneeJoint.IMU_Data.ax = -BNO08x_IMU_Data[0];
-			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[1];
-			CM_KneeJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
-			CM_KneeJoint.IMU_Data.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
-		}
-		else if(Device.Side == Right)
-			memcpy(&CM_KneeJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(KneeIMU_Data_t));
-
-		float yaw, pitch, roll;
-		QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
-		CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
-		CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
-		CM_KneeJoint.IMU_Data.roll = roll * RAD_TO_DEG;
-
-		CM_hipAngle = CM_KneeJoint.MotorReadData.speed - CM_KneeJoint.IMU_Data.pitch;
+//		if(Device.Side == Left)
+//		{
+//			CM_KneeJoint.IMU_Data.ax = -BNO08x_IMU_Data[0];
+//			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[1];
+//			CM_KneeJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
+//			CM_KneeJoint.IMU_Data.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
+//			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
+//			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
+//		}
+//		else if(Device.Side == Right)
+//			memcpy(&CM_KneeJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(KneeIMU_Data_t));
+//
+//		float yaw, pitch, roll;
+//		QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
+//		CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+//		CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
+//		CM_KneeJoint.IMU_Data.roll = roll * RAD_TO_DEG;
+//
+//		CM_hipAngle = CM_KneeJoint.MotorReadData.speed - CM_KneeJoint.IMU_Data.pitch;
 	}
 }
 
@@ -695,6 +699,16 @@ static void ActivateLED(LED_Color_e color)
 /*******************************************************************************
 * CALLBACKS
 *******************************************************************************/
+
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+	imuReadStarted = 1;
+}
+
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+	imuDataReceived = 1;
+}
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
