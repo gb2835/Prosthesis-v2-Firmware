@@ -72,14 +72,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define OSCOPE_Pin GPIO_PIN_13
 #define OSCOPE_GPIO_Port GPIOC
-#define ANKLE_IMU_BT_Pin GPIO_PIN_0
-#define ANKLE_IMU_BT_GPIO_Port GPIOA
-#define ANKLE_IMU_P0_Pin GPIO_PIN_1
-#define ANKLE_IMU_P0_GPIO_Port GPIOA
-#define ANKLE_IMU_P1_Pin GPIO_PIN_2
-#define ANKLE_IMU_P1_GPIO_Port GPIOA
-#define ANKLE_IMU_RST_Pin GPIO_PIN_3
-#define ANKLE_IMU_RST_GPIO_Port GPIOA
 #define ANKLE_IMU_CS_Pin GPIO_PIN_4
 #define ANKLE_IMU_CS_GPIO_Port GPIOA
 #define IMU_SCL_Pin GPIO_PIN_5
@@ -94,9 +86,6 @@ void Error_Handler(void);
 #define LED_GREEN_GPIO_Port GPIOB
 #define LED_RED_Pin GPIO_PIN_2
 #define LED_RED_GPIO_Port GPIOB
-#define ANKLE_IMU_INT_Pin GPIO_PIN_8
-#define ANKLE_IMU_INT_GPIO_Port GPIOA
-#define ANKLE_IMU_INT_EXTI_IRQn EXTI9_5_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

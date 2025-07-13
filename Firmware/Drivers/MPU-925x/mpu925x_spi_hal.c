@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* TITLE: Driver for InvenSense MPU-9250 and MPU-9255 IMU using SPI
+* TITLE: Driver for InvenSense MPU-9250 and MPU-9255 IMU using SPI with HAL
 *
 * NOTES
 * 1. This driver is based on
@@ -18,8 +18,8 @@
 *
 *******************************************************************************/
 
-#include "mpu925x_spi.h"
-#include "stm32l4xx_ll_gpio.h"
+#include "mpu925x_spi_hal.h"
+
 #include <string.h>
 
 
@@ -29,18 +29,20 @@
 
 typedef struct
 {
-	SPI_TypeDef *SPI_Handle;
+	SPI_HandleTypeDef *SPI_Handle;
 	GPIO_TypeDef *CS_GPIOx;
 	uint16_t csPin;
 	uint32_t isInit;
 } Device_t;
 
 static Device_t Device[MPU925X_NUMBER_OF_DEVICES];
-static float accelSensitivity = MPU925X_ACCEL_SENSITIVITY_2G;	// ±2 g is default
-static float gyroSensitivity = MPU925X_GYRO_SENSITIVITY_250DPS;	// ±250 degrees/second is default
+static double accelSensitivity = MPU925X_ACCEL_SENSITIVITY_2G;		// ±2 g is default
+static double gyroSensitivity = MPU925X_GYRO_SENSITIVITY_250DPS;	// ±250 degrees/second is default
 
 static void ReadRegData(uint8_t deviceIndex, uint8_t startAddress, uint8_t *data, uint8_t nBytes);
+static void ReadData_IT(uint8_t deviceIndex, uint8_t *data, uint8_t nBytes);
 static void WriteRegData(uint8_t deviceIndex, uint8_t startAdress, uint8_t *data, uint8_t nBytes);
+static void WriteData_IT(uint8_t deviceIndex, uint8_t *data, uint8_t nBytes);
 static inline void ClearChipSelect(uint8_t deviceIndex);
 static inline void SetChipSelect(uint8_t deviceIndex);
 
@@ -59,7 +61,7 @@ MPU925x_Error_e MPU925x_Init(uint8_t deviceIndex, MPU925x_Init_t *Device_Init)
 	ClearChipSelect(deviceIndex);
 
 	uint8_t whoAmI;
-	ReadRegData(deviceIndex, MPU925X_REG_WHO_AM_I, &whoAmI, sizeof(whoAmI));
+	ReadRegData(deviceIndex, MPU925X_REG_WHO_AM_I, &whoAmI, 1);
 	if((whoAmI != MPU9250_DEVICE_ID) && (whoAmI != MPU9255_DEVICE_ID))
 		return MPU925x_WhoAmI_Error;
 
@@ -248,6 +250,27 @@ void MPU925x_SetGyroDlpfBandwidth(uint8_t deviceIndex, MPU925x_GyroDLPF_BandWidt
 	}
 }
 
+void MPU925x_GetGyroOffsets(uint8_t deviceIndex, double *offsets)
+{
+	if(!Device[deviceIndex].isInit)
+		while(1);
+
+	double sumGx = 0.0;
+	double sumGy = 0.0;
+	double sumGz = 0.0;
+	for(uint16_t i = 0; i < 1000; i++)
+	{
+		MPU925x_IMU_Data_t IMU_Data = MPU925x_ReadIMU(deviceIndex);
+		sumGx += IMU_Data.Struct.gx;
+		sumGy += IMU_Data.Struct.gy;
+		sumGz += IMU_Data.Struct.gz;
+	}
+
+	offsets[0] = sumGx / 1000.0;
+	offsets[1] = sumGy / 1000.0;
+	offsets[2] = sumGz / 1000.0;
+}
+
 // Only applies when sample frequency = 1 kHz
 // New sample rate = 1 kHz / (1 + divider)
 void MPU925x_SetSampleRateDiv(uint8_t deviceIndex, uint8_t divider)
@@ -263,25 +286,27 @@ MPU925x_IMU_Data_t MPU925x_ReadIMU(uint8_t deviceIndex)
 	if(!Device[deviceIndex].isInit)
 		while(1);
 
-	MPU925x_IMU_Data_t IMU_Data;
 	uint8_t data[14];
 	ReadRegData(deviceIndex, MPU925X_REG_ACCEL_XOUT_H, data, 14);
 
-	int16_t ax = ((int16_t) data[0] << 8) | data[1];
-	int16_t ay = ((int16_t) data[2] << 8) | data[3];
-	int16_t az = ((int16_t) data[4] << 8) | data[5];
-	int16_t gx = ((int16_t) data[8] << 8) | data[9];
-	int16_t gy = ((int16_t) data[10] << 8) | data[11];
-	int16_t gz = ((int16_t) data[12] << 8) | data[13];
+	return MPU925x_ConvertIMU_Data(data);
+}
 
-	IMU_Data.Struct.ax = ax / accelSensitivity;
-	IMU_Data.Struct.ay = ay / accelSensitivity;
-	IMU_Data.Struct.az = az / accelSensitivity;
-	IMU_Data.Struct.gx = gx / gyroSensitivity;
-	IMU_Data.Struct.gy = gy / gyroSensitivity;
-	IMU_Data.Struct.gz = gz / gyroSensitivity;
+void MPU925x_StartReadIMU_IT(uint8_t deviceIndex)
+{
+	if(!Device[deviceIndex].isInit)
+		while(1);
 
-	return IMU_Data;
+	uint8_t startAddress = MPU925X_REG_ACCEL_XOUT_H | 0x80;
+	WriteData_IT(deviceIndex, &startAddress, 1);
+}
+
+void MPU925x_ReadIMU_IT(uint8_t deviceIndex, uint8_t *data)
+{
+	if(!Device[deviceIndex].isInit)
+		while(1);
+
+	ReadData_IT(deviceIndex, data, 14);
 }
 
 void MPU925x_ReadRegData(uint8_t deviceIndex, uint8_t startAddress, uint8_t *data, uint8_t nBytes)
@@ -292,12 +317,64 @@ void MPU925x_ReadRegData(uint8_t deviceIndex, uint8_t startAddress, uint8_t *dat
 	ReadRegData(deviceIndex, startAddress, data, nBytes);
 }
 
+void MPU925x_ReadData_IT(uint8_t deviceIndex, uint8_t *data, uint8_t nBytes)
+{
+	if(!Device[deviceIndex].isInit)
+		while(1);
+
+	ReadData_IT(deviceIndex, data, nBytes);
+}
+
 void MPU925x_WriteRegData(uint8_t deviceIndex, uint8_t startAdress, uint8_t *data, uint8_t nBytes)
 {
 	if(!Device[deviceIndex].isInit)
 		while(1);
 
 	WriteRegData(deviceIndex, startAdress, data, nBytes);
+}
+
+void MPU925x_WriteData_IT(uint8_t deviceIndex, uint8_t *data, uint8_t nBytes)
+{
+	if(!Device[deviceIndex].isInit)
+		while(1);
+
+	WriteData_IT(deviceIndex, data, nBytes);
+}
+
+MPU925x_IMU_Data_t MPU925x_ConvertIMU_Data(uint8_t *data)
+{
+	int16_t ax = ((int16_t) data[0] << 8) | data[1];
+	int16_t ay = ((int16_t) data[2] << 8) | data[3];
+	int16_t az = ((int16_t) data[4] << 8) | data[5];
+	int16_t gx = ((int16_t) data[8] << 8) | data[9];
+	int16_t gy = ((int16_t) data[10] << 8) | data[11];
+	int16_t gz = ((int16_t) data[12] << 8) | data[13];
+
+	MPU925x_IMU_Data_t IMU_Data;
+	IMU_Data.Struct.ax = ax / accelSensitivity;
+	IMU_Data.Struct.ay = ay / accelSensitivity;
+	IMU_Data.Struct.az = az / accelSensitivity;
+	IMU_Data.Struct.gx = gx / gyroSensitivity;
+	IMU_Data.Struct.gy = gy / gyroSensitivity;
+	IMU_Data.Struct.gz = gz / gyroSensitivity;
+
+	return IMU_Data;
+}
+
+void MPU925x_ClearChipSelect(uint8_t deviceIndex)
+{
+	if(!Device[deviceIndex].isInit)
+		while(1);
+
+	ClearChipSelect(deviceIndex);
+}
+
+void MPU925x_SetChipSelect(uint8_t deviceIndex)
+{
+	if(!Device[deviceIndex].isInit)
+		while(1);
+
+	SetChipSelect(deviceIndex);
 }
 
 
@@ -309,40 +386,31 @@ static void ReadRegData(uint8_t deviceIndex, uint8_t startAddress, uint8_t *data
 {
 	SetChipSelect(deviceIndex);
 
-	while(!(LL_SPI_IsActiveFlag_TXE(Device[deviceIndex].SPI_Handle)));
-	LL_SPI_TransmitData8(Device[deviceIndex].SPI_Handle, (startAddress | 0x80));
-	while(!(LL_SPI_IsActiveFlag_RXNE(Device[deviceIndex].SPI_Handle)));
-	LL_SPI_ReceiveData8(Device[deviceIndex].SPI_Handle);
-
-	for(uint8_t i = 0; i < nBytes; i++)
-	{
-		while(!(LL_SPI_IsActiveFlag_TXE(Device[deviceIndex].SPI_Handle)));
-		LL_SPI_TransmitData8(Device[deviceIndex].SPI_Handle, 0x00);
-		while(!(LL_SPI_IsActiveFlag_RXNE(Device[deviceIndex].SPI_Handle)));
-		data[i] = LL_SPI_ReceiveData8(Device[deviceIndex].SPI_Handle);
-	}
+	startAddress = startAddress | 0x80;
+	HAL_SPI_Transmit(Device[deviceIndex].SPI_Handle, &startAddress, 1, 10);
+	HAL_SPI_Receive(Device[deviceIndex].SPI_Handle, data, nBytes, 10);
 
 	ClearChipSelect(deviceIndex);
 }
 
-static void WriteRegData(uint8_t deviceIndex, uint8_t startAdress, uint8_t *data, uint8_t nBytes)
+static void ReadData_IT(uint8_t deviceIndex, uint8_t *data, uint8_t nBytes)
+{
+	HAL_SPI_Receive_IT(Device[deviceIndex].SPI_Handle, data, nBytes);
+}
+
+static void WriteRegData(uint8_t deviceIndex, uint8_t startAddress, uint8_t *data, uint8_t nBytes)
 {
 	SetChipSelect(deviceIndex);
 
-	while (!(Device[deviceIndex].SPI_Handle->SR & SPI_SR_TXE));
-	LL_SPI_TransmitData8(Device[deviceIndex].SPI_Handle, startAdress);
-	while (!(Device[deviceIndex].SPI_Handle->SR & SPI_SR_RXNE));
-	LL_SPI_ReceiveData8(Device[deviceIndex].SPI_Handle);
-
-	for(uint8_t i = 0; i <nBytes; i++)
-	{
-		while (!(Device[deviceIndex].SPI_Handle->SR & SPI_SR_TXE));
-		LL_SPI_TransmitData8(Device[deviceIndex].SPI_Handle, data[i]);
-		while (!(Device[deviceIndex].SPI_Handle->SR & SPI_SR_RXNE));
-		LL_SPI_ReceiveData8(Device[deviceIndex].SPI_Handle);
-	}
+	HAL_SPI_Transmit(Device[deviceIndex].SPI_Handle, &startAddress, 1, 10);
+	HAL_SPI_Transmit(Device[deviceIndex].SPI_Handle, data, nBytes, 10);
 
 	ClearChipSelect(deviceIndex);
+}
+
+static void WriteData_IT(uint8_t deviceIndex, uint8_t *data, uint8_t nBytes)
+{
+	HAL_SPI_Transmit_IT(Device[deviceIndex].SPI_Handle, data, nBytes);
 }
 
 static inline void ClearChipSelect(uint8_t deviceIndex)

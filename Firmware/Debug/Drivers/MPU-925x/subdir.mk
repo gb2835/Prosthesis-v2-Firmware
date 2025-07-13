@@ -5,13 +5,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Drivers/MPU-925x/mpu925x_spi.c 
+../Drivers/MPU-925x/mpu925x_spi_hal.c 
 
 OBJS += \
-./Drivers/MPU-925x/mpu925x_spi.o 
+./Drivers/MPU-925x/mpu925x_spi_hal.o 
 
 C_DEPS += \
-./Drivers/MPU-925x/mpu925x_spi.d 
+./Drivers/MPU-925x/mpu925x_spi_hal.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +21,7 @@ Drivers/MPU-925x/%.o Drivers/MPU-925x/%.su: ../Drivers/MPU-925x/%.c Drivers/MPU-
 clean: clean-Drivers-2f-MPU-2d-925x
 
 clean-Drivers-2f-MPU-2d-925x:
-	-$(RM) ./Drivers/MPU-925x/mpu925x_spi.d ./Drivers/MPU-925x/mpu925x_spi.o ./Drivers/MPU-925x/mpu925x_spi.su
+	-$(RM) ./Drivers/MPU-925x/mpu925x_spi_hal.d ./Drivers/MPU-925x/mpu925x_spi_hal.o ./Drivers/MPU-925x/mpu925x_spi_hal.su
 
 .PHONY: clean-Drivers-2f-MPU-2d-925x
 
