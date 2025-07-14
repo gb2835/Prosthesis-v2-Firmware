@@ -72,6 +72,10 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define OSCOPE_Pin GPIO_PIN_13
 #define OSCOPE_GPIO_Port GPIOC
+#define BOT_LC_IN_Pin GPIO_PIN_0
+#define BOT_LC_IN_GPIO_Port GPIOC
+#define TOP_LC_IN_Pin GPIO_PIN_1
+#define TOP_LC_IN_GPIO_Port GPIOC
 #define ANKLE_IMU_CS_Pin GPIO_PIN_4
 #define ANKLE_IMU_CS_GPIO_Port GPIOA
 #define IMU_SCL_Pin GPIO_PIN_5

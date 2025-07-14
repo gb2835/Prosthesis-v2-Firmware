@@ -35,15 +35,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_ranges 00001898  00000000  00000000  00045518  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0002dc12  00000000  00000000  00046db0  2**0
+ 16 .debug_macro  0002dc2a  00000000  00000000  00046db0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0001c2e3  00000000  00000000  000749c2  2**0
+ 17 .debug_line   0001c2e5  00000000  00000000  000749da  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0011191e  00000000  00000000  00090ca5  2**0
+ 18 .debug_str    00111984  00000000  00000000  00090cbf  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  001a25c3  2**0
+ 19 .comment      00000050  00000000  00000000  001a2643  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00007270  00000000  00000000  001a2614  2**2
+ 20 .debug_frame  00007270  00000000  00000000  001a2694  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -3385,10 +3385,10 @@ int main(void)
  8001a66:	781b      	ldrb	r3, [r3, #0]
  8001a68:	2b00      	cmp	r3, #0
  8001a6a:	d0fb      	beq.n	8001a64 <main+0x22c>
-	{
-		  RunProsthesisControl();
+		{
+			RunProsthesisControl();
  8001a6c:	f000 f9c4 	bl	8001df8 <RunProsthesisControl>
-		  isProsthesisControlRequired = 0;
+			isProsthesisControlRequired = 0;
  8001a70:	4b06      	ldr	r3, [pc, #24]	; (8001a8c <main+0x254>)
  8001a72:	2200      	movs	r2, #0
  8001a74:	701a      	strb	r2, [r3, #0]
