@@ -1,6 +1,6 @@
 Drivers/BNO08x/spi_hal.o: ../Drivers/BNO08x/spi_hal.c \
- ../Drivers/BNO08x/spi_hal.h ../Drivers/SH2/sh2_hal.h \
- ../Drivers/SH2/sh2_err.h ../Core/Inc/main.h \
+ ../Drivers/BNO08x/spi_hal.h ../Drivers/BNO08x/SH2/sh2_hal.h \
+ ../Drivers/BNO08x/SH2/sh2_err.h ../Core/Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Core/Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
@@ -44,10 +44,11 @@ Drivers/BNO08x/spi_hal.o: ../Drivers/BNO08x/spi_hal.c \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_pwr.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_dma.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_gpio.h \
- ../Core/Inc/spi.h ../Core/Inc/main.h ../Core/Inc/tim.h
+ ../Core/Inc/spi.h ../Core/Inc/main.h ../Core/Inc/tim.h \
+ ../Core/Inc/prosthesis_v2.h
 ../Drivers/BNO08x/spi_hal.h:
-../Drivers/SH2/sh2_hal.h:
-../Drivers/SH2/sh2_err.h:
+../Drivers/BNO08x/SH2/sh2_hal.h:
+../Drivers/BNO08x/SH2/sh2_err.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
@@ -95,3 +96,4 @@ Drivers/BNO08x/spi_hal.o: ../Drivers/BNO08x/spi_hal.c \
 ../Core/Inc/spi.h:
 ../Core/Inc/main.h:
 ../Core/Inc/tim.h:
+../Core/Inc/prosthesis_v2.h:

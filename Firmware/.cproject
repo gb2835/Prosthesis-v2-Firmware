@@ -48,11 +48,11 @@
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32L4xx/Include"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy"/>
-									<listOptionValue builtIn="false" value="../Drivers/SH2"/>
 									<listOptionValue builtIn="false" value="../Drivers/BNO08x"/>
 									<listOptionValue builtIn="false" value="../Drivers/AKxx-x"/>
 									<listOptionValue builtIn="false" value="../Drivers/MPU-925x"/>
 									<listOptionValue builtIn="false" value="../Drivers/LL_Drivers"/>
+									<listOptionValue builtIn="false" value="../Drivers/BNO08x/SH2"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.290977148" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>

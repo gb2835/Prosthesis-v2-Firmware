@@ -1,5 +1,6 @@
-Drivers/SH2/shtp.o: ../Drivers/SH2/shtp.c ../Drivers/SH2/shtp.h \
- ../Drivers/SH2/sh2_hal.h ../Drivers/SH2/sh2_err.h \
+Drivers/BNO08x/SH2/shtp.o: ../Drivers/BNO08x/SH2/shtp.c \
+ ../Drivers/BNO08x/SH2/shtp.h ../Drivers/BNO08x/SH2/sh2_hal.h \
+ ../Drivers/BNO08x/SH2/sh2_err.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h \
  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h \
  ../Drivers/CMSIS/Include/core_cm4.h \
@@ -31,9 +32,9 @@ Drivers/SH2/shtp.o: ../Drivers/SH2/shtp.c ../Drivers/SH2/shtp.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h
-../Drivers/SH2/shtp.h:
-../Drivers/SH2/sh2_hal.h:
-../Drivers/SH2/sh2_err.h:
+../Drivers/BNO08x/SH2/shtp.h:
+../Drivers/BNO08x/SH2/sh2_hal.h:
+../Drivers/BNO08x/SH2/sh2_err.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h:
 ../Drivers/CMSIS/Include/core_cm4.h:

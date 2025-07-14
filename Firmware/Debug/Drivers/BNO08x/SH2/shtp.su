@@ -1,0 +1,11 @@
+../Drivers/BNO08x/SH2/shtp.c:98:13:shtp_init	16	static
+../Drivers/BNO08x/SH2/shtp.c:109:16:getInstance	16	static
+../Drivers/BNO08x/SH2/shtp.c:123:24:min_u16	16	static
+../Drivers/BNO08x/SH2/shtp.c:134:12:txProcess	56	static
+../Drivers/BNO08x/SH2/shtp.c:219:13:rxAssemble	40	static
+../Drivers/BNO08x/SH2/shtp.c:340:7:shtp_open	24	static
+../Drivers/BNO08x/SH2/shtp.c:377:6:shtp_close	24	static
+../Drivers/BNO08x/SH2/shtp.c:389:6:shtp_setEventCallback	32	static
+../Drivers/BNO08x/SH2/shtp.c:399:5:shtp_listenChan	32	static
+../Drivers/BNO08x/SH2/shtp.c:417:5:shtp_send	32	static
+../Drivers/BNO08x/SH2/shtp.c:436:6:shtp_service	40	static

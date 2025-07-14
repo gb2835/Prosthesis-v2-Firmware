@@ -199,6 +199,7 @@ static int txProcess(shtp_t *pShtp, uint8_t chan, const uint8_t* pData, uint32_t
         if(timeoutOccurred)
         	return SH2_ERR_TIMEOUT;
 
+
 /******************************************************************************/
 
         if (status < 0)
