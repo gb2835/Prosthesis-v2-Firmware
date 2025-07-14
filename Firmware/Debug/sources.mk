@@ -24,6 +24,7 @@ SUBDIRS := \
 Core/Src \
 Core/Startup \
 Drivers/AKxx-x \
+Drivers/BNO08x \
 Drivers/LL_Drivers \
 Drivers/MPU-925x \
 Drivers/SH2 \

@@ -9,7 +9,6 @@
 *
 *******************************************************************************/
 
-
 #include "spi_hal.h"
 
 #include "sh2_hal.h"
@@ -94,31 +93,31 @@ static bool isOpen = false;
 
 static void bootn(bool state)
 {
-    HAL_GPIO_WritePin(ANKLE_IMU_BT_GPIO_Port, ANKLE_IMU_BT_Pin,
+    HAL_GPIO_WritePin(KNEE_IMU_BT_GPIO_Port, KNEE_IMU_BT_Pin,
                       state ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 static void rstn(bool state)
 {
-    HAL_GPIO_WritePin(ANKLE_IMU_RST_GPIO_Port, ANKLE_IMU_RST_Pin,
+    HAL_GPIO_WritePin(KNEE_IMU_RST_GPIO_Port, KNEE_IMU_RST_Pin,
                       state ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 static void ps0_waken(bool state)
 {
-    HAL_GPIO_WritePin(ANKLE_IMU_P0_GPIO_Port, ANKLE_IMU_P0_Pin,
+    HAL_GPIO_WritePin(KNEE_IMU_P0_GPIO_Port, KNEE_IMU_P0_Pin,
                       state ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 static void ps1(bool state)
 {
-    HAL_GPIO_WritePin(ANKLE_IMU_P1_GPIO_Port, ANKLE_IMU_P1_Pin,
+    HAL_GPIO_WritePin(KNEE_IMU_P1_GPIO_Port, KNEE_IMU_P1_Pin,
                       state ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 static void csn(bool state)
 {
-    HAL_GPIO_WritePin(ANKLE_IMU_CS_GPIO_Port, ANKLE_IMU_CS_Pin,
+    HAL_GPIO_WritePin(KNEE_IMU_CS_GPIO_Port, KNEE_IMU_CS_Pin,
                       state ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 

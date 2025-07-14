@@ -200,8 +200,8 @@ int main(void)
 	}
 	if((Prosthesis_Init.Joint == Knee) || (Prosthesis_Init.Joint == Combined))
 	{
-//	  	if(BNO08x_Init())
-//	  		ErrorHandler(KneeIMU_Error);	source files for knee imu removed from build??
+	  	if(BNO08x_Init())
+	  		ErrorHandler(KneeIMU_Error);
 
 		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;

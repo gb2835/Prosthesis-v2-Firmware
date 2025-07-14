@@ -1,0 +1,6 @@
+../Drivers/BNO08x/bno08x_spi_hal.c:46:16:BNO08x_Init	16	static
+../Drivers/BNO08x/bno08x_spi_hal.c:64:16:BNO08x_StartReports	8	static
+../Drivers/BNO08x/bno08x_spi_hal.c:73:6:BNO08x_ReadSensors	8	static
+../Drivers/BNO08x/bno08x_spi_hal.c:85:23:StartReports	24	static
+../Drivers/BNO08x/bno08x_spi_hal.c:112:13:EventHandler	16	static
+../Drivers/BNO08x/bno08x_spi_hal.c:118:13:ReadEvent	112	static

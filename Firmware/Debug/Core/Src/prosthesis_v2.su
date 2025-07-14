@@ -9,7 +9,7 @@
 ../Core/Src/prosthesis_v2.c:292:6:ErrorHandler	24	static
 ../Core/Src/prosthesis_v2.c:314:13:GetInputs	64	static
 ../Core/Src/prosthesis_v2.c:356:17:ReadLoadCell	16	static
-../Core/Src/prosthesis_v2.c:363:13:ProcessInputs	48	static
+../Core/Src/prosthesis_v2.c:363:13:ProcessInputs	64	static
 ../Core/Src/prosthesis_v2.c:443:13:RunStateMachine	4	static
 ../Core/Src/prosthesis_v2.c:612:13:ServiceMotor	24	static
 ../Core/Src/prosthesis_v2.c:669:13:ActivateLED	16	static

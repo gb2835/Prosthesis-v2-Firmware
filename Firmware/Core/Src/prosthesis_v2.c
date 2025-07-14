@@ -342,14 +342,14 @@ static void GetInputs(void)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-//		if(BNO08x_resetOccurred)
-//		{
-//			BNO08x_resetOccurred = 0;
-//			if(BNO08x_StartReports())
-//				ErrorHandler(KneeIMU_Error);
-//		}
-//
-//		BNO08x_ReadSensors();
+		if(BNO08x_resetOccurred)
+		{
+			BNO08x_resetOccurred = 0;
+			if(BNO08x_StartReports())
+				ErrorHandler(KneeIMU_Error);
+		}
+
+		BNO08x_ReadSensors();
 	}
 }
 
@@ -418,25 +418,25 @@ static void ProcessInputs(void)
 
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-//		if(Device.Side == Left)
-//		{
-//			CM_KneeJoint.IMU_Data.ax = -BNO08x_IMU_Data[0];
-//			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[1];
-//			CM_KneeJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
-//			CM_KneeJoint.IMU_Data.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
-//			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
-//			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
-//		}
-//		else if(Device.Side == Right)
-//			memcpy(&CM_KneeJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(KneeIMU_Data_t));
-//
-//		float yaw, pitch, roll;
-//		QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
-//		CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
-//		CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
-//		CM_KneeJoint.IMU_Data.roll = roll * RAD_TO_DEG;
-//
-//		CM_hipAngle = CM_KneeJoint.MotorReadData.speed - CM_KneeJoint.IMU_Data.pitch;
+		if(Device.Side == Left)
+		{
+			CM_KneeJoint.IMU_Data.ax = -BNO08x_IMU_Data[0];
+			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[1];
+			CM_KneeJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
+			CM_KneeJoint.IMU_Data.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
+		}
+		else if(Device.Side == Right)
+			memcpy(&CM_KneeJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(KneeIMU_Data_t));
+
+		float yaw, pitch, roll;
+		QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
+		CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+		CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
+		CM_KneeJoint.IMU_Data.roll = roll * RAD_TO_DEG;
+
+		CM_hipAngle = CM_KneeJoint.MotorReadData.speed - CM_KneeJoint.IMU_Data.pitch;
 	}
 }
 

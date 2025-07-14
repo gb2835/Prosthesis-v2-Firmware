@@ -13,6 +13,7 @@ RM := rm -rf
 -include Drivers/SH2/subdir.mk
 -include Drivers/MPU-925x/subdir.mk
 -include Drivers/LL_Drivers/subdir.mk
+-include Drivers/BNO08x/subdir.mk
 -include Drivers/AKxx-x/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk

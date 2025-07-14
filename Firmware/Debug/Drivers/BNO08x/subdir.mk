@@ -5,13 +5,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Drivers/BNO08x/bno08x_spi_hal.c 
+../Drivers/BNO08x/bno08x_spi_hal.c \
+../Drivers/BNO08x/spi_hal.c 
 
 OBJS += \
-./Drivers/BNO08x/bno08x_spi_hal.o 
+./Drivers/BNO08x/bno08x_spi_hal.o \
+./Drivers/BNO08x/spi_hal.o 
 
 C_DEPS += \
-./Drivers/BNO08x/bno08x_spi_hal.d 
+./Drivers/BNO08x/bno08x_spi_hal.d \
+./Drivers/BNO08x/spi_hal.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +24,7 @@ Drivers/BNO08x/%.o Drivers/BNO08x/%.su: ../Drivers/BNO08x/%.c Drivers/BNO08x/sub
 clean: clean-Drivers-2f-BNO08x
 
 clean-Drivers-2f-BNO08x:
-	-$(RM) ./Drivers/BNO08x/bno08x_spi_hal.d ./Drivers/BNO08x/bno08x_spi_hal.o ./Drivers/BNO08x/bno08x_spi_hal.su
+	-$(RM) ./Drivers/BNO08x/bno08x_spi_hal.d ./Drivers/BNO08x/bno08x_spi_hal.o ./Drivers/BNO08x/bno08x_spi_hal.su ./Drivers/BNO08x/spi_hal.d ./Drivers/BNO08x/spi_hal.o ./Drivers/BNO08x/spi_hal.su
 
 .PHONY: clean-Drivers-2f-BNO08x
 
