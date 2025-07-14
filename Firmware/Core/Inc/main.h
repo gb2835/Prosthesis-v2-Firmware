@@ -88,6 +88,16 @@ void Error_Handler(void);
 #define LED_RED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
+
+/*******************************************************************************
+* USER ADDED MAIN.H
+*******************************************************************************/
+
+extern uint8_t isProsthesisControlRequired;
+
+
+/******************************************************************************/
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

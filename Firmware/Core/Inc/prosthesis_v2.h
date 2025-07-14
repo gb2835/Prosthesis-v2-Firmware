@@ -58,8 +58,6 @@ typedef struct
 	Side_e Side;
 } Prosthesis_Init_t;
 
-extern uint8_t isProsthesisControlRequired;
-
 void InitProsthesisControl(Prosthesis_Init_t *Device_Init);
 void RequireTestProgram(TestProgram_e option);
 void RunProsthesisControl(void);

@@ -72,6 +72,8 @@ void SystemClock_Config(void);
 
 #define LPTIM2_PERIOD	0x3F	// Timer frequency = timer clock frequency / (prescaler * (period + 1))
 
+uint8_t isProsthesisControlRequired = 0;
+
 
 /******************************************************************************/
 
