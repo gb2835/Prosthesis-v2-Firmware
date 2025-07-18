@@ -172,14 +172,6 @@ int main(void)
 	LL_ADC_Enable(ADC1);
 	LL_ADC_Enable(ADC2);
 
-	for(uint8_t i = 0; i < 5; i++)	// Significant delay when powering on AK motor
-	{
-		ActivateLED(Blue);
-		LL_mDelay(500);
-		ActivateLED(NoColor);
-		LL_mDelay(500);
-	}
-
 	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[AnkleIndex]))
 		ErrorHandler(CAN_Error);
 	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[KneeIndex]))
@@ -189,6 +181,7 @@ int main(void)
 
 	if((Prosthesis_Init.Joint == Ankle) || (Prosthesis_Init.Joint == Combined))
 	{
+		LL_mDelay(10);
 	  	if(MPU925x_Init(0, &AnkleIMU_Init))
 	  		ErrorHandler(AnkleIMU_Error);
 		MPU925x_SetAccelSensitivity(0, MPU925x_AccelSensitivity_8g);

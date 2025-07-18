@@ -334,7 +334,7 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef * hspi1)
 * USER ADDED CODE
 *******************************************************************************/
 
-//	ErrorHandler(KneeIMU_Error);??
+	ErrorHandler(KneeIMU_Error);
 
 /******************************************************************************/
 
