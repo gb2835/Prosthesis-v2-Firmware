@@ -116,7 +116,6 @@ static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
 
 static AnkleJoint_t CM_AnkleJoint;
-static float CM_footSpeedThreshold;
 static int8_t CM_state_angles, CM_state_torques;
 static int16_t CM_state_speeds;
 static KneeJoint_t CM_KneeJoint;
@@ -125,6 +124,7 @@ static uint16_t CM_state_loadCells;
 
 static Error_e CM_ledCode = NoError;
 static float CM_footSpeed = 0.0f;
+static float CM_footSpeedThreshold = 0.0f;
 static float CM_hipAngle = 0.0f;
 
 static void GetInputs(void);
@@ -146,6 +146,7 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	memset(&CM_AnkleJoint, 0, sizeof(CM_AnkleJoint));
 	memset(&CM_KneeJoint, 0, sizeof(CM_KneeJoint));
 
+	// might not need this since starting on bumpers??
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
 		float startPosition = 0.0f;
@@ -209,8 +210,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 
 	CM_LoadCell.intoStanceThreshold = 1300; //??
 	CM_LoadCell.outOfStanceThreshold = 1300 + 50; //??
-
-	CM_footSpeedThreshold = 0.0f;
 
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
