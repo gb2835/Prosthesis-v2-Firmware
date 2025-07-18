@@ -38,13 +38,6 @@
 
 typedef enum
 {
-	Blue,
-	Green,
-	Red
-} LED_Color_e;
-
-typedef enum
-{
 	EarlyStance,
 	MidStance,
 	LateStance,
@@ -138,8 +131,8 @@ static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
 static void RunStateMachine(void);
+static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
-static void ActivateLED(LED_Color_e color);
 
 
 /*******************************************************************************
@@ -247,37 +240,7 @@ void RunProsthesisControl(void)
 	ProcessInputs();
 
 	RunStateMachine();
-
-	if((Device.Joint == Ankle) || (Device.Joint == Combined))
-	{
-		static uint8_t missedAnkleMotorCalls = 0;
-		if(CM_AnkleJoint.motorDataReceived)
-		{
-			missedAnkleMotorCalls = 0;
-			CM_AnkleJoint.motorDataReceived = 0;
-			ServiceMotor(AnkleIndex);
-		}
-		else
-			missedAnkleMotorCalls++;
-
-		if(missedAnkleMotorCalls >= 5)
-			ErrorHandler(AnkleMotorError);
-	}
-	if((Device.Joint == Knee) || (Device.Joint == Combined))
-	{
-		static uint8_t missedKneeMotorCalls = 0;
-		if(CM_KneeJoint.motorDataReceived)
-		{
-			missedKneeMotorCalls = 0;
-			CM_KneeJoint.motorDataReceived = 0;
-			ServiceMotor(KneeIndex);
-		}
-		else
-			missedKneeMotorCalls++;
-
-		if(missedKneeMotorCalls >= 5)
-			ErrorHandler(KneeMotorError);
-	}
+	CheckMotorCalls();
 
 	// Check for first and second executions, needed for load cell filter
 	if(isFirst)
@@ -287,6 +250,34 @@ void RunProsthesisControl(void)
 	}
 	else if(isSecond)
 		isSecond = 0;
+}
+
+void ActivateLED(LED_Color_e color)
+{
+	if(color == NoColor)
+	{
+		LL_GPIO_SetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		LL_GPIO_SetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
+	}
+	if(color == Blue)
+	{
+		LL_GPIO_ResetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		LL_GPIO_SetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
+	}
+	else if(color == Green)
+	{
+		LL_GPIO_SetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		LL_GPIO_SetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
+	}
+	else if(color == Red)
+	{
+		LL_GPIO_SetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
+	}
 }
 
 void ErrorHandler(Error_e error)
@@ -324,8 +315,11 @@ static void GetInputs(void)
 			imuReadStarted = 0;
 			MPU925x_ReadIMU_IT(0, tempImuData);
 		}
+
+		static uint8_t missedAnkleImuCalls = 0;
 		if(imuDataReceived)
 		{
+			missedAnkleImuCalls = 0;
 			imuDataReceived = 0;
 			MPU925x_ClearChipSelect(0);
 
@@ -339,6 +333,11 @@ static void GetInputs(void)
 			IMU_Data.Struct.gy -= 0.59624999999999995;
 			IMU_Data.Struct.gz -= -1.578993902439024;
 		}
+		else
+			missedAnkleImuCalls++;
+
+		if(missedAnkleImuCalls >= 5)
+			ErrorHandler(AnkleIMU_Error);
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
@@ -609,6 +608,41 @@ static void RunStateMachine(void)
 	}
 }
 
+static void CheckMotorCalls(void)
+{
+	if((Device.Joint == Ankle) || (Device.Joint == Combined))
+	{
+		static uint8_t missedAnkleMotorCalls = 0;
+		if(CM_AnkleJoint.motorDataReceived)
+		{
+			LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
+			missedAnkleMotorCalls = 0;
+			CM_AnkleJoint.motorDataReceived = 0;
+			ServiceMotor(AnkleIndex);
+		}
+		else
+			missedAnkleMotorCalls++;
+
+		if(missedAnkleMotorCalls >= 5)
+			ErrorHandler(AnkleMotorError);
+	}
+	if((Device.Joint == Knee) || (Device.Joint == Combined))
+	{
+		static uint8_t missedKneeMotorCalls = 0;
+		if(CM_KneeJoint.motorDataReceived)
+		{
+			missedKneeMotorCalls = 0;
+			CM_KneeJoint.motorDataReceived = 0;
+			ServiceMotor(KneeIndex);
+		}
+		else
+			missedKneeMotorCalls++;
+
+		if(missedKneeMotorCalls >= 5)
+			ErrorHandler(KneeMotorError);
+	}
+}
+
 static void ServiceMotor(DeviceIndex_e deviceIndex)
 {
 	static uint8_t firstCall = 1;
@@ -663,28 +697,6 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		else
 			if(AKxx_x_EnterMotorCtrlMode(deviceIndex, &txMailbox))
 				ErrorHandler(KneeMotorError);
-	}
-}
-
-static void ActivateLED(LED_Color_e color)
-{
-	if(color == Blue)
-	{
-		LL_GPIO_ResetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
-		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-		LL_GPIO_SetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
-	}
-	else if(color == Green)
-	{
-		LL_GPIO_SetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
-		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-		LL_GPIO_SetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
-	}
-	else if(color == Red)
-	{
-		LL_GPIO_SetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
-		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-		LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
 	}
 }
 

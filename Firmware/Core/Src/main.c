@@ -172,7 +172,13 @@ int main(void)
 	LL_ADC_Enable(ADC1);
 	LL_ADC_Enable(ADC2);
 
-	LL_mDelay(5000);	// Significant delay when powering on AK motor
+	for(uint8_t i = 0; i < 5; i++)	// Significant delay when powering on AK motor
+	{
+		ActivateLED(Blue);
+		LL_mDelay(500);
+		ActivateLED(NoColor);
+		LL_mDelay(500);
+	}
 
 	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[AnkleIndex]))
 		ErrorHandler(CAN_Error);
@@ -190,8 +196,15 @@ int main(void)
 
 		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
-		if(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
-			ErrorHandler(AnkleMotorError);
+		while(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
+		{
+			ActivateLED(Blue);
+			LL_mDelay(50);
+			ActivateLED(NoColor);
+			LL_mDelay(50);
+		}
+		ActivateLED(NoColor);
+
 		if(AKxx_x_ZeroMotorPosition(AnkleIndex, &txMailbox))
 			ErrorHandler(AnkleMotorError);
 		if(AKxx_x_PollMotorReadWith10msTimeout(&RxData_Float))
@@ -204,8 +217,15 @@ int main(void)
 
 		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
-		if(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
-			ErrorHandler(KneeMotorError);
+		while(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
+		{
+			ActivateLED(Blue);
+			LL_mDelay(50);
+			ActivateLED(NoColor);
+			LL_mDelay(50);
+		}
+		ActivateLED(NoColor);
+
 		if(AKxx_x_ZeroMotorPosition(KneeIndex, &txMailbox))
 			ErrorHandler(KneeMotorError);
 		if(AKxx_x_PollMotorReadWith10msTimeout(&RxData_Float))
@@ -222,7 +242,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(ReadOnly);
+	RequireTestProgram(ImpedanceControl);
 
 
 /*******************************************************************************
