@@ -115,12 +115,24 @@ static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
 
+static const int8_t state_angles[3][6] = {{-20, -14, -8, -2,  4, 10},	// Ankle only
+									 	  {-20,  -4, 12, 28, 44, 60},	// Combined
+										  {  0,  12, 24, 36, 48, 60}};	// Knee only
+
+static const int8_t state_torques[3][6] = {{-100, -70, -40, -10, 20, 50},	// Ankle only
+										   {-100, -70, -40, -10, 20, 50},	// Combined
+										   { -50, -30, -10,  10, 30, 50}};	// Knee only
+
+static const int16_t state_speeds[6] = {-600, -360, -120, 120, 360, 600};
+
+static const uint16_t state_loadCells[6] = {1100, 1200, 1300, 1400, 1500, 1600}; //??
+
 static AnkleJoint_t CM_AnkleJoint;
 static int8_t CM_state_angles, CM_state_torques;
 static int16_t CM_state_speeds;
+static uint16_t CM_state_loadCells;
 static KneeJoint_t CM_KneeJoint;
 static LoadCell_t CM_LoadCell;
-static uint16_t CM_state_loadCells;
 
 static Error_e CM_ledCode = NoError;
 static float CM_footSpeed = 0.0f;
@@ -444,10 +456,24 @@ static void RunStateMachine(void)
 	switch(state)
 	{
 	case EarlyStance:
-		CM_state_angles = -10;
-		CM_state_loadCells = 1100; //??
-		CM_state_torques = -30;
-		CM_state_speeds = -200;
+		CM_state_loadCells = state_loadCells[EarlyStance];
+		CM_state_speeds = state_speeds[EarlyStance];
+
+		if(Device.Joint == Ankle)
+		{
+			CM_state_angles = state_angles[Ankle][EarlyStance];
+			CM_state_torques = state_torques[Ankle][EarlyStance];
+		}
+		if(Device.Joint == Knee)
+		{
+			CM_state_angles = state_angles[Knee][EarlyStance];
+			CM_state_torques = state_torques[Knee][EarlyStance];
+		}
+		if(Device.Joint == Combined)
+		{
+			CM_state_angles = state_angles[Combined][EarlyStance];
+			CM_state_torques = state_torques[Combined][EarlyStance];
+		}
 
 		if(testProgram != ImpedanceControl)
 		{
@@ -471,10 +497,24 @@ static void RunStateMachine(void)
 		break;
 
 	case MidStance:
-		CM_state_angles = 5;
-		CM_state_loadCells = 1200;
-		CM_state_torques = -20;
-		CM_state_speeds = -120;
+		CM_state_loadCells = state_loadCells[MidStance];
+		CM_state_speeds = state_speeds[MidStance];
+
+		if(Device.Joint == Ankle)
+		{
+			CM_state_angles = state_angles[Ankle][MidStance];
+			CM_state_torques = state_torques[Ankle][MidStance];
+		}
+		if(Device.Joint == Knee)
+		{
+			CM_state_angles = state_angles[Knee][MidStance];
+			CM_state_torques = state_torques[Knee][MidStance];
+		}
+		if(Device.Joint == Combined)
+		{
+			CM_state_angles = state_angles[Combined][MidStance];
+			CM_state_torques = state_torques[Combined][MidStance];
+		}
 
 		if(testProgram != ImpedanceControl)
 		{
@@ -498,10 +538,24 @@ static void RunStateMachine(void)
 		break;
 
 	case LateStance:
-		CM_state_angles = 20;
-		CM_state_loadCells = 1300;
-		CM_state_torques = -10;
-		CM_state_speeds = -40;
+		CM_state_loadCells = state_loadCells[LateStance];
+		CM_state_speeds = state_speeds[LateStance];
+
+		if(Device.Joint == Ankle)
+		{
+			CM_state_angles = state_angles[Ankle][LateStance];
+			CM_state_torques = state_torques[Ankle][LateStance];
+		}
+		if(Device.Joint == Knee)
+		{
+			CM_state_angles = state_angles[Knee][LateStance];
+			CM_state_torques = state_torques[Knee][LateStance];
+		}
+		if(Device.Joint == Combined)
+		{
+			CM_state_angles = state_angles[Combined][LateStance];
+			CM_state_torques = state_torques[Combined][LateStance];
+		}
 
 		if(testProgram != ImpedanceControl)
 		{
@@ -525,10 +579,24 @@ static void RunStateMachine(void)
 		break;
 
 	case SwingFlexion:
-		CM_state_angles = 35;
-		CM_state_loadCells = 1400;
-		CM_state_torques = 0;
-		CM_state_speeds = 40;
+		CM_state_loadCells = state_loadCells[SwingFlexion];
+		CM_state_speeds = state_speeds[SwingFlexion];
+
+		if(Device.Joint == Ankle)
+		{
+			CM_state_angles = state_angles[Ankle][SwingFlexion];
+			CM_state_torques = state_torques[Ankle][SwingFlexion];
+		}
+		if(Device.Joint == Knee)
+		{
+			CM_state_angles = state_angles[Knee][SwingFlexion];
+			CM_state_torques = state_torques[Knee][SwingFlexion];
+		}
+		if(Device.Joint == Combined)
+		{
+			CM_state_angles = state_angles[Combined][SwingFlexion];
+			CM_state_torques = state_torques[Combined][SwingFlexion];
+		}
 
 		if(testProgram != ImpedanceControl)
 		{
@@ -552,10 +620,24 @@ static void RunStateMachine(void)
 		break;
 
 	case SwingExtension:
-		CM_state_angles = 50;
-		CM_state_loadCells = 1500;
-		CM_state_torques = 10;
-		CM_state_speeds = 120;
+		CM_state_loadCells = state_loadCells[SwingExtension];
+		CM_state_speeds = state_speeds[SwingExtension];
+
+		if(Device.Joint == Ankle)
+		{
+			CM_state_angles = state_angles[Ankle][SwingExtension];
+			CM_state_torques = state_torques[Ankle][SwingExtension];
+		}
+		if(Device.Joint == Knee)
+		{
+			CM_state_angles = state_angles[Knee][SwingExtension];
+			CM_state_torques = state_torques[Knee][SwingExtension];
+		}
+		if(Device.Joint == Combined)
+		{
+			CM_state_angles = state_angles[Combined][SwingExtension];
+			CM_state_torques = state_torques[Combined][SwingExtension];
+		}
 
 		if(testProgram != ImpedanceControl)
 		{
@@ -579,10 +661,24 @@ static void RunStateMachine(void)
 		break;
 
 	case SwingDescension:
-		CM_state_angles = 65;
-		CM_state_loadCells = 1600;
-		CM_state_torques = 20;
-		CM_state_speeds = 200;
+		CM_state_loadCells = state_loadCells[SwingDescension];
+		CM_state_speeds = state_speeds[SwingDescension];
+
+		if(Device.Joint == Ankle)
+		{
+			CM_state_angles = state_angles[Ankle][SwingDescension];
+			CM_state_torques = state_torques[Ankle][SwingDescension];
+		}
+		if(Device.Joint == Knee)
+		{
+			CM_state_angles = state_angles[Knee][SwingDescension];
+			CM_state_torques = state_torques[Knee][SwingDescension];
+		}
+		if(Device.Joint == Combined)
+		{
+			CM_state_angles = state_angles[Combined][SwingDescension];
+			CM_state_torques = state_torques[Combined][SwingDescension];
+		}
 
 		if(testProgram != ImpedanceControl)
 		{
