@@ -13,9 +13,9 @@
 ../Core/Src/prosthesis_v2.c:366:17:ReadLoadCell	16	static
 ../Core/Src/prosthesis_v2.c:373:13:ProcessInputs	64	static
 ../Core/Src/prosthesis_v2.c:453:13:RunStateMachine	4	static
-../Core/Src/prosthesis_v2.c:706:13:CheckMotorCalls	8	static
-../Core/Src/prosthesis_v2.c:741:13:ServiceMotor	24	static
-../Core/Src/prosthesis_v2.c:803:6:HAL_SPI_TxCpltCallback	16	static
-../Core/Src/prosthesis_v2.c:808:6:HAL_SPI_RxCpltCallback	16	static
-../Core/Src/prosthesis_v2.c:813:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
-../Core/Src/prosthesis_v2.c:823:6:HAL_CAN_RxFifo1MsgPendingCallback	48	static
+../Core/Src/prosthesis_v2.c:712:13:CheckMotorCalls	8	static
+../Core/Src/prosthesis_v2.c:747:13:ServiceMotor	24	static
+../Core/Src/prosthesis_v2.c:809:6:HAL_SPI_TxCpltCallback	16	static
+../Core/Src/prosthesis_v2.c:814:6:HAL_SPI_RxCpltCallback	16	static
+../Core/Src/prosthesis_v2.c:819:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
+../Core/Src/prosthesis_v2.c:829:6:HAL_CAN_RxFifo1MsgPendingCallback	48	static

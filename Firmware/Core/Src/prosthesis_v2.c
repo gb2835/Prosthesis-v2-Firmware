@@ -491,8 +491,11 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_footSpeed > CM_footSpeedThreshold)
-			state = MidStance;
+//		if(CM_footSpeed > CM_footSpeedThreshold) ??
+//			state = MidStance;
+
+		if(CM_AnkleJoint.MotorReadData.speed < 0.0f)
+			state = LateStance;
 
 		break;
 
@@ -532,7 +535,7 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_AnkleJoint.MotorReadData.speed < 0)
+		if(CM_AnkleJoint.MotorReadData.speed < 0.0f)
 			state = LateStance;
 
 		break;
@@ -573,8 +576,11 @@ static void RunStateMachine(void)
 			}
 		}
 
+//		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.outOfStanceThreshold) ??
+//			state = SwingFlexion;
+
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.outOfStanceThreshold)
-			state = SwingFlexion;
+			state = SwingDescension;
 
 		break;
 
@@ -614,7 +620,7 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_KneeJoint.MotorReadData.speed < 0)
+		if(CM_KneeJoint.MotorReadData.speed < 0.0f)
 			state = SwingExtension;
 
 		break;
@@ -655,7 +661,7 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_footSpeed < 0)
+		if(CM_footSpeed < 0.0f)
 			state = SwingDescension;
 
 		break;
