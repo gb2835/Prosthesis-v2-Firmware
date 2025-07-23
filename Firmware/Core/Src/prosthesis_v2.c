@@ -716,7 +716,6 @@ static void CheckMotorCalls(void)
 		static uint8_t missedAnkleMotorCalls = 0;
 		if(CM_AnkleJoint.motorDataReceived)
 		{
-			LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 			missedAnkleMotorCalls = 0;
 			CM_AnkleJoint.motorDataReceived = 0;
 			ServiceMotor(AnkleIndex);
@@ -725,7 +724,12 @@ static void CheckMotorCalls(void)
 			missedAnkleMotorCalls++;
 
 		if(missedAnkleMotorCalls >= 5)
-			ErrorHandler(AnkleMotorError);
+		{
+//			uint32_t txMailbox;
+//			AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox);
+//				if(missedAnkleMotorCalls >= 10)
+					ErrorHandler(AnkleMotorError);
+		}
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
