@@ -56,6 +56,9 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t SwingDescCtrl;
+	float position;
+	float speed;
+	float torque;
 	MPU925x_IMU_Data_t IMU_Data;
 	uint8_t motorDataReceived;
 } AnkleJoint_t;
@@ -83,6 +86,9 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t SwingDescCtrl;
+	float position;
+	float speed;
+	float torque;
 	KneeIMU_Data_t IMU_Data;
 	uint8_t motorDataReceived;
 } KneeJoint_t;
@@ -99,8 +105,10 @@ typedef struct
 		float bot[3];	// [0] = k-0, [1] = k-1, [2] = k-2
 		float top[3];	// [0] = k-0, [1] = k-1, [2] = k-2
 	} Filtered;
-	float outOfStanceThreshold;
-	float intoStanceThreshold;
+	float bot_outOfStanceThreshold;
+	float bot_intoStanceThreshold;
+	float top_outOfStanceThreshold;
+	float top_intoStanceThreshold;
 } LoadCell_t;
 
 static AKxx_x_ReadData_t MotorRxData[AKXX_X_NUMBER_OF_DEVICES];
@@ -158,8 +166,8 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	memset(&CM_AnkleJoint, 0, sizeof(CM_AnkleJoint));
 	memset(&CM_KneeJoint, 0, sizeof(CM_KneeJoint));
 
-	CM_LoadCell.intoStanceThreshold = 1300; //??
-	CM_LoadCell.outOfStanceThreshold = 1300 + 50; //??
+//	CM_LoadCell.intoStanceThreshold = 1300; //??
+//	CM_LoadCell.outOfStanceThreshold = 1300 + 50; //??
 
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
@@ -367,7 +375,7 @@ static void ProcessInputs(void)
 		else if(Device.Side == Right)
 			memcpy(&CM_AnkleJoint.IMU_Data, &IMU_Data, sizeof(MPU925x_IMU_Data_t));
 
-		CM_footSpeed = CM_AnkleJoint.MotorReadData.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
+		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
 	}
 
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
@@ -390,7 +398,7 @@ static void ProcessInputs(void)
 		CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
 		CM_KneeJoint.IMU_Data.roll = roll * RAD_TO_DEG;
 
-		CM_hipAngle = CM_KneeJoint.MotorReadData.speed - CM_KneeJoint.IMU_Data.pitch;
+		CM_hipAngle = CM_KneeJoint.speed - CM_KneeJoint.IMU_Data.pitch;
 	}
 }
 
@@ -423,22 +431,22 @@ static void RunStateMachine(void)
 		{
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			{
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.EarlyStanceCtrl.position;
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.EarlyStanceCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.EarlyStanceCtrl.kp;
+				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.EarlyStanceCtrl.position;
 			}
 			if((Device.Joint == Knee) || (Device.Joint == Combined))
 			{
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.EarlyStanceCtrl.position;
 				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.EarlyStanceCtrl.kd;
 				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.EarlyStanceCtrl.kp;
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.EarlyStanceCtrl.position;
 			}
 		}
 
 //		if(CM_footSpeed > CM_footSpeedThreshold) ??
 //			state = MidStance;
 
-		if(CM_AnkleJoint.MotorReadData.speed < 0.0f)
+		if(CM_AnkleJoint.speed < 0.0f)
 			state = LateStance;
 
 		break;
@@ -467,19 +475,19 @@ static void RunStateMachine(void)
 		{
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			{
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.MidStanceCtrl.position;
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.MidStanceCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.MidStanceCtrl.kp;
+				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.MidStanceCtrl.position;
 			}
 			if((Device.Joint == Knee) || (Device.Joint == Combined))
 			{
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.MidStanceCtrl.position;
 				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.MidStanceCtrl.kd;
 				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.MidStanceCtrl.kp;
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.MidStanceCtrl.position;
 			}
 		}
 
-		if(CM_AnkleJoint.MotorReadData.speed < 0.0f)
+		if(CM_AnkleJoint.speed < 0.0f)
 			state = LateStance;
 
 		break;
@@ -508,20 +516,26 @@ static void RunStateMachine(void)
 		{
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			{
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.LateStanceCtrl.position;
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.LateStanceCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.LateStanceCtrl.kp;
+				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.LateStanceCtrl.position;
 			}
 			if((Device.Joint == Knee) || (Device.Joint == Combined))
 			{
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.LateStanceCtrl.position;
 				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.LateStanceCtrl.kd;
 				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.LateStanceCtrl.kp;
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.LateStanceCtrl.position;
 			}
 		}
 
-		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.outOfStanceThreshold)
-			state = SwingFlexion;
+		if(CM_LoadCell.bot_outOfStanceThreshold != 0)
+			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.bot_outOfStanceThreshold)
+				state = SwingFlexion;
+			else
+				__NOP();
+		else
+			if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.top_outOfStanceThreshold)
+				state = SwingFlexion;
 
 		break;
 
@@ -549,23 +563,29 @@ static void RunStateMachine(void)
 		{
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			{
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingFlexCtrl.position;
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingFlexCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingFlexCtrl.kp;
+				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingFlexCtrl.position;
 			}
 			if((Device.Joint == Knee) || (Device.Joint == Combined))
 			{
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingFlexCtrl.position;
 				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingFlexCtrl.kd;
 				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingFlexCtrl.kp;
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingFlexCtrl.position;
 			}
 		}
 
-//		if(CM_KneeJoint.MotorReadData.speed < 0.0f) ??
+//		if(CM_KneeJoint.speed < 0.0f) ??
 //			state = SwingExtension;
 
-		if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoStanceThreshold)
-			state = EarlyStance;
+		if(CM_LoadCell.bot_intoStanceThreshold != 0)
+			if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.bot_intoStanceThreshold)
+				state = EarlyStance;
+			else
+				__NOP();
+		else
+			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.top_intoStanceThreshold)
+				state = EarlyStance;
 
 		break;
 
@@ -593,15 +613,15 @@ static void RunStateMachine(void)
 		{
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			{
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingExtCtrl.position;
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingExtCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingExtCtrl.kp;
+				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingExtCtrl.position;
 			}
 			if((Device.Joint == Knee) || (Device.Joint == Combined))
 			{
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingExtCtrl.position;
 				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingExtCtrl.kd;
 				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingExtCtrl.kp;
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingExtCtrl.position;
 			}
 		}
 
@@ -634,20 +654,20 @@ static void RunStateMachine(void)
 		{
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			{
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingDescCtrl.position;
 				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingDescCtrl.kd;
 				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingDescCtrl.kp;
+				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingDescCtrl.position;
 			}
 			if((Device.Joint == Knee) || (Device.Joint == Combined))
 			{
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingDescCtrl.position;
 				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingDescCtrl.kd;
 				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingDescCtrl.kp;
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingDescCtrl.position;
 			}
 		}
 
-		if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoStanceThreshold)
-			state = EarlyStance;
+//		if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoStanceThreshold) ??
+//			state = EarlyStance;
 
 		break;
 	}
@@ -703,19 +723,19 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 
 	if(deviceIndex == AnkleIndex)
 	{
-		if(CM_AnkleJoint.MotorReadData.error)
+		if(MotorRxData[AnkleIndex].error)
 			ErrorHandler(AnkleMotorError);
 
-		CM_AnkleJoint.MotorReadData.position = -MotorRxData[deviceIndex].position / ANKLE_GEAR_RATIO * RAD_TO_DEG - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER;
-		CM_AnkleJoint.MotorReadData.speed = -MotorRxData[deviceIndex].speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
-		CM_AnkleJoint.MotorReadData.torque = -MotorRxData[deviceIndex].torque * ANKLE_GEAR_RATIO ;
+		CM_AnkleJoint.position = -MotorRxData[deviceIndex].position / ANKLE_GEAR_RATIO * RAD_TO_DEG - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER;
+		CM_AnkleJoint.speed = -MotorRxData[deviceIndex].speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
+		CM_AnkleJoint.torque = -MotorRxData[deviceIndex].torque * ANKLE_GEAR_RATIO ;
 
 		uint32_t txMailbox;
 		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
-			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp;
+			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 
 			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
 				ErrorHandler(AnkleMotorError);
@@ -726,19 +746,19 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 	}
 	else if(deviceIndex == KneeIndex)
 	{
-		if(CM_KneeJoint.MotorReadData.error)
+		if(MotorRxData[KneeIndex].error)
 			ErrorHandler(KneeMotorError);
 
-		CM_KneeJoint.MotorReadData.position = MotorRxData[deviceIndex].position / KNEE_GEAR_RATIO * RAD_TO_DEG - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER;
-		CM_KneeJoint.MotorReadData.speed = MotorRxData[deviceIndex].speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
-		CM_KneeJoint.MotorReadData.torque = MotorRxData[deviceIndex].torque * KNEE_GEAR_RATIO ;
+		CM_KneeJoint.position = MotorRxData[deviceIndex].position / KNEE_GEAR_RATIO * RAD_TO_DEG - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER;
+		CM_KneeJoint.speed = MotorRxData[deviceIndex].speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
+		CM_KneeJoint.torque = MotorRxData[deviceIndex].torque * KNEE_GEAR_RATIO ;
 
 		uint32_t txMailbox;
 		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
-			MotorTxData.position = (CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp;
+			MotorTxData.position = (CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 
 			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
 				ErrorHandler(KneeMotorError);
