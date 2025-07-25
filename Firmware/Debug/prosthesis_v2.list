@@ -2007,11 +2007,11 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pin = KNEE_IMU_INT_Pin;
  80011f2:	2320      	movs	r3, #32
  80011f4:	617b      	str	r3, [r7, #20]
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
- 80011f6:	f44f 1388 	mov.w	r3, #1114112	; 0x110000
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+ 80011f6:	f44f 1304 	mov.w	r3, #2162688	; 0x210000
  80011fa:	61bb      	str	r3, [r7, #24]
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
- 80011fc:	2300      	movs	r3, #0
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+ 80011fc:	2301      	movs	r3, #1
  80011fe:	61fb      	str	r3, [r7, #28]
   HAL_GPIO_Init(KNEE_IMU_INT_GPIO_Port, &GPIO_InitStruct);
  8001200:	f107 0314 	add.w	r3, r7, #20
@@ -3165,8 +3165,8 @@ int main(void)
  80018da:	87bb      	strh	r3, [r7, #60]	; 0x3c
 
 	Prosthesis_Init_t Prosthesis_Init;
-	Prosthesis_Init.Joint = Ankle;
- 80018dc:	2300      	movs	r3, #0
+	Prosthesis_Init.Joint = Knee;
+ 80018dc:	2302      	movs	r3, #2
  80018de:	f887 3030 	strb.w	r3, [r7, #48]	; 0x30
 	Prosthesis_Init.Side = Right;
  80018e2:	2301      	movs	r3, #1
