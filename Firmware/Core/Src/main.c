@@ -156,7 +156,7 @@ int main(void)
   	AnkleIMU_Init.csPin = ANKLE_IMU_CS_Pin;
 
 	Prosthesis_Init_t Prosthesis_Init;
-	Prosthesis_Init.Joint = Knee;
+	Prosthesis_Init.Joint = Ankle;
 	Prosthesis_Init.Side = Right;
 
 

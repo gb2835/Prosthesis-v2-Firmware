@@ -731,9 +731,9 @@ static void CheckMotorCalls(void)
 
 		if(missedAnkleMotorCalls >= 5)
 		{
-//			uint32_t txMailbox;
-//			AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox);
-//				if(missedAnkleMotorCalls >= 10)
+			uint32_t txMailbox;
+			AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox);
+				if(missedAnkleMotorCalls >= 10)
 					ErrorHandler(AnkleMotorError);
 		}
 	}

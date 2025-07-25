@@ -3165,8 +3165,8 @@ int main(void)
  80018da:	87bb      	strh	r3, [r7, #60]	; 0x3c
 
 	Prosthesis_Init_t Prosthesis_Init;
-	Prosthesis_Init.Joint = Knee;
- 80018dc:	2302      	movs	r3, #2
+	Prosthesis_Init.Joint = Ankle;
+ 80018dc:	2300      	movs	r3, #0
  80018de:	f887 3030 	strb.w	r3, [r7, #48]	; 0x30
 	Prosthesis_Init.Side = Right;
  80018e2:	2301      	movs	r3, #1
