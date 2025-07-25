@@ -44,7 +44,8 @@ typedef enum
 	NoColor,
 	Blue,
 	Green,
-	Red
+	Red,
+	White
 } LED_Color_e;
 
 typedef enum

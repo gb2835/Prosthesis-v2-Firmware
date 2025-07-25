@@ -289,6 +289,12 @@ void ActivateLED(LED_Color_e color)
 		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 		LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
 	}
+	else if(color == White)
+	{
+		LL_GPIO_ResetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+		LL_GPIO_ResetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		LL_GPIO_ResetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
+	}
 }
 
 void ErrorHandler(Error_e error)

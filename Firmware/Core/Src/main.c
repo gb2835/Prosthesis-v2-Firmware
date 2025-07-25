@@ -212,7 +212,7 @@ int main(void)
 		AKxx_x_ReadData_t RxData_Float;
 		while(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
 		{
-			ActivateLED(Blue); //purple??
+			ActivateLED(White);
 			LL_mDelay(50);
 			ActivateLED(NoColor);
 			LL_mDelay(50);
