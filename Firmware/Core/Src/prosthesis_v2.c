@@ -125,7 +125,7 @@ static const int8_t state_torques[3][6] = {{-100, -70, -40, -10, 20, 50},	// Ank
 
 static const int16_t state_speeds[6] = {-600, -360, -120, 120, 360, 600};
 
-static const uint16_t state_loadCells[6] = {1100, 1200, 1300, 1400, 1500, 1600}; //??
+static const uint16_t state_loadCells[6] = {1100, 1200, 1300, 1400, 1500, 1600};
 
 static AnkleJoint_t CM_AnkleJoint;
 static int8_t CM_state_angles, CM_state_torques;
@@ -157,68 +157,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 
 	memset(&CM_AnkleJoint, 0, sizeof(CM_AnkleJoint));
 	memset(&CM_KneeJoint, 0, sizeof(CM_KneeJoint));
-
-	// might not need this since starting on bumpers??
-	if((Device.Joint == Ankle) || (Device.Joint == Combined))
-	{
-		float startPosition = 0.0f;
-		float startKd = 0.0f;
-		float startKp = 0.0f;
-
-		CM_AnkleJoint.EarlyStanceCtrl.position = startPosition;
-		CM_AnkleJoint.EarlyStanceCtrl.kd = startKd;
-		CM_AnkleJoint.EarlyStanceCtrl.kp = startKp;
-
-		CM_AnkleJoint.MidStanceCtrl.position = startPosition;
-		CM_AnkleJoint.MidStanceCtrl.kd = startKd;
-		CM_AnkleJoint.MidStanceCtrl.kp = startKp;
-
-		CM_AnkleJoint.LateStanceCtrl.position = startPosition;
-		CM_AnkleJoint.LateStanceCtrl.kd = startKd;
-		CM_AnkleJoint.LateStanceCtrl.kp = startKp;
-
-		CM_AnkleJoint.SwingFlexCtrl.position = startPosition;
-		CM_AnkleJoint.SwingFlexCtrl.kd = startKd;
-		CM_AnkleJoint.SwingFlexCtrl.kp = startKp;
-
-		CM_AnkleJoint.SwingExtCtrl.position = startPosition;
-		CM_AnkleJoint.SwingExtCtrl.kd = startKd;
-		CM_AnkleJoint.SwingExtCtrl.kp = startKp;
-
-		CM_AnkleJoint.SwingDescCtrl.position = startPosition;
-		CM_AnkleJoint.SwingDescCtrl.kd = startKd;
-		CM_AnkleJoint.SwingDescCtrl.kp = startKp;
-	}
-	if((Device.Joint == Knee) || (Device.Joint == Combined))
-	{
-		float startPosition = 0.0f;
-		float startKd = 0.0f;
-		float startKp = 0.0f;
-
-		CM_KneeJoint.EarlyStanceCtrl.position = startPosition;
-		CM_KneeJoint.EarlyStanceCtrl.kd = startKd;
-		CM_KneeJoint.EarlyStanceCtrl.kp = startKp;
-
-		CM_KneeJoint.MidStanceCtrl.position = startPosition;
-		CM_KneeJoint.MidStanceCtrl.kd = startKd;
-		CM_KneeJoint.MidStanceCtrl.kp = startKp;
-
-		CM_KneeJoint.LateStanceCtrl.position = startPosition;
-		CM_KneeJoint.LateStanceCtrl.kd = startKd;
-		CM_KneeJoint.LateStanceCtrl.kp = startKp;
-
-		CM_KneeJoint.SwingFlexCtrl.position = startPosition;
-		CM_KneeJoint.SwingFlexCtrl.kd = startKd;
-		CM_KneeJoint.SwingFlexCtrl.kp = startKp;
-
-		CM_KneeJoint.SwingExtCtrl.position = startPosition;
-		CM_KneeJoint.SwingExtCtrl.kd = startKd;
-		CM_KneeJoint.SwingExtCtrl.kp = startKp;
-
-		CM_KneeJoint.SwingDescCtrl.position = startPosition;
-		CM_KneeJoint.SwingDescCtrl.kd = startKd;
-		CM_KneeJoint.SwingDescCtrl.kp = startKp;
-	}
 
 	CM_LoadCell.intoStanceThreshold = 1300; //??
 	CM_LoadCell.outOfStanceThreshold = 1300 + 50; //??
@@ -582,11 +520,8 @@ static void RunStateMachine(void)
 			}
 		}
 
-//		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.outOfStanceThreshold) ??
-//			state = SwingFlexion;
-
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.outOfStanceThreshold)
-			state = SwingDescension;
+			state = SwingFlexion;
 
 		break;
 
@@ -626,8 +561,11 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_KneeJoint.MotorReadData.speed < 0.0f)
-			state = SwingExtension;
+//		if(CM_KneeJoint.MotorReadData.speed < 0.0f) ??
+//			state = SwingExtension;
+
+		if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoStanceThreshold)
+			state = EarlyStance;
 
 		break;
 

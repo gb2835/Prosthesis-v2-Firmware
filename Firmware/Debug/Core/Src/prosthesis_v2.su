@@ -12,7 +12,7 @@
 ../Core/Src/prosthesis_v2.c:372:17:ReadLoadCell	16	static
 ../Core/Src/prosthesis_v2.c:379:13:ProcessInputs	64	static
 ../Core/Src/prosthesis_v2.c:459:13:RunStateMachine	4	static
-../Core/Src/prosthesis_v2.c:718:13:CheckMotorCalls	8	static
+../Core/Src/prosthesis_v2.c:718:13:CheckMotorCalls	16	static
 ../Core/Src/prosthesis_v2.c:757:13:ServiceMotor	24	static
 ../Core/Src/prosthesis_v2.c:819:6:HAL_SPI_TxCpltCallback	16	static
 ../Core/Src/prosthesis_v2.c:824:6:HAL_SPI_RxCpltCallback	16	static
