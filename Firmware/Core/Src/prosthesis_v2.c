@@ -105,10 +105,8 @@ typedef struct
 		float bot[3];	// [0] = k-0, [1] = k-1, [2] = k-2
 		float top[3];	// [0] = k-0, [1] = k-1, [2] = k-2
 	} Filtered;
-	float bot_outOfStanceThreshold;
-	float bot_intoStanceThreshold;
-	float top_outOfStanceThreshold;
-	float top_intoStanceThreshold;
+	float intoStanceThreshold;
+	float outOfStanceThreshold;
 } LoadCell_t;
 
 static AKxx_x_ReadData_t MotorRxData[AKXX_X_NUMBER_OF_DEVICES];
@@ -166,8 +164,8 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	memset(&CM_AnkleJoint, 0, sizeof(CM_AnkleJoint));
 	memset(&CM_KneeJoint, 0, sizeof(CM_KneeJoint));
 
-//	CM_LoadCell.intoStanceThreshold = 1300; //??
-//	CM_LoadCell.outOfStanceThreshold = 1300 + 50; //??
+	CM_LoadCell.intoStanceThreshold = 1300;
+	CM_LoadCell.outOfStanceThreshold = 1270;
 
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
@@ -528,14 +526,8 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_LoadCell.bot_outOfStanceThreshold != 0)
-			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.bot_outOfStanceThreshold)
-				state = SwingFlexion;
-			else
-				__NOP();
-		else
-			if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.top_outOfStanceThreshold)
-				state = SwingFlexion;
+		if(CM_LoadCell.Filtered.top[0] < CM_LoadCell.outOfStanceThreshold)
+			state = SwingFlexion;
 
 		break;
 
@@ -578,14 +570,8 @@ static void RunStateMachine(void)
 //		if(CM_KneeJoint.speed < 0.0f) ??
 //			state = SwingExtension;
 
-		if(CM_LoadCell.bot_intoStanceThreshold != 0)
-			if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.bot_intoStanceThreshold)
-				state = EarlyStance;
-			else
-				__NOP();
-		else
-			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.top_intoStanceThreshold)
-				state = EarlyStance;
+		if(CM_LoadCell.Filtered.top[0] > CM_LoadCell.intoStanceThreshold)
+			state = EarlyStance;
 
 		break;
 
@@ -666,8 +652,8 @@ static void RunStateMachine(void)
 			}
 		}
 
-//		if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoStanceThreshold) ??
-//			state = EarlyStance;
+		if(CM_LoadCell.Filtered.top[0] > CM_LoadCell.intoStanceThreshold)
+			state = EarlyStance;
 
 		break;
 	}
