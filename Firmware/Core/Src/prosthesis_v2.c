@@ -441,11 +441,11 @@ static void RunStateMachine(void)
 			}
 		}
 
-//		if(CM_footSpeed > CM_footSpeedThreshold) ??
-//			state = MidStance;
+		if(CM_footSpeed > CM_footSpeedThreshold)
+			state = MidStance;
 
-		if(CM_AnkleJoint.speed < 0.0f)
-			state = LateStance;
+//		if(CM_AnkleJoint.speed < 0.0f)
+//			state = LateStance;
 
 		break;
 
