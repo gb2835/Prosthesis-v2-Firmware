@@ -71,6 +71,7 @@ void SystemClock_Config(void);
 
 #define LPTIM2_PERIOD	0x3F	// Timer frequency = timer clock frequency / (prescaler * (period + 1))
 
+static uint8_t CM__StartProgram = 0;
 uint8_t isProsthesisControlRequired = 0;
 
 
@@ -184,7 +185,6 @@ int main(void)
 		LL_mDelay(10);
 	  	if(MPU925x_Init(0, &AnkleIMU_Init))
 	  		ErrorHandler(AnkleIMU_Error);
-		MPU925x_SetAccelSensitivity(0, MPU925x_AccelSensitivity_8g);
 		MPU925x_SetGyroSensitivity(0, MPU925x_GyroSensitivity_1000dps);
 
 		uint32_t txMailbox;
@@ -236,6 +236,15 @@ int main(void)
 *******************************************************************************/
 
 	RequireTestProgram(ImpedanceControl);
+
+	if(testProgram == None)
+	{
+		while(!CM__StartProgram)
+		{
+			ActivateLED(Blue);
+		}
+		ActivateLED(NoColor);
+	}
 
 
 /*******************************************************************************
