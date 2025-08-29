@@ -3253,8 +3253,8 @@ int main(void)
 	  		ErrorHandler(AnkleIMU_Error);
  800197c:	2001      	movs	r0, #1
  800197e:	f000 fac5 	bl	8001f0c <ErrorHandler>
-		MPU925x_SetGyroSensitivity(0, MPU925x_GyroSensitivity_2000dps);
- 8001982:	2103      	movs	r1, #3
+		MPU925x_SetGyroSensitivity(0, MPU925x_GyroSensitivity_1000dps);
+ 8001982:	2102      	movs	r1, #2
  8001984:	2000      	movs	r0, #0
  8001986:	f005 f95f 	bl	8006c48 <MPU925x_SetGyroSensitivity>
 
