@@ -1,4 +1,4 @@
 *.o
-Debug/Startup/
-Debug/Drivers/
-Debug/Src/
+Firmware/Debug/Startup/
+Firmware/Debug/Drivers/
+Firmware/Debug/Src/
