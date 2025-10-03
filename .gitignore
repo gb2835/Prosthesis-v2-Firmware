@@ -1,0 +1,4 @@
+*.o
+Debug/Startup/
+Debug/Drivers/
+Debug/Src/

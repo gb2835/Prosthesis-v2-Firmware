@@ -36,7 +36,7 @@ static uint8_t isInit = 0;
 
 static BNO08x_Error_e StartReports(void);
 static void EventHandler(void * cookie, sh2_AsyncEvent_t *pEvent);
-static void ReadEvent(void * cookie, sh2_SensorEvent_t * event, int16_t *data);
+static void ReadEvent(void * cookie, sh2_SensorEvent_t * event);
 
 
 /*******************************************************************************
@@ -115,7 +115,7 @@ static void EventHandler(void * cookie, sh2_AsyncEvent_t *pEvent)
         BNO08x_resetOccurred = 1;
 }
 
-static void ReadEvent(void * cookie, sh2_SensorEvent_t * event, int16_t *data)
+static void ReadEvent(void * cookie, sh2_SensorEvent_t * event)
 {
     int rc;
     sh2_SensorValue_t value;

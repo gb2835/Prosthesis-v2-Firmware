@@ -1,0 +1,14 @@
+../Drivers/CMSIS/Include/core_cm4.h:1667:26:__NVIC_GetPriorityGrouping	1
+../Drivers/CMSIS/Include/core_cm4.h:1679:22:__NVIC_EnableIRQ	2
+../Drivers/CMSIS/Include/core_cm4.h:1809:22:__NVIC_SetPriority	2
+../Drivers/CMSIS/Include/core_cm4.h:1856:26:NVIC_EncodePriority	2
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:461:22:LL_LPTIM_SetUpdateMode	1
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:586:22:LL_LPTIM_SetCounterMode	1
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:662:22:LL_LPTIM_SetPolarity	1
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:700:22:LL_LPTIM_SetPrescaler	1
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:735:22:LL_LPTIM_SetInput1Src	1
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:811:22:LL_LPTIM_TrigSw	1
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_lptim.h:916:22:LL_LPTIM_SetClockSource	1
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_rcc.h:3031:22:LL_RCC_SetLPTIMClockSource	1
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_bus.h:1111:22:LL_APB1_GRP2_EnableClock	1
+../Core/Src/lptim.c:28:6:MX_LPTIM2_Init	1

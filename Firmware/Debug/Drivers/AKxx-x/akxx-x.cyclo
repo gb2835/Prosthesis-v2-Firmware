@@ -1,0 +1,16 @@
+../Drivers/AKxx-x/akxx-x.c:57:16:AKxx_x_Init	8
+../Drivers/AKxx-x/akxx-x.c:98:16:AKxx_x_ReadMotor	1
+../Drivers/AKxx-x/akxx-x.c:103:16:AKxx_x_WriteMotor	2
+../Drivers/AKxx-x/akxx-x.c:111:16:AKxx_x_EnterMotorCtrlMode	2
+../Drivers/AKxx-x/akxx-x.c:119:16:AKxx_x_ExitMotorCtrlMode	3
+../Drivers/AKxx-x/akxx-x.c:139:16:AKxx_x_ZeroMotorPosition	3
+../Drivers/AKxx-x/akxx-x.c:159:16:AKxx_x_PollTxMessagePendingWith10msTimeout	4
+../Drivers/AKxx-x/akxx-x.c:178:16:AKxx_x_PollMotorReadWith10msTimeout	7
+../Drivers/AKxx-x/akxx-x.c:206:20:AKxx_x_DecodeError	7
+../Drivers/AKxx-x/akxx-x.c:232:23:ReadData	2
+../Drivers/AKxx-x/akxx-x.c:244:23:WriteData	2
+../Drivers/AKxx-x/akxx-x.c:263:23:EnterMotorCtrlMode	2
+../Drivers/AKxx-x/akxx-x.c:280:13:PackData	1
+../Drivers/AKxx-x/akxx-x.c:298:13:UnpackData	3
+../Drivers/AKxx-x/akxx-x.c:318:14:UintToFloat	3
+../Drivers/AKxx-x/akxx-x.c:331:17:FloatToUint	5
