@@ -56,8 +56,6 @@ static uint16_t FloatToUint(float x_float, float xMin_float, float xMax_float, u
 
 AKxx_x_Error_e AKxx_x_Init(uint8_t deviceIndex, AKxx_x_Init_t *Device_Init)
 {
-	if(Device[deviceIndex].isInit)	// Can only init a device once
-		while(1);
 	if(deviceIndex >= AKXX_X_NUMBER_OF_DEVICES)
 		while(1);
 

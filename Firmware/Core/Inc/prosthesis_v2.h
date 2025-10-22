@@ -41,6 +41,15 @@ typedef enum
 
 typedef enum
 {
+	NoColor,
+	Blue,
+	Green,
+	Red,
+	White
+} LED_Color_e;
+
+typedef enum
+{
 	Left,
 	Right
 } Side_e;
@@ -58,11 +67,12 @@ typedef struct
 	Side_e Side;
 } Prosthesis_Init_t;
 
-extern uint8_t isProsthesisControlRequired;
+extern TestProgram_e testProgram;
 
 void InitProsthesisControl(Prosthesis_Init_t *Device_Init);
 void RequireTestProgram(TestProgram_e option);
 void RunProsthesisControl(void);
+void ActivateLED(LED_Color_e color);;
 void ErrorHandler(Error_e error);
 
 

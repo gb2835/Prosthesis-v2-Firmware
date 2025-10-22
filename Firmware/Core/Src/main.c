@@ -9,10 +9,15 @@
 *		- LL_GPIO_SetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 *		- LL_GPIO_ResetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 *		- LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
-* 2. Search -> File on "* USER ADDED " will show code added to MX auto-generated files external file resources.
+* 2. Search -> File on "* USER ADDED " will show code added to MX auto-generated files and other resources.
+* 3. LED meanings below.
+* 		- Flashing blue = Ankle motor not initialized (most likely no motor power)
+* 		- Flashing white = Knee motor not initialized (most likely no motor power)
+* 		- Solid Blue = waiting for CM__StartProgram to be true (only when RequireTestProgram(None);)
+* 		- Solid Green = motor(s) are communicating
+* 		- Solid Red = program in error handler
 *
 *******************************************************************************/
-
 
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -65,12 +70,15 @@ void SystemClock_Config(void);
 
 #include "akxx-x.h"
 #include "bno08x_spi_hal.h"
-#include "mpu925x_spi_hal.h" // add pins??
+#include "mpu925x_spi_hal.h"
 #include "prosthesis_v2.h"
 
 #include <string.h>
 
 #define LPTIM2_PERIOD	0x3F	// Timer frequency = timer clock frequency / (prescaler * (period + 1))
+
+static uint8_t CM__StartProgram = 0;
+uint8_t isProsthesisControlRequired = 0;
 
 
 /******************************************************************************/
@@ -123,12 +131,12 @@ int main(void)
 * USER ADDED DEFINITIONS
 *******************************************************************************/
 
-  	AKxx_x_Init_t Motor_Init[AKXX_X_NUMBER_OF_DEVICES];
-  	Motor_Init[AnkleIndex].canId = AnkleMotorCAN_ID;
-  	Motor_Init[AnkleIndex].Motor = AK80_9;
+	AKxx_x_Init_t Motor_Init[AKXX_X_NUMBER_OF_DEVICES];
+	Motor_Init[AnkleIndex].canId = AnkleMotorCAN_ID;
+	Motor_Init[AnkleIndex].Motor = AK80_9;
 
-  	Motor_Init[KneeIndex].canId = KneeMotorCAN_ID;
-  	Motor_Init[KneeIndex].Motor = AK70_10;
+	Motor_Init[KneeIndex].canId = KneeMotorCAN_ID;
+	Motor_Init[KneeIndex].Motor = AK70_10;
 
 	CAN_FilterTypeDef CAN1_FilterInit[AKXX_X_NUMBER_OF_DEVICES];
 	CAN1_FilterInit[AnkleIndex].FilterActivation = ENABLE;
@@ -149,13 +157,13 @@ int main(void)
 	CAN1_FilterInit[KneeIndex].FilterMaskIdHigh = KneeMotorCAN_ID << 5;
 	CAN1_FilterInit[KneeIndex].FilterMaskIdLow = KneeMotorCAN_ID << 5;
 
-  	MPU925x_Init_t AnkleIMU_Init;
-  	AnkleIMU_Init.SPI_Handle = &hspi1;
-  	AnkleIMU_Init.CS_GPIOx = ANKLE_IMU_CS_GPIO_Port;
-  	AnkleIMU_Init.csPin = ANKLE_IMU_CS_Pin;
+	MPU925x_Init_t AnkleIMU_Init;
+	AnkleIMU_Init.SPI_Handle = &hspi1;
+	AnkleIMU_Init.CS_GPIOx = ANKLE_IMU_CS_GPIO_Port;
+	AnkleIMU_Init.csPin = ANKLE_IMU_CS_Pin;
 
 	Prosthesis_Init_t Prosthesis_Init;
-	Prosthesis_Init.Joint = Ankle;
+	Prosthesis_Init.Joint = Knee;
 	Prosthesis_Init.Side = Right;
 
 
@@ -171,8 +179,6 @@ int main(void)
 	LL_ADC_Enable(ADC1);
 	LL_ADC_Enable(ADC2);
 
-	LL_mDelay(5000);	// Significant delay when powering on AK motor
-
 	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[AnkleIndex]))
 		ErrorHandler(CAN_Error);
 	if(HAL_CAN_ConfigFilter(&hcan1, &CAN1_FilterInit[KneeIndex]))
@@ -182,15 +188,22 @@ int main(void)
 
 	if((Prosthesis_Init.Joint == Ankle) || (Prosthesis_Init.Joint == Combined))
 	{
+		LL_mDelay(10);
 	  	if(MPU925x_Init(0, &AnkleIMU_Init))
 	  		ErrorHandler(AnkleIMU_Error);
-		MPU925x_SetAccelSensitivity(0, MPU925x_AccelSensitivity_8g);
 		MPU925x_SetGyroSensitivity(0, MPU925x_GyroSensitivity_1000dps);
 
 		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
-		if(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
-			ErrorHandler(AnkleMotorError);
+		while(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
+		{
+			ActivateLED(Blue);
+			LL_mDelay(50);
+			ActivateLED(NoColor);
+			LL_mDelay(50);
+		}
+		ActivateLED(NoColor);
+
 		if(AKxx_x_ZeroMotorPosition(AnkleIndex, &txMailbox))
 			ErrorHandler(AnkleMotorError);
 		if(AKxx_x_PollMotorReadWith10msTimeout(&RxData_Float))
@@ -198,13 +211,20 @@ int main(void)
 	}
 	if((Prosthesis_Init.Joint == Knee) || (Prosthesis_Init.Joint == Combined))
 	{
-//	  	if(BNO08x_Init())
-//	  		ErrorHandler(KneeIMU_Error);	source files for knee imu removed from build??
+	  	if(BNO08x_Init())
+	  		ErrorHandler(KneeIMU_Error);
 
 		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
-		if(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
-			ErrorHandler(KneeMotorError);
+		while(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
+		{
+			ActivateLED(White);
+			LL_mDelay(50);
+			ActivateLED(NoColor);
+			LL_mDelay(50);
+		}
+		ActivateLED(NoColor);
+
 		if(AKxx_x_ZeroMotorPosition(KneeIndex, &txMailbox))
 			ErrorHandler(KneeMotorError);
 		if(AKxx_x_PollMotorReadWith10msTimeout(&RxData_Float))
@@ -221,20 +241,26 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(ReadOnly);
+	RequireTestProgram(ImpedanceControl);
+
+	if(testProgram == None)
+	{
+		while(!CM__StartProgram)
+		{
+			ActivateLED(Blue);
+		}
+		ActivateLED(NoColor);
+	}
 
 
 /*******************************************************************************
 * USER ADDED MAIN LOOP
 *******************************************************************************/
 
-  while(1)
-  {
-	  if(isProsthesisControlRequired)
-	  {
-		  RunProsthesisControl();
-		  isProsthesisControlRequired = 0;
-	  }
+	while(1)
+	{
+		RunProsthesisControl();
+		isProsthesisControlRequired = 0;
 
 
 /******************************************************************************/

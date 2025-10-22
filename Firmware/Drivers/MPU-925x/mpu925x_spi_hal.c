@@ -13,7 +13,7 @@
 * 1. Unless otherwise specified, units are
 * 		- Accelerometer = g's
 * 		- Gyroscope     = degrees/second
-* 2. #define NUMBER_OF_DEVICES must be updated to (at least) the number of devices used.
+* 2. #define MPU925X_NUMBER_OF_DEVICES must be updated to (at least) the number of devices used.
 * 3. Additional bandwidths are available though not present here (additional programming required).
 *
 *******************************************************************************/
@@ -53,7 +53,7 @@ static inline void SetChipSelect(uint8_t deviceIndex);
 
 MPU925x_Error_e MPU925x_Init(uint8_t deviceIndex, MPU925x_Init_t *Device_Init)
 {
-	if(deviceIndex + 1 > MPU925X_NUMBER_OF_DEVICES)
+	if(deviceIndex >= MPU925X_NUMBER_OF_DEVICES)
 		while(1);
 
 	memcpy(&Device[deviceIndex], Device_Init, sizeof(MPU925x_Init_t));

@@ -1,0 +1,4 @@
+*.o
+Firmware/Debug/Startup/
+Firmware/Debug/Drivers/
+Firmware/Debug/Src/
