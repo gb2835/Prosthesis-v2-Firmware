@@ -142,6 +142,7 @@ static const int16_t state_speeds[6] = {-600, -360, -120, 120, 360, 600};
 static const uint16_t state_loadCells[6] = {1100, 1200, 1300, 1400, 1500, 1600};
 
 static AnkleJoint_t CM_AnkleJoint;
+static float CM_cpv;
 static int8_t CM_state_angles, CM_state_torques;
 static int16_t CM_state_speeds;
 static uint16_t CM_state_loadCells;
@@ -157,6 +158,7 @@ static float CM_hipAngle = 0.0f;
 static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
+static void GetCPV(void);
 static void RunStateMachine(void);
 static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
@@ -494,7 +496,14 @@ static void ProcessInputs(void)
 
 		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
 		CM_hipAngle = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
+
+		GetCPV();
 	}
+}
+
+static void GetCPV(void)
+{
+
 }
 
 static void RunStateMachine(void)
