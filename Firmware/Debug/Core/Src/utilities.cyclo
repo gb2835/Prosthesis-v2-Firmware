@@ -1,4 +1,0 @@
-../Core/Src/utilities.c:29:6:DelayUs	2
-../Core/Src/utilities.c:36:18:CalibrateIMU	1
-../Core/Src/utilities.c:78:8:CalculateIMU_GlobalAngle	1
-../Core/Src/utilities.c:90:6:QuaternionsToYPR	1

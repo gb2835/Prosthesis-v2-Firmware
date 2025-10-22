@@ -20,10 +20,28 @@ typedef struct
 	double gz;
 } Utils_IMU_Data_t;
 
-void DelayUs(TIM_TypeDef *TIMx, uint8_t timerRateMHz, uint16_t useconds);
-Utils_IMU_Data_t CalibrateIMU(double *IMU_Data, double *biases, double n, double *cosines, double *sines);
-double CalculateIMU_GlobalAngle(double accel_1, double accel_2, double accel_3, double gyro_3, double dt, double alpha);
-void QuaternionsToYPR(float r, float i, float j, float k, float *yaw, float *pitch, float *roll);
+typedef struct
+{
+	float r;
+	float i;
+	float j;
+	float k;
+} Utils_Quaternion_t;
+
+typedef struct
+{
+	float angle;
+	float x;
+	float y;
+	float z;
+} Utils_Rotation_t;
+
+void Utils_DelayUs(TIM_TypeDef *TIMx, uint8_t timerRateMHz, uint16_t useconds);
+Utils_IMU_Data_t Utils_CalibrateIMU(double *IMU_Data, double *biases, double n, double *cosines, double *sines);
+double Utils_CalculateIMU_GlobalAngle(double accel_1, double accel_2, double accel_3, double gyro_3, double dt, double alpha);
+void Utils_QuaternionToYPR(float r, float i, float j, float k, float *yaw, float *pitch, float *roll);
+Utils_Quaternion_t Utils_RotateQuaternion(Utils_Rotation_t *Rotation, Utils_Quaternion_t *Quaternion);
+void Utils_Normalize(float *vector, uint8_t length);
 
 
 /*******************************************************************************

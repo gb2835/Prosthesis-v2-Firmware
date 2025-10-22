@@ -26,14 +26,14 @@
  *  500			~500.0
  *  1000		~998.0
  */
-void DelayUs(TIM_TypeDef *TIMx, uint8_t timerRateMHz, uint16_t useconds)
+void Utils_DelayUs(TIM_TypeDef *TIMx, uint8_t timerRateMHz, uint16_t useconds)
 {
 	TIMx->CNT = 0;
 	uint16_t duration = useconds * timerRateMHz;
 	while(TIMx->CNT < duration);
 }
 
-Utils_IMU_Data_t CalibrateIMU(double *IMU_Data, double *biases, double n, double *cosines, double *sines)
+Utils_IMU_Data_t Utils_CalibrateIMU(double *IMU_Data, double *biases, double n, double *cosines, double *sines)
 {
 	Utils_IMU_Data_t Utils_IMU_Data;
 
@@ -70,12 +70,12 @@ Utils_IMU_Data_t CalibrateIMU(double *IMU_Data, double *biases, double n, double
 
 /**
  * The angle is calculated on axis 3 using a complementary filter.
- * Axis 1 points vertically, axis 2 points horizontally.
+ * Axis 1 points horizontally, axis 2 points vertically.
  * Units for gyroscope are degrees/second.
  * Units for accelerometer do not matter.
  * An optimal alpha was previously found to be 0.002 from trial and error experiment of MSE for Invensense MPU9255.
  */
-double CalculateIMU_GlobalAngle(double accel_1, double accel_2, double accel_3, double gyro_3, double dt, double alpha)
+double Utils_CalculateIMU_GlobalAngle(double accel_1, double accel_2, double accel_3, double gyro_3, double dt, double alpha)
 {
 	double accelAngle = (atan(accel_1 / sqrt(pow(accel_2, 2) + pow(accel_3, 2)))) * 180.0 / M_PI;
 	static double globalAngle = 0.0;
@@ -87,7 +87,7 @@ double CalculateIMU_GlobalAngle(double accel_1, double accel_2, double accel_3, 
 	return globalAngle;
 }
 
-void QuaternionsToYPR(float r, float i, float j, float k, float *yaw, float *pitch, float *roll)
+void Utils_QuaternionToYPR(float r, float i, float j, float k, float *yaw, float *pitch, float *roll)
 {
 	float siny_cosp = 2 * (r * k + i * j);
 	float cosy_cosp = 1 - 2 * (j * j + k * k);
@@ -100,6 +100,50 @@ void QuaternionsToYPR(float r, float i, float j, float k, float *yaw, float *pit
     float sinr_cosp = 2 * (r * i + j * k);
     float cosr_cosp = 1 - 2 * (i * i + j * j);
     *roll = atan2(sinr_cosp, cosr_cosp);
+}
+
+Utils_Quaternion_t Utils_RotateQuaternion(Utils_Rotation_t *Rotation, Utils_Quaternion_t *Quaternion)
+{
+    float w = cos(Rotation->angle / 2.0f);
+
+    float factor = sin(Rotation->angle / 2.0f);
+    float x = Rotation->x * factor;
+    float y = Rotation->y * factor;
+    float z = Rotation->z * factor;
+
+    float rotation[4] = {w, x, y, z};
+    Utils_Normalize(rotation, 4);
+
+    float r = Quaternion->r * rotation[0] - Quaternion->i * rotation[1] - Quaternion->j * rotation[2] - Quaternion->k * rotation[3];
+    float i = Quaternion->r * rotation[1] + Quaternion->i * rotation[0] + Quaternion->j * rotation[3] - Quaternion->k * rotation[2];
+    float j = Quaternion->r * rotation[2] - Quaternion->i * rotation[3] + Quaternion->j * rotation[0] + Quaternion->k * rotation[1];
+    float k = Quaternion->r * rotation[3] + Quaternion->i * rotation[2] - Quaternion->j * rotation[1] + Quaternion->k * rotation[0];
+
+    float quaternion[4] = {r, i, j, k};
+    Utils_Normalize(quaternion, 4);
+
+    Utils_Quaternion_t Result;
+    Result.r = quaternion[0];
+    Result.i = quaternion[1];
+    Result.j = quaternion[2];
+    Result.k = quaternion[3];
+
+    return Result;
+}
+
+void Utils_Normalize(float *vector, uint8_t length)
+{
+	float squaredMagnitude = 0.0f;
+	for(uint8_t i = 0; i < length; i++)
+		squaredMagnitude += vector[i]*vector[i];
+
+	if(squaredMagnitude == 0.0f)
+		return;
+
+	float inverseMagnitude = 1.0f / sqrt(squaredMagnitude);
+
+	for(uint8_t i = 0; i < length; i++)
+		vector[i] *= inverseMagnitude;
 }
 
 
