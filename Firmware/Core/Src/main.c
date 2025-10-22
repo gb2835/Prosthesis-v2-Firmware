@@ -10,6 +10,12 @@
 *		- LL_GPIO_ResetOutputPin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 *		- LL_GPIO_TogglePin(OSCOPE_GPIO_Port, OSCOPE_Pin);
 * 2. Search -> File on "* USER ADDED " will show code added to MX auto-generated files and other resources.
+* 3. LED meanings below.
+* 		- Flashing blue = Ankle motor not initialized (most likely no motor power)
+* 		- Flashing white = Knee motor not initialized (most likely no motor power)
+* 		- Solid Blue = waiting for CM__StartProgram to be true (only when RequireTestProgram(None);)
+* 		- Solid Green = motor(s) are communicating
+* 		- Solid Red = program in error handler
 *
 *******************************************************************************/
 
