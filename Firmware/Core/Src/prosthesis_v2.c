@@ -154,7 +154,6 @@ static float CM_AnkleSpeedThreshold = -5.0f;
 static float CM_footSpeedThreshold = -5.0f;
 static float CM_hipAngle = 0.0f;
 
-
 static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
@@ -369,10 +368,16 @@ static void GetInputs(void)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
+		static uint8_t missedKneeImuCalls = 0;
 		if(BNO08x_resetOccurred)
 		{
 			BNO08x_resetOccurred = 0;
 			if(BNO08x_StartReports())
+				missedKneeImuCalls++;
+			else
+				missedKneeImuCalls = 0;
+
+			if(missedKneeImuCalls >= 5)
 				ErrorHandler(KneeIMU_Error);
 		}
 
@@ -439,30 +444,56 @@ static void ProcessInputs(void)
 		}
 		else if(Device.Side == Right)
 			memcpy(&CM_AnkleJoint.IMU_Data, &IMU_Data, sizeof(MPU925x_IMU_Data_t));
-
-		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
 		if(Device.Side == Left)
 		{
-			CM_KneeJoint.IMU_Data.ax = -BNO08x_IMU_Data[0];
-			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[1];
+			CM_KneeJoint.IMU_Data.ax = BNO08x_IMU_Data[1];
+			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[0];
 			CM_KneeJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
-			CM_KneeJoint.IMU_Data.gx = -BNO08x_IMU_Data[3] * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[4] * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.gx = BNO08x_IMU_Data[4] * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[3] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
+
+			Utils_Rotation_t RotateX_90 = {-90.0f * 3.1416f/180.0f, 1.0f, 0.0f, 0.0f};
+			Utils_Quaternion_t Quaternion = {BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9]};
+			Quaternion = Utils_RotateQuaternion(&RotateX_90, &Quaternion);
+
+			Utils_Rotation_t RotateY_90 = {90.0f * 3.1416f/180.0f, 0.0f, 1.0f, 0.0f};
+			Quaternion = Utils_RotateQuaternion(&RotateY_90, &Quaternion);
+
+			float yaw, pitch, roll;
+			Utils_QuaternionToYPR(Quaternion.r, Quaternion.i, Quaternion.j, Quaternion.k, &yaw, &pitch, &roll);
+			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG + 90.0f;
+			CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.roll = -roll * RAD_TO_DEG;
 		}
 		else if(Device.Side == Right)
-			memcpy(&CM_KneeJoint.IMU_Data, &BNO08x_IMU_Data, sizeof(KneeIMU_Data_t));
+		{
+			CM_KneeJoint.IMU_Data.ax = -BNO08x_IMU_Data[1];
+			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[0];
+			CM_KneeJoint.IMU_Data.az = BNO08x_IMU_Data[2];
+			CM_KneeJoint.IMU_Data.gx = -BNO08x_IMU_Data[4] * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[3] * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.gz = BNO08x_IMU_Data[5] * RAD_TO_DEG;
 
-		float yaw, pitch, roll;
-		QuaternionsToYPR(BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9], &yaw, &pitch, &roll);
-		CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
-		CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
-		CM_KneeJoint.IMU_Data.roll = roll * RAD_TO_DEG;
+			Utils_Rotation_t RotateX_90 = {90.0f * 3.1416f/180.0f, 1.0f, 0.0f, 0.0f};
+			Utils_Quaternion_t Quaternion = {BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9]};
+			Quaternion = Utils_RotateQuaternion(&RotateX_90, &Quaternion);
 
-		CM_hipAngle = CM_KneeJoint.speed - CM_KneeJoint.IMU_Data.pitch;
+			Utils_Rotation_t RotateY_90 = {90.0f * 3.1416f/180.0f, 0.0f, 1.0f, 0.0f};
+			Quaternion = Utils_RotateQuaternion(&RotateY_90, &Quaternion);
+
+			float yaw, pitch, roll;
+			Utils_QuaternionToYPR(Quaternion.r, Quaternion.i, Quaternion.j, Quaternion.k, &yaw, &pitch, &roll);
+			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG - 90.f;
+			CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.roll = -roll * RAD_TO_DEG;
+		}
+
+		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
+		CM_hipAngle = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 	}
 }
 
@@ -630,11 +661,8 @@ static void RunStateMachine(void)
 			}
 		}
 
-//		if(CM_KneeJoint.speed < 0.0f)
-//			state = SwingExtension;
-
-		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
-			state = EarlyStance;
+		if(CM_KneeJoint.speed < 0.0f)
+			state = SwingExtension;
 
 		break;
 
@@ -798,16 +826,16 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		if(CM_KneeJoint.MotorReadData.error)
 			ErrorHandler(KneeMotorError);
 
-		CM_KneeJoint.position = CM_KneeJoint.MotorReadData.position / KNEE_GEAR_RATIO * RAD_TO_DEG - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER;
-		CM_KneeJoint.speed = CM_KneeJoint.MotorReadData.speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
-		CM_KneeJoint.torque = CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO ;
+		CM_KneeJoint.position = -CM_KneeJoint.MotorReadData.position / KNEE_GEAR_RATIO * RAD_TO_DEG - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER;
+		CM_KneeJoint.speed = -CM_KneeJoint.MotorReadData.speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
+		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO ;
 
 		uint32_t txMailbox;
 		if((testProgram == None) || (testProgram == ImpedanceControl))
 		{
 			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp;
-			MotorTxData.position = (CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
+			MotorTxData.position = (-CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 
 			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
 				ErrorHandler(KneeMotorError);

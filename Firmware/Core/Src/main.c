@@ -125,12 +125,12 @@ int main(void)
 * USER ADDED DEFINITIONS
 *******************************************************************************/
 
-  	AKxx_x_Init_t Motor_Init[AKXX_X_NUMBER_OF_DEVICES];
-  	Motor_Init[AnkleIndex].canId = AnkleMotorCAN_ID;
-  	Motor_Init[AnkleIndex].Motor = AK80_9;
+	AKxx_x_Init_t Motor_Init[AKXX_X_NUMBER_OF_DEVICES];
+	Motor_Init[AnkleIndex].canId = AnkleMotorCAN_ID;
+	Motor_Init[AnkleIndex].Motor = AK80_9;
 
-  	Motor_Init[KneeIndex].canId = KneeMotorCAN_ID;
-  	Motor_Init[KneeIndex].Motor = AK70_10;
+	Motor_Init[KneeIndex].canId = KneeMotorCAN_ID;
+	Motor_Init[KneeIndex].Motor = AK70_10;
 
 	CAN_FilterTypeDef CAN1_FilterInit[AKXX_X_NUMBER_OF_DEVICES];
 	CAN1_FilterInit[AnkleIndex].FilterActivation = ENABLE;
@@ -151,13 +151,13 @@ int main(void)
 	CAN1_FilterInit[KneeIndex].FilterMaskIdHigh = KneeMotorCAN_ID << 5;
 	CAN1_FilterInit[KneeIndex].FilterMaskIdLow = KneeMotorCAN_ID << 5;
 
-  	MPU925x_Init_t AnkleIMU_Init;
-  	AnkleIMU_Init.SPI_Handle = &hspi1;
-  	AnkleIMU_Init.CS_GPIOx = ANKLE_IMU_CS_GPIO_Port;
-  	AnkleIMU_Init.csPin = ANKLE_IMU_CS_Pin;
+	MPU925x_Init_t AnkleIMU_Init;
+	AnkleIMU_Init.SPI_Handle = &hspi1;
+	AnkleIMU_Init.CS_GPIOx = ANKLE_IMU_CS_GPIO_Port;
+	AnkleIMU_Init.csPin = ANKLE_IMU_CS_Pin;
 
 	Prosthesis_Init_t Prosthesis_Init;
-	Prosthesis_Init.Joint = Ankle;
+	Prosthesis_Init.Joint = Knee;
 	Prosthesis_Init.Side = Right;
 
 
@@ -253,11 +253,8 @@ int main(void)
 
 	while(1)
 	{
-		if(isProsthesisControlRequired)
-		{
-			RunProsthesisControl();
-			isProsthesisControlRequired = 0;
-		}
+		RunProsthesisControl();
+		isProsthesisControlRequired = 0;
 
 
 /******************************************************************************/
