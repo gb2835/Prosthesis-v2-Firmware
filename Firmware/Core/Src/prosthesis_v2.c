@@ -20,6 +20,7 @@
 #include "prosthesis_v2.h"
 #include "utilities.h"
 
+#include <math.h>
 #include <stdint.h>
 #include <stm32l4xx_ll_adc.h>
 #include <string.h>
@@ -37,11 +38,12 @@ TestProgram_e testProgram = None;
 *******************************************************************************/
 
 #define ANKLE_GEAR_RATIO								(90.0f / 15.0f)
-#define KNEE_GEAR_RATIO									(70.0f / 16.0f)
 #define ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER	31.0f
+#define DEG_TO_RAD										(M_PI / 180.0f)
+#define DT												(1 / 500.0f)
+#define KNEE_GEAR_RATIO									(70.0f / 16.0f)
 #define KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER		10.0f
-#define DEG_TO_RAD										(3.1416f / 180.0f)
-#define RAD_TO_DEG										(180.0f / 3.1416f)
+#define RAD_TO_DEG										(180.0f / M_PI)
 
 typedef enum
 {
@@ -143,6 +145,9 @@ static const uint16_t state_loadCells[6] = {1100, 1200, 1300, 1400, 1500, 1600};
 
 static AnkleJoint_t CM_AnkleJoint;
 static float CM_cpv;
+static float CM_thighAngle;
+static float CM_xPhaseAngle;
+static float CM_yPhaseAngle;
 static int8_t CM_state_angles, CM_state_torques;
 static int16_t CM_state_speeds;
 static uint16_t CM_state_loadCells;
@@ -153,7 +158,6 @@ static Error_e CM_ledCode = NoError;
 static float CM_footSpeed = 0.0f;
 static float CM_AnkleSpeedThreshold = -5.0f;
 static float CM_footSpeedThreshold = -5.0f;
-static float CM_hipAngle = 0.0f;
 
 static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
@@ -458,11 +462,11 @@ static void ProcessInputs(void)
 			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[3] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
 
-			Utils_Rotation_t RotateX_90 = {-90.0f * 3.1416f/180.0f, 1.0f, 0.0f, 0.0f};
+			Utils_Rotation_t RotateX_90 = {-90.0f * M_PI/180.0f, 1.0f, 0.0f, 0.0f};
 			Utils_Quaternion_t Quaternion = {BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9]};
 			Quaternion = Utils_RotateQuaternion(&RotateX_90, &Quaternion);
 
-			Utils_Rotation_t RotateY_90 = {90.0f * 3.1416f/180.0f, 0.0f, 1.0f, 0.0f};
+			Utils_Rotation_t RotateY_90 = {90.0f * M_PI/180.0f, 0.0f, 1.0f, 0.0f};
 			Quaternion = Utils_RotateQuaternion(&RotateY_90, &Quaternion);
 
 			float yaw, pitch, roll;
@@ -480,11 +484,11 @@ static void ProcessInputs(void)
 			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[3] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gz = BNO08x_IMU_Data[5] * RAD_TO_DEG;
 
-			Utils_Rotation_t RotateX_90 = {90.0f * 3.1416f/180.0f, 1.0f, 0.0f, 0.0f};
+			Utils_Rotation_t RotateX_90 = {90.0f * M_PI/180.0f, 1.0f, 0.0f, 0.0f};
 			Utils_Quaternion_t Quaternion = {BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9]};
 			Quaternion = Utils_RotateQuaternion(&RotateX_90, &Quaternion);
 
-			Utils_Rotation_t RotateY_90 = {90.0f * 3.1416f/180.0f, 0.0f, 1.0f, 0.0f};
+			Utils_Rotation_t RotateY_90 = {90.0f * M_PI/180.0f, 0.0f, 1.0f, 0.0f};
 			Quaternion = Utils_RotateQuaternion(&RotateY_90, &Quaternion);
 
 			float yaw, pitch, roll;
@@ -495,7 +499,7 @@ static void ProcessInputs(void)
 		}
 
 		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
-		CM_hipAngle = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
+		CM_thighAngle = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 
 		GetCPV();
 	}
@@ -503,7 +507,35 @@ static void ProcessInputs(void)
 
 static void GetCPV(void)
 {
+	static float maxThighAngle_unbiased = 0.0f;
+	static float minThighAngle_unbiased = 0.0f;
+	static float thighAngle_bias = 0.0f;
+	static float thighIntegral = 0.0f;
+	static float thighIntegral_unbiased = 0.0f;
+	static float z = 1;
 
+	if(heelStrike)
+	{
+		thighAngle_bias = thighIntegral / DT;
+		z = fabs(maxThighAngle_unbiased - minThighAngle_unbiased) / fabs(maxThighIntegral_unbiased - minThighIntegral_unbiased);
+	}
+
+	float thighAngle_unbiased = CM_thighAngle - thighAngle_bias;
+	if(thighAngle_unbiased > maxThighAngle_unbiased)
+		maxThighAngle_unbiased = thighAngle_unbiased;
+	if(thighAngle_unbiased < minThighAngle_unbiased)
+		minThighAngle_unbiased = thighAngle_unbiased;
+
+	thighIntegral = thighIntegral + CM_thighAngle*DT; //trap??
+	thighIntegral_unbiased = thighIntegral_unbiased + thighAngle_unbiased*DT;
+	if(thighIntegral_unbiased > maxThighIntegral_unbiased)
+		maxThighIntegral_unbiased = thighAngle_unbiased;
+	if(thighIntegral_unbiased < minThighIntegral_unbiased)
+		minThighIntegral_unbiased = thighAngle_unbiased;
+
+	CM_xPhaseAngle = -thighAngle_unbiased;
+	CM_yPhaseAngle = -z * thighIntegral_unbiased;
+	CM_cpv = atan2(CM_yPhaseAngle, CM_xPhaseAngle) / (2*M_PI);
 }
 
 static void RunStateMachine(void)
@@ -794,7 +826,12 @@ static void CheckMotorCalls(void)
 			missedKneeMotorCalls++;
 
 		if(missedKneeMotorCalls >= 5)
-			ErrorHandler(KneeMotorError);
+		{
+			uint32_t txMailbox;
+			AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox);
+				if(missedKneeMotorCalls >= 10)
+					ErrorHandler(KneeMotorError);
+		}
 	}
 }
 
