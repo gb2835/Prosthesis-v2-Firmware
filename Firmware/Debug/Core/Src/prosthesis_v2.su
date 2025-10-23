@@ -13,8 +13,8 @@
 ../Core/Src/prosthesis_v2.c:395:13:ProcessInputs	168	static
 ../Core/Src/prosthesis_v2.c:500:13:RunStateMachine	4	static
 ../Core/Src/prosthesis_v2.c:753:13:CheckMotorCalls	16	static
-../Core/Src/prosthesis_v2.c:792:13:ServiceMotor	24	static
-../Core/Src/prosthesis_v2.c:854:6:HAL_SPI_TxCpltCallback	16	static
-../Core/Src/prosthesis_v2.c:859:6:HAL_SPI_RxCpltCallback	16	static
-../Core/Src/prosthesis_v2.c:864:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
-../Core/Src/prosthesis_v2.c:874:6:HAL_CAN_RxFifo1MsgPendingCallback	48	static
+../Core/Src/prosthesis_v2.c:797:13:ServiceMotor	24	static
+../Core/Src/prosthesis_v2.c:859:6:HAL_SPI_TxCpltCallback	16	static
+../Core/Src/prosthesis_v2.c:864:6:HAL_SPI_RxCpltCallback	16	static
+../Core/Src/prosthesis_v2.c:869:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
+../Core/Src/prosthesis_v2.c:879:6:HAL_CAN_RxFifo1MsgPendingCallback	48	static

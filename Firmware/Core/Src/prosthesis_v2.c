@@ -785,7 +785,12 @@ static void CheckMotorCalls(void)
 			missedKneeMotorCalls++;
 
 		if(missedKneeMotorCalls >= 5)
-			ErrorHandler(KneeMotorError);
+		{
+			uint32_t txMailbox;
+			AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox);
+				if(missedKneeMotorCalls >= 10)
+					ErrorHandler(KneeMotorError);
+		}
 	}
 }
 
