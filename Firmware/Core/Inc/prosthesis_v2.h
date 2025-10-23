@@ -58,7 +58,8 @@ typedef enum
 {
 	None,
 	ReadOnly,
-	ImpedanceControl
+	ImpedanceControl,
+	Sinusoid
 } TestProgram_e;
 
 typedef struct

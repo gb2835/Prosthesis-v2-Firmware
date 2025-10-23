@@ -40,7 +40,7 @@ TestProgram_e testProgram = None;
 #define ANKLE_GEAR_RATIO								(90.0f / 15.0f)
 #define ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER	31.0f
 #define DEG_TO_RAD										(M_PI / 180.0f)
-#define DT												(1 / 500.0f)
+#define DT												(1 / 500.0)
 #define KNEE_GEAR_RATIO									(70.0f / 16.0f)
 #define KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER		10.0f
 #define RAD_TO_DEG										(180.0f / M_PI)
@@ -124,7 +124,7 @@ static AKxx_x_WriteData_t MotorTxData;
 static MPU925x_IMU_Data_t IMU_Data;
 static Prosthesis_Init_t Device;
 
-
+static uint8_t heelStrike = 0;
 static uint8_t imuReadStarted = 0;
 static uint8_t imuDataReceived = 0;
 static uint8_t isFirst = 1;
@@ -144,8 +144,8 @@ static const int16_t state_speeds[6] = {-600, -360, -120, 120, 360, 600};
 static const uint16_t state_loadCells[6] = {1100, 1200, 1300, 1400, 1500, 1600};
 
 static AnkleJoint_t CM_AnkleJoint;
+static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1
 static float CM_cpv;
-static float CM_thighAngle;
 static float CM_xPhaseAngle;
 static float CM_yPhaseAngle;
 static int8_t CM_state_angles, CM_state_torques;
@@ -499,7 +499,8 @@ static void ProcessInputs(void)
 		}
 
 		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
-		CM_thighAngle = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
+//		CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
+		CM_thighAngle[0] = CM_KneeJoint.IMU_Data.pitch;
 
 		GetCPV();
 	}
@@ -507,35 +508,46 @@ static void ProcessInputs(void)
 
 static void GetCPV(void)
 {
+	static double thighAngle_bias = 0.0;
+	static double thighAngle_unbiased[2] = {0.0, 0.0};
+	static double thighIntegral = 0.0;
+	static double thighIntegral_unbiased = 0.0;
 	static float maxThighAngle_unbiased = 0.0f;
 	static float minThighAngle_unbiased = 0.0f;
-	static float thighAngle_bias = 0.0f;
-	static float thighIntegral = 0.0f;
-	static float thighIntegral_unbiased = 0.0f;
+	static float maxThighIntegral_unbiased = 0.0f;
+	static float minThighIntegral_unbiased = 0.0f;
 	static float z = 1;
 
 	if(heelStrike)
 	{
+		heelStrike = 0;
+
 		thighAngle_bias = thighIntegral / DT;
 		z = fabs(maxThighAngle_unbiased - minThighAngle_unbiased) / fabs(maxThighIntegral_unbiased - minThighIntegral_unbiased);
 	}
 
-	float thighAngle_unbiased = CM_thighAngle - thighAngle_bias;
-	if(thighAngle_unbiased > maxThighAngle_unbiased)
-		maxThighAngle_unbiased = thighAngle_unbiased;
-	if(thighAngle_unbiased < minThighAngle_unbiased)
-		minThighAngle_unbiased = thighAngle_unbiased;
+	thighAngle_unbiased[0] = CM_thighAngle[0] - thighAngle_bias;
+	if(thighAngle_unbiased[0] > maxThighAngle_unbiased)
+		maxThighAngle_unbiased = thighAngle_unbiased[0];
+	if(thighAngle_unbiased[0] < minThighAngle_unbiased)
+		minThighAngle_unbiased = thighAngle_unbiased[0];
 
-	thighIntegral = thighIntegral + CM_thighAngle*DT; //trap??
-	thighIntegral_unbiased = thighIntegral_unbiased + thighAngle_unbiased*DT;
-	if(thighIntegral_unbiased > maxThighIntegral_unbiased)
-		maxThighIntegral_unbiased = thighAngle_unbiased;
-	if(thighIntegral_unbiased < minThighIntegral_unbiased)
-		minThighIntegral_unbiased = thighAngle_unbiased;
+	if(!isFirst)
+	{
+		thighIntegral = thighIntegral + (CM_thighAngle[0] + CM_thighAngle[1])*DT/2.0;								// trapezoidal integration used
+		thighIntegral_unbiased = thighIntegral_unbiased + (thighAngle_unbiased[0] + thighAngle_unbiased[1])*DT/2.0;	// trapezoidal integration used
+		if(thighIntegral_unbiased > maxThighIntegral_unbiased)
+			maxThighIntegral_unbiased = thighAngle_unbiased[0];
+		if(thighIntegral_unbiased < minThighIntegral_unbiased)
+			minThighIntegral_unbiased = thighAngle_unbiased[0];
+	}
 
-	CM_xPhaseAngle = -thighAngle_unbiased;
+	CM_xPhaseAngle = -thighAngle_unbiased[0];
 	CM_yPhaseAngle = -z * thighIntegral_unbiased;
 	CM_cpv = atan2(CM_yPhaseAngle, CM_xPhaseAngle) / (2*M_PI);
+
+	CM_thighAngle[1] = CM_thighAngle[0];
+	thighAngle_unbiased[1] = thighAngle_unbiased[0];
 }
 
 static void RunStateMachine(void)
@@ -877,11 +889,24 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO ;
 
 		uint32_t txMailbox;
-		if((testProgram == None) || (testProgram == ImpedanceControl))
+		if((testProgram == None) || (testProgram == ImpedanceControl) || (testProgram == Sinusoid))
 		{
-			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd;
-			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp;
-			MotorTxData.position = (-CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
+			if(testProgram != Sinusoid)
+			{
+				MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd;
+				MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp;
+				MotorTxData.position = (-CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
+			}
+			else
+			{
+				static float time = 0.0f;
+
+				MotorTxData.kd = 0.05f;
+				MotorTxData.kp = 20.0f;
+				MotorTxData.position = (10.0f * cos(M_PI*time) - 10.0f) * KNEE_GEAR_RATIO * DEG_TO_RAD;
+
+				time = time + DT;
+			}
 
 			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
 				ErrorHandler(KneeMotorError);

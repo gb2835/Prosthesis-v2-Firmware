@@ -241,7 +241,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(ImpedanceControl);
+	RequireTestProgram(Sinusoid);
 
 	if(testProgram == None)
 	{
@@ -259,8 +259,11 @@ int main(void)
 
 	while(1)
 	{
-		RunProsthesisControl();
-		isProsthesisControlRequired = 0;
+		if(isProsthesisControlRequired)
+		{
+			RunProsthesisControl();
+			isProsthesisControlRequired = 0;
+		}
 
 
 /******************************************************************************/
