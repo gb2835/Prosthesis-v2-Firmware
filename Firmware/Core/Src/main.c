@@ -241,7 +241,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(Sinusoid);
+	RequireTestProgram(CPC_Simulation);
 
 	if(testProgram == None)
 	{

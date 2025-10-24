@@ -57,9 +57,9 @@ typedef enum
 typedef enum
 {
 	None,
+	CPC_Simulation,
 	ReadOnly,
-	ImpedanceControl,
-	Sinusoid
+	ImpedanceControl
 } TestProgram_e;
 
 typedef struct
