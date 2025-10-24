@@ -901,6 +901,9 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 			{
 				static float time = 0.0f;
 
+				if((sin(time) < 0.0f) && (sin(time-DT) > 0.0f))
+					heelStrike = 1;
+
 				MotorTxData.kd = 0.05f;
 				MotorTxData.kp = 20.0f;
 				MotorTxData.position = (10.0f * cos(M_PI*time) - 10.0f) * KNEE_GEAR_RATIO * DEG_TO_RAD;
