@@ -133,6 +133,7 @@ typedef struct
 } LoadCell_t;
 
 static AKxx_x_WriteData_t MotorTxData;
+static float kneeAngleAtHeelStrike;
 static MPU925x_IMU_Data_t IMU_Data;
 static Prosthesis_Init_t Device;
 
@@ -148,6 +149,7 @@ static AnkleJoint_t CM_AnkleJoint;
 static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1
 static float CM_cpvx10;
 static float CM_state_quadrant;
+static float CM_trajectory;
 static float CM_xPhaseAngle, CM_yPhaseAngle;
 static int8_t CM_state_angles, CM_state_torques;
 static int16_t CM_state_speeds;
@@ -180,7 +182,10 @@ static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
 static void GetCPV(void);
-static void GetTrajectory(void);
+static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3);
+static void GetThirdOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float v_2, float *a);
+static void GetSecondOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float *a);
+static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3);
 static void RunStateMachine(void);
 static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
@@ -298,9 +303,14 @@ void RunProsthesisControl(void)
 	GetInputs();
 	ProcessInputs();
 
+	static float cpv[3], a1[4], a2[4], a3[3];
 	if(toeOff)
-		GetTrajectory();
+	{
+		toeOff = 0;
+		GetSegmentConstants(cpv, a1, a2, a3);
+	}
 
+	GetTrajectory(cpv, a1, a2, a3);
 	RunStateMachine();
 	CheckMotorCalls();
 
@@ -668,9 +678,66 @@ static void GetCPV(void)
 	time += DT;
 }
 
-static void GetTrajectory(void)
+static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3)
 {
+	float p[4];
+	float v[3];
 
+	float CPV_1 = CM_KneeJoint.CPC_Params.CPV_1;
+	float CPV_2 = CM_KneeJoint.CPC_Params.CPV_2;
+	float CPV_3 = CM_KneeJoint.CPC_Params.CPV_3;
+	float P_1 = CM_KneeJoint.CPC_Params.P_1;
+	float P_2 = CM_KneeJoint.CPC_Params.P_2;
+	float P_3 = CM_KneeJoint.CPC_Params.P_3;
+	float P_4 = CM_KneeJoint.CPC_Params.P_4;
+
+	cpv[0] = CM_cpv;
+	p[0] = CM_KneeJoint.position;
+	v[0] = CM_KneeJoint.speed;
+
+	cpv[1] = p[0] + (CPV_2 - CPV_1)/(1.0f - CPV_1) * (1.0f - cpv[0]);
+	p[1] = p[0] * P_2/P_1;
+	v[1] = 0.0f;
+
+	p[3] = kneeAngleAtHeelStrike;
+
+	float dP_34 = P_4 - P_3;
+	cpv[2] = p[0] + (CPV_3 - CPV_1)/(1.0f - CPV_1) * (1.0f - cpv[0]);
+	p[2] = p[3] - dP_34;
+	v[2] = 0;
+
+	GetThirdOrderSegmentConstants(cpv[0], cpv[1], p[0], p[1], v[0], v[1], a1);
+	GetThirdOrderSegmentConstants(cpv[1], cpv[2], p[1], p[2], v[1], v[2], a2);
+	GetSecondOrderSegmentConstants(cpv[1], cpv[2], p[1], p[2], v[1], a3);
+}
+
+static void GetThirdOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float v_2, float *a)
+{
+	float dcpv = cpv_2 - cpv_1;
+	a[0] = p_1;
+	a[1] = v_1;
+	a[2] = (3.0f*p_2 - 3.0f*p_1 - 2.0f*v_1*dcpv - v_2*dcpv) / (dcpv*dcpv);
+	a[3] = (2.0f*p_1 + (v_1 + v_2)*dcpv - 2.0f*p_2) / (dcpv*dcpv*dcpv);
+}
+
+static void GetSecondOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float *a)
+{
+	float dcpv = cpv_2 - cpv_1;
+	a[0] = p_1;
+	a[1] = v_1;
+	a[2] = (p_2 - a[0] - a[1]*dcpv) / (dcpv*dcpv);
+}
+
+static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3)
+{
+	if((CM_cpv >= cpv[0]) && (CM_cpv < cpv[1]))
+		CM_trajectory = a1[0] + a1[1]*CM_cpv + a1[2]*CM_cpv*CM_cpv + a1[3]*CM_cpv*CM_cpv*CM_cpv;
+	if((CM_cpv >= cpv[1]) && (CM_cpv < cpv[2]))
+		CM_trajectory = a2[0] + a2[1]*CM_cpv + a2[2]*CM_cpv*CM_cpv + a2[3]*CM_cpv*CM_cpv*CM_cpv;
+	if((CM_cpv >= cpv[2]) && (CM_cpv < 1))
+		CM_trajectory = a3[0] + a3[1]*CM_cpv + a3[2]*CM_cpv*CM_cpv;
+	else
+		CM_trajectory = 0.0f;
 }
 
 static void RunStateMachine(void)
