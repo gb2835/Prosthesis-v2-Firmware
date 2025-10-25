@@ -17,6 +17,12 @@ typedef enum
 
 typedef enum
 {
+	Kaden,
+	Winter
+} CPC_Specs_e;
+
+typedef enum
+{
 	AnkleIndex,
 	KneeIndex
 } DeviceIndex_e;
@@ -66,6 +72,7 @@ typedef struct
 {
 	Joint_e Joint;
 	Side_e Side;
+	CPC_Specs_e CPC_Spec;
 } Prosthesis_Init_t;
 
 extern TestProgram_e testProgram;

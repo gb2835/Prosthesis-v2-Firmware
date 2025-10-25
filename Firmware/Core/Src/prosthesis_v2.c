@@ -74,6 +74,17 @@ typedef struct
 
 typedef struct
 {
+	float CPV_1;
+	float CPV_2;
+	float CPV_3;
+	float P_1;
+	float P_2;
+	float P_3;
+	float P_4;
+} CPC_Params_t;
+
+typedef struct
+{
 	float ax;
 	float ay;
 	float az;
@@ -95,6 +106,7 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t SwingDescCtrl;
+	CPC_Params_t CPC_Params;
 	float position;
 	float speed;
 	float torque;
@@ -130,6 +142,7 @@ static uint8_t imuDataReceived = 0;
 static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
+static uint8_t toeOff = 0;
 
 static AnkleJoint_t CM_AnkleJoint;
 static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1
@@ -167,6 +180,7 @@ static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
 static void GetCPV(void);
+static void GetTrajectory(void);
 static void RunStateMachine(void);
 static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
@@ -253,6 +267,20 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_KneeJoint.SwingDescCtrl.kp = startKp;
 		CM_KneeJoint.SwingDescCtrl.position = startPos;
 
+		switch(Device.CPC_Spec)
+		{
+		case Kaden:
+			// ??
+		case Winter:
+			CM_KneeJoint.CPC_Params.CPV_1 = 0.717203740538403f;
+			CM_KneeJoint.CPC_Params.CPV_2 = 0.786907375601145f;
+			CM_KneeJoint.CPC_Params.CPV_3 = 0.980305166790268f;
+			CM_KneeJoint.CPC_Params.P_1 = 57.540000000000000f;
+			CM_KneeJoint.CPC_Params.P_2 = 64.860000000000000f;
+			CM_KneeJoint.CPC_Params.P_3 = 0.540000000000000f;
+			CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
+		}
+
 		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
 			ErrorHandler(KneeMotorError);
 	}
@@ -270,10 +298,13 @@ void RunProsthesisControl(void)
 	GetInputs();
 	ProcessInputs();
 
+	if(toeOff)
+		GetTrajectory();
+
 	RunStateMachine();
 	CheckMotorCalls();
 
-	// Check for first and second executions, needed for load cell filter
+	// Check for first and second executions, needed for load cell filter and miscellaneous initializations
 	if(isFirst)
 	{
 		isFirst = 0;
@@ -635,6 +666,11 @@ static void GetCPV(void)
 	quadrant[1] = quadrant[0];
 
 	time += DT;
+}
+
+static void GetTrajectory(void)
+{
+
 }
 
 static void RunStateMachine(void)

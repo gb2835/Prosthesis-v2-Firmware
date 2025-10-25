@@ -165,6 +165,7 @@ int main(void)
 	Prosthesis_Init_t Prosthesis_Init;
 	Prosthesis_Init.Joint = Knee;
 	Prosthesis_Init.Side = Right;
+	Prosthesis_Init.CPC_Spec = Winter;
 
 
 /*******************************************************************************
