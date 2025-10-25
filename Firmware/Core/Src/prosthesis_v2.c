@@ -131,6 +131,26 @@ static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
 
+static AnkleJoint_t CM_AnkleJoint;
+static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1
+static float CM_cpvx10;
+static float CM_state_quadrant;
+static float CM_xPhaseAngle, CM_yPhaseAngle;
+static int8_t CM_state_angles, CM_state_torques;
+static int16_t CM_state_speeds;
+static uint16_t CM_state_loadCells;
+static KneeJoint_t CM_KneeJoint;
+static LoadCell_t CM_LoadCell;
+
+static double CM_thighAngle_unbiased[2] = {0.0, 0.0};	// [0] = k-0, [1] = k-1
+static double CM_thighIntegral_unbiased = 0.0;
+static Error_e CM_ledCode = NoError;
+static float CM_cpv = 0.0f;
+static float CM_footSpeed = 0.0f;
+static float CM_AnkleSpeedThreshold = -5.0f;
+static float CM_footSpeedThreshold = -5.0f;
+static uint8_t CM_healthyStride = 0;
+
 static const int8_t state_angles[3][6] = {{-20, -14, -8, -2,  4, 10},	// Ankle only
 									 	  {-20,  -4, 12, 28, 44, 60},	// Combined
 										  {  0,  12, 24, 36, 48, 60}};	// Knee only
@@ -142,23 +162,6 @@ static const int8_t state_torques[3][6] = {{-100, -70, -40, -10, 20, 50},	// Ank
 static const int16_t state_speeds[6] = {-600, -360, -120, 120, 360, 600};
 
 static const uint16_t state_loadCells[6] = {1100, 1200, 1300, 1400, 1500, 1600};
-
-static AnkleJoint_t CM_AnkleJoint;
-static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1
-static float CM_cpv, CM_cpvx10;
-static float CM_xPhaseAngle, CM_yPhaseAngle;
-static int8_t CM_state_angles, CM_state_torques;
-static int16_t CM_state_speeds;
-static uint16_t CM_state_loadCells;
-static KneeJoint_t CM_KneeJoint;
-static LoadCell_t CM_LoadCell;
-
-static double CM_thighAngle_unbiased[2] = {0.0, 0.0};	// [0] = k-0, [1] = k-1
-static double CM_thighIntegral_unbiased = 0.0;
-static Error_e CM_ledCode = NoError;
-static float CM_footSpeed = 0.0f;
-static float CM_AnkleSpeedThreshold = -5.0f;
-static float CM_footSpeedThreshold = -5.0f;
 
 static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
@@ -500,6 +503,7 @@ static void ProcessInputs(void)
 		}
 
 		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
+
 		if(!CPC_Simulation)
 			CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 		else
@@ -507,8 +511,8 @@ static void ProcessInputs(void)
 			static double time = 0.0f;
 			CM_thighAngle[0] = 20.0*cos(M_PI*time) + 5.0*cos(5.0*time);
 
-			// Check derivative of thigh angle for pseudo heel strike detection
-			if(((-20.0*M_PI*sin(M_PI*time) - 25.0*sin(5.0*time)) <= 0.0) && ((-20.0*M_PI*sin(M_PI*(time-DT)) - 25.0*sin(5.0*(time-DT))) > 0.0))
+			// Check derivative of thigh angle for pseudo heel strike detection. Phase shifted to be more biomechanically representative
+			if(((-20.0*M_PI*sin(M_PI*time-0.2) - 25.0*sin(5.0*time-0.2)) <= 0.0) && ((-20.0*M_PI*sin(M_PI*(time-DT)-0.2) - 25.0*sin(5.0*(time-DT)-0.2)) > 0.0))
 				heelStrike = 1;
 
 			time = time + DT;
@@ -528,6 +532,7 @@ static void GetCPV(void)
 	static float time = 0.0f;
 	static float z = 1.0f;
 	static uint8_t firstCall = 1;
+	static uint8_t quadrant[2] = {0, 0};
 
 	static float maxThighAngle_unbiased;
 	static float minThighAngle_unbiased;
@@ -540,6 +545,8 @@ static void GetCPV(void)
 	if(heelStrike)
 	{
 		heelStrike = 0;
+		quadrant[0] = 0;
+		quadrant[1] = 0;
 
 		float dtime = time - startTime;
 
@@ -547,12 +554,18 @@ static void GetCPV(void)
 			firstCall = 0;
 		else
 		{
-			thighAngle_bias = thighIntegral / dtime;
-			z = fabs(maxThighAngle_unbiased - minThighAngle_unbiased) / fabs(maxThighIntegral_unbiased - minThighIntegral_unbiased);
+			if(CM_healthyStride)
+			{
+				CM_healthyStride = 0;
+				thighAngle_bias = thighIntegral / dtime;
+				z = fabs(maxThighAngle_unbiased - minThighAngle_unbiased) / fabs(maxThighIntegral_unbiased - minThighIntegral_unbiased);
+			}
 		}
 
 		thighIntegral = 0.0f;
 		CM_thighIntegral_unbiased = 0.0f;
+		CM_healthyStride = 10;
+		CM_cpv = 0.0f;
 
 		maxThighAngle_unbiased = CM_thighAngle[0] - thighAngle_bias;
 		minThighAngle_unbiased = CM_thighAngle[0] - thighAngle_bias;
@@ -581,21 +594,45 @@ static void GetCPV(void)
 	CM_xPhaseAngle = -CM_thighAngle_unbiased[0];
 	CM_yPhaseAngle = -z * CM_thighIntegral_unbiased;
 
-	uint8_t quadrant;
 	if((CM_xPhaseAngle <= 0.0f) && (CM_yPhaseAngle < 0.0f))
-		quadrant = 3;
+	{
+		CM_state_quadrant = 0.0f;
+		quadrant[0] = 1;
+	}
 	if((CM_xPhaseAngle > 0.0f) && (CM_yPhaseAngle <= 0.0f))
-		quadrant = 4;
+	{
+		CM_state_quadrant = 3.3f;
+		quadrant[0] = 2;
+	}
 	if((CM_xPhaseAngle >= 0.0f) && (CM_yPhaseAngle > 0.0f))
-		quadrant = 1;
+	{
+		CM_state_quadrant = 6.7f;
+		quadrant[0] = 3;
+	}
 	if((CM_xPhaseAngle < 0.0f) && (CM_yPhaseAngle >= 0.0f))
-		quadrant = 2;
+	{
+		CM_state_quadrant = 10.0f;
+		quadrant[0] = 4;
+	}
 
-	CM_cpv = (atan2(CM_yPhaseAngle, CM_xPhaseAngle) + M_PI) / (2.0f*M_PI);
+	if(CM_healthyStride)
+	{
+		if((quadrant[0] == 1) && (quadrant[1] == 4))
+			quadrant[0] = 4;
+		if(quadrant[0] >= quadrant[1])
+			CM_healthyStride = 10;
+		else
+			CM_healthyStride = 0;
+	}
+
+	if(CM_cpv < ((atan2(CM_yPhaseAngle, CM_xPhaseAngle) + M_PI) / (2.0f*M_PI)))
+		CM_cpv = (atan2(CM_yPhaseAngle, CM_xPhaseAngle) + M_PI) / (2.0f*M_PI);
+
 	CM_cpvx10 = CM_cpv * 10.0f;
 
 	CM_thighAngle[1] = CM_thighAngle[0];
 	CM_thighAngle_unbiased[1] = CM_thighAngle_unbiased[0];
+	quadrant[1] = quadrant[0];
 
 	time += DT;
 }
