@@ -5447,7 +5447,7 @@ static void ProcessInputs(void)
  80029dc:	4a1d      	ldr	r2, [pc, #116]	; (8002a54 <ProcessInputs+0x80c>)
  80029de:	6013      	str	r3, [r2, #0]
 
-		if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+		if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
  80029e0:	4b1d      	ldr	r3, [pc, #116]	; (8002a58 <ProcessInputs+0x810>)
  80029e2:	781b      	ldrb	r3, [r3, #0]
  80029e4:	2b01      	cmp	r3, #1
@@ -5512,7 +5512,7 @@ static void GetSimulatedThighAngle(void)
  8002a66:	f04f 0200 	mov.w	r2, #0
  8002a6a:	f04f 4380 	mov.w	r3, #1073741824	; 0x40000000
  8002a6e:	e9c7 2304 	strd	r2, r3, [r7, #16]
-	if(testProgram == CPV_Simulation_Ideal)
+	if(testProgram == CPC_Simulation_Ideal)
  8002a72:	4ba5      	ldr	r3, [pc, #660]	; (8002d08 <GetSimulatedThighAngle+0x2a8>)
  8002a74:	781b      	ldrb	r3, [r3, #0]
  8002a76:	2b01      	cmp	r3, #1
@@ -5641,7 +5641,7 @@ static void GetSimulatedThighAngle(void)
 	}
 }
  8002bba:	e160      	b.n	8002e7e <GetSimulatedThighAngle+0x41e>
-		if(testProgram == CPV_Simulation_WinterUnsteady)
+		if(testProgram == CPC_Simulation_WinterUnsteady)
  8002bbc:	4b52      	ldr	r3, [pc, #328]	; (8002d08 <GetSimulatedThighAngle+0x2a8>)
  8002bbe:	781b      	ldrb	r3, [r3, #0]
  8002bc0:	2b03      	cmp	r3, #3
@@ -7710,7 +7710,7 @@ static void RunStateMachine(void)
  8003da8:	4b1c      	ldr	r3, [pc, #112]	; (8003e1c <RunStateMachine+0x428>)
  8003daa:	2200      	movs	r2, #0
  8003dac:	701a      	strb	r2, [r3, #0]
-				if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+				if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
  8003dae:	4b1e      	ldr	r3, [pc, #120]	; (8003e28 <RunStateMachine+0x434>)
  8003db0:	781b      	ldrb	r3, [r3, #0]
  8003db2:	2b01      	cmp	r3, #1
@@ -7886,7 +7886,7 @@ static void RunStateMachine(void)
  8003ede:	eef5 7ac0 	vcmpe.f32	s15, #0.0
  8003ee2:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
  8003ee6:	d400      	bmi.n	8003eea <RunStateMachine+0x4f6>
-				if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+				if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
 					heelStrike = 1;
 			}
 
@@ -7918,7 +7918,7 @@ static void RunStateMachine(void)
  8003f14:	4b51      	ldr	r3, [pc, #324]	; (800405c <RunStateMachine+0x668>)
  8003f16:	2200      	movs	r2, #0
  8003f18:	701a      	strb	r2, [r3, #0]
-				if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+				if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
  8003f1a:	4b52      	ldr	r3, [pc, #328]	; (8004064 <RunStateMachine+0x670>)
  8003f1c:	781b      	ldrb	r3, [r3, #0]
  8003f1e:	2b01      	cmp	r3, #1
@@ -8056,7 +8056,7 @@ static void RunStateMachine(void)
  8003ff4:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
  8003ff8:	dc00      	bgt.n	8003ffc <RunStateMachine+0x608>
 
-			if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+			if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
 				heelStrike = 1;
 		}
 
@@ -8066,7 +8066,7 @@ static void RunStateMachine(void)
  8003ffc:	4b17      	ldr	r3, [pc, #92]	; (800405c <RunStateMachine+0x668>)
  8003ffe:	2200      	movs	r2, #0
  8004000:	701a      	strb	r2, [r3, #0]
-			if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+			if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
  8004002:	4b18      	ldr	r3, [pc, #96]	; (8004064 <RunStateMachine+0x670>)
  8004004:	781b      	ldrb	r3, [r3, #0]
  8004006:	2b01      	cmp	r3, #1

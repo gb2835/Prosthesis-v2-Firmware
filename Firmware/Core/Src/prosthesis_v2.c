@@ -555,7 +555,7 @@ static void ProcessInputs(void)
 
 		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
 
-		if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+		if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
 			CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 		else
 			GetSimulatedThighAngle();
@@ -569,7 +569,7 @@ static void GetSimulatedThighAngle(void)
 	static double time = 0.0;
 
 	double stridePeriod = 2.0;	// User may edit this to change stride period in seconds
-	if(testProgram == CPV_Simulation_Ideal)
+	if(testProgram == CPC_Simulation_Ideal)
 	{
 		double w = 2 * M_PI / stridePeriod;
 
@@ -585,7 +585,7 @@ static void GetSimulatedThighAngle(void)
 		static double cosTime = 0.0;
 
 		double unsteady;
-		if(testProgram == CPV_Simulation_WinterUnsteady)
+		if(testProgram == CPC_Simulation_WinterUnsteady)
 		{
 			double w = (2 * M_PI / stridePeriod) * (5.0 / M_PI);
 			unsteady = 5.0*cos(w*cosTime);
@@ -978,7 +978,7 @@ static void RunStateMachine(void)
 			{
 				state = EarlyStance;
 
-				if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+				if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
 					heelStrike = 1;
 			}
 
@@ -1032,7 +1032,7 @@ static void RunStateMachine(void)
 			{
 				state = EarlyStance;
 
-				if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+				if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
 					heelStrike = 1;
 			}
 
@@ -1076,7 +1076,7 @@ static void RunStateMachine(void)
 		{
 			state = EarlyStance;
 
-			if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
+			if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
 				heelStrike = 1;
 		}
 
