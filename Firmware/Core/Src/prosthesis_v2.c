@@ -790,7 +790,10 @@ static void RunStateMachine(void)
 		}
 		else if(Device.Joint == Knee)
 			if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoSwingThreshold)
+			{
 				state = SwingFlexion;
+				toeOff = 1;
+			}
 
 		break;
 
@@ -872,7 +875,10 @@ static void RunStateMachine(void)
 		}
 
 		if(CM_AnkleJoint.speed > 0.0f) // can we use load cell??
+		{
 			state = SwingFlexion;
+			toeOff = 1;
+		}
 
 		break;
 
@@ -915,7 +921,13 @@ static void RunStateMachine(void)
 		if(Device.Joint == Ankle)
 		{
 			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
+			{
 				state = EarlyStance;
+
+				if(testProgram != CPC_Simulation)
+					heelStrike = 1;
+			}
+
 		}
 		else if((Device.Joint == Knee) || (Device.Joint == Combined))
 			if(CM_KneeJoint.speed < 0.0f)
@@ -966,7 +978,13 @@ static void RunStateMachine(void)
 		}
 		else if(Device.Joint == Knee)
 			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
+			{
 				state = EarlyStance;
+
+				if(testProgram != CPC_Simulation)
+					heelStrike = 1;
+			}
+
 
 		break;
 
@@ -1007,7 +1025,12 @@ static void RunStateMachine(void)
 		}
 
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
+		{
 			state = EarlyStance;
+
+			if(testProgram != CPC_Simulation)
+				heelStrike = 1;
+		}
 
 		break;
 	}
