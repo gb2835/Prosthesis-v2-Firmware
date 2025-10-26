@@ -19,6 +19,7 @@
 #include "mpu925x_spi_hal.h"
 #include "prosthesis_v2.h"
 #include "utilities.h"
+#include "winter_bio_data.h"
 
 #include <math.h>
 #include <stdint.h>
@@ -181,6 +182,7 @@ static const uint16_t state_loadCells[6] = {1100, 1200, 1300, 1400, 1500, 1600};
 static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
+static void GetSimulatedThighAngle(void);
 static void GetCPV(void);
 static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3);
 static void GetThirdOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float v_2, float *a);
@@ -553,18 +555,58 @@ static void ProcessInputs(void)
 		if(testProgram != CPV_Simulation)
 			CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 		else
-		{
-			static double time = 0.0f;
-			CM_thighAngle[0] = 20.0*cos(M_PI*time) + 5.0*cos(5.0*time);
-
-			// Check derivative of thigh angle for pseudo heel strike detection. Phase shifted to be more biomechanically representative
-			if(((-20.0*M_PI*sin(M_PI*time-0.2) - 25.0*sin(5.0*time-0.2)) <= 0.0) && ((-20.0*M_PI*sin(M_PI*(time-DT)-0.2) - 25.0*sin(5.0*(time-DT)-0.2)) > 0.0))
-				heelStrike = 1;
-
-			time = time + DT;
-		}
+			GetSimulatedThighAngle();
 
 		GetCPV();
+	}
+}
+
+static void GetSimulatedThighAngle(void)
+{
+//	static double time = 0.0;
+//	CM_thighAngle[0] = 20.0*cos(M_PI*time) + 5.0*cos(5.0*time);
+//
+//	// Check derivative of thigh angle for pseudo heel strike detection. Phase shifted to be more biomechanically representative
+//	if(((-20.0*M_PI*sin(M_PI*time-0.2) - 25.0*sin(5.0*time-0.2)) <= 0.0) && ((-20.0*M_PI*sin(M_PI*(time-DT)-0.2) - 25.0*sin(5.0*(time-DT)-0.2)) > 0.0))
+//		heelStrike = 1;
+//
+//	time = time + DT;
+
+	static double time = 0.0;
+
+	static float winter[51][2];
+	if(isFirst)
+	{
+		for(uint8_t row = 0; row <= 51; row++)
+		{
+			winter[row][0] = winterBioData[row][Winter_Stride] * (2.0f/100.f);
+			winter[row][1] = winterBioData[row][Winter_HipAngle];
+		}
+	}
+
+	static uint8_t row = 1;
+	if(time == 0.0)
+	{
+		heelStrike = 1;
+		CM_thighAngle[0] = winterBioData[0][Winter_HipAngle];
+	}
+	else
+	{
+		for(row = start; row < 51; row++)
+			if((time > winter[row][0]) && (time < winter[row+1][0]))
+				break;
+
+		if(row == 51)
+			row = 1;
+
+		CM_thighAngle[0] = Utils_LinearInterpolate(time, winter[row][0], winter[row][1], winter[row+1][0], winter[row+1][1]);
+	}
+
+	time = time + DT;
+	if(time >= 2.0)
+	{
+		time = 0.0;
+		row = 1;
 	}
 }
 
