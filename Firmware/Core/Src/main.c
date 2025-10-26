@@ -242,7 +242,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(CPV_Simulation_WinterUnsteady);
+	RequireTestProgram(ImpedanceControl);
 
 	if(testProgram == None)
 	{

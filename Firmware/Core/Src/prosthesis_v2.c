@@ -318,7 +318,10 @@ void RunProsthesisControl(void)
 	}
 
 	GetTrajectory(cpv, a1, a2, a3);
-	RunStateMachine();
+
+	if(testProgram == None)
+		RunStateMachine();
+
 	CheckMotorCalls();
 
 	// Check for first and second executions, needed for load cell filter and miscellaneous initializations
@@ -830,20 +833,17 @@ static void RunStateMachine(void)
 			CM_state_torques = state_torques[Combined][EarlyStance];
 		}
 
-		if(testProgram != ImpedanceControl)
+		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			{
-				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.EarlyStanceCtrl.kd;
-				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.EarlyStanceCtrl.kp;
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.EarlyStanceCtrl.position;
-			}
-			if((Device.Joint == Knee) || (Device.Joint == Combined))
-			{
-				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.EarlyStanceCtrl.kd;
-				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.EarlyStanceCtrl.kp;
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.EarlyStanceCtrl.position;
-			}
+			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.EarlyStanceCtrl.kd;
+			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.EarlyStanceCtrl.kp;
+			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.EarlyStanceCtrl.position;
+		}
+		if((Device.Joint == Knee) || (Device.Joint == Combined))
+		{
+			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.EarlyStanceCtrl.kd;
+			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.EarlyStanceCtrl.kp;
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.EarlyStanceCtrl.position;
 		}
 
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
@@ -880,20 +880,17 @@ static void RunStateMachine(void)
 			CM_state_torques = state_torques[Combined][MidStance];
 		}
 
-		if(testProgram != ImpedanceControl)
+		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			{
-				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.MidStanceCtrl.kd;
-				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.MidStanceCtrl.kp;
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.MidStanceCtrl.position;
-			}
-			if((Device.Joint == Knee) || (Device.Joint == Combined))
-			{
-				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.MidStanceCtrl.kd;
-				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.MidStanceCtrl.kp;
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.MidStanceCtrl.position;
-			}
+			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.MidStanceCtrl.kd;
+			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.MidStanceCtrl.kp;
+			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.MidStanceCtrl.position;
+		}
+		if((Device.Joint == Knee) || (Device.Joint == Combined))
+		{
+			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.MidStanceCtrl.kd;
+			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.MidStanceCtrl.kp;
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.MidStanceCtrl.position;
 		}
 
 		if(CM_AnkleJoint.speed < CM_AnkleSpeedThreshold) // check with angle plot (not speed plot)??
@@ -921,20 +918,17 @@ static void RunStateMachine(void)
 			CM_state_torques = state_torques[Combined][LateStance];
 		}
 
-		if(testProgram != ImpedanceControl)
+		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			{
-				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.LateStanceCtrl.kd;
-				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.LateStanceCtrl.kp;
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.LateStanceCtrl.position;
-			}
-			if((Device.Joint == Knee) || (Device.Joint == Combined))
-			{
-				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.LateStanceCtrl.kd;
-				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.LateStanceCtrl.kp;
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.LateStanceCtrl.position;
-			}
+			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.LateStanceCtrl.kd;
+			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.LateStanceCtrl.kp;
+			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.LateStanceCtrl.position;
+		}
+		if((Device.Joint == Knee) || (Device.Joint == Combined))
+		{
+			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.LateStanceCtrl.kd;
+			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.LateStanceCtrl.kp;
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.LateStanceCtrl.position;
 		}
 
 		if(CM_AnkleJoint.speed > 0.0f) // can we use load cell??
@@ -965,20 +959,17 @@ static void RunStateMachine(void)
 			CM_state_torques = state_torques[Combined][SwingFlexion];
 		}
 
-		if(testProgram != ImpedanceControl)
+		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			{
-				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingFlexCtrl.kd;
-				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingFlexCtrl.kp;
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingFlexCtrl.position;
-			}
-			if((Device.Joint == Knee) || (Device.Joint == Combined))
-			{
-				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingFlexCtrl.kd;
-				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingFlexCtrl.kp;
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingFlexCtrl.position;
-			}
+			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingFlexCtrl.kd;
+			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingFlexCtrl.kp;
+			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingFlexCtrl.position;
+		}
+		if((Device.Joint == Knee) || (Device.Joint == Combined))
+		{
+			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingFlexCtrl.kd;
+			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingFlexCtrl.kp;
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingFlexCtrl.position;
 		}
 
 		if(Device.Joint == Ankle)
@@ -1018,20 +1009,17 @@ static void RunStateMachine(void)
 			CM_state_torques = state_torques[Combined][SwingExtension];
 		}
 
-		if(testProgram != ImpedanceControl)
+		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			{
-				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingExtCtrl.kd;
-				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingExtCtrl.kp;
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingExtCtrl.position;
-			}
-			if((Device.Joint == Knee) || (Device.Joint == Combined))
-			{
-				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingExtCtrl.kd;
-				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingExtCtrl.kp;
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingExtCtrl.position;
-			}
+			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingExtCtrl.kd;
+			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingExtCtrl.kp;
+			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingExtCtrl.position;
+		}
+		if((Device.Joint == Knee) || (Device.Joint == Combined))
+		{
+			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingExtCtrl.kd;
+			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingExtCtrl.kp;
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingExtCtrl.position;
 		}
 
 		if(Device.Joint == Combined)
@@ -1071,20 +1059,17 @@ static void RunStateMachine(void)
 			CM_state_torques = state_torques[Combined][SwingDescension];
 		}
 
-		if(testProgram != ImpedanceControl)
+		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
-			{
-				CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingDescCtrl.kd;
-				CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingDescCtrl.kp;
-				CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingDescCtrl.position;
-			}
-			if((Device.Joint == Knee) || (Device.Joint == Combined))
-			{
-				CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingDescCtrl.kd;
-				CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingDescCtrl.kp;
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingDescCtrl.position;
-			}
+			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingDescCtrl.kd;
+			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingDescCtrl.kp;
+			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingDescCtrl.position;
+		}
+		if((Device.Joint == Knee) || (Device.Joint == Combined))
+		{
+			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingDescCtrl.kd;
+			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingDescCtrl.kp;
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingDescCtrl.position;
 		}
 
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
