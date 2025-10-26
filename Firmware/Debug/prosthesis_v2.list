@@ -6362,17 +6362,17 @@ static void GetCPV(void)
  800326e:	4a8c      	ldr	r2, [pc, #560]	; (80034a0 <GetCPV+0x5f8>)
  8003270:	6013      	str	r3, [r2, #0]
 
-	if((CM_xPhaseAngle <= 0.0f) && (CM_yPhaseAngle < 0.0f))
+	if((CM_xPhaseAngle < 0.0f) && (CM_yPhaseAngle <= 0.0f))
  8003272:	4b8c      	ldr	r3, [pc, #560]	; (80034a4 <GetCPV+0x5fc>)
  8003274:	edd3 7a00 	vldr	s15, [r3]
  8003278:	eef5 7ac0 	vcmpe.f32	s15, #0.0
  800327c:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003280:	d80e      	bhi.n	80032a0 <GetCPV+0x3f8>
+ 8003280:	d50e      	bpl.n	80032a0 <GetCPV+0x3f8>
  8003282:	4b87      	ldr	r3, [pc, #540]	; (80034a0 <GetCPV+0x5f8>)
  8003284:	edd3 7a00 	vldr	s15, [r3]
  8003288:	eef5 7ac0 	vcmpe.f32	s15, #0.0
  800328c:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003290:	d506      	bpl.n	80032a0 <GetCPV+0x3f8>
+ 8003290:	d806      	bhi.n	80032a0 <GetCPV+0x3f8>
 	{
 		CM_state_quadrant = 0.0f;
  8003292:	4b85      	ldr	r3, [pc, #532]	; (80034a8 <GetCPV+0x600>)
@@ -6383,17 +6383,17 @@ static void GetCPV(void)
  800329c:	2201      	movs	r2, #1
  800329e:	701a      	strb	r2, [r3, #0]
 	}
-	if((CM_xPhaseAngle > 0.0f) && (CM_yPhaseAngle <= 0.0f))
+	if((CM_xPhaseAngle >= 0.0f) && (CM_yPhaseAngle < 0.0f))
  80032a0:	4b80      	ldr	r3, [pc, #512]	; (80034a4 <GetCPV+0x5fc>)
  80032a2:	edd3 7a00 	vldr	s15, [r3]
  80032a6:	eef5 7ac0 	vcmpe.f32	s15, #0.0
  80032aa:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80032ae:	dd0d      	ble.n	80032cc <GetCPV+0x424>
+ 80032ae:	db0d      	blt.n	80032cc <GetCPV+0x424>
  80032b0:	4b7b      	ldr	r3, [pc, #492]	; (80034a0 <GetCPV+0x5f8>)
  80032b2:	edd3 7a00 	vldr	s15, [r3]
  80032b6:	eef5 7ac0 	vcmpe.f32	s15, #0.0
  80032ba:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80032be:	d805      	bhi.n	80032cc <GetCPV+0x424>
+ 80032be:	d505      	bpl.n	80032cc <GetCPV+0x424>
 	{
 		CM_state_quadrant = 3.0f;
  80032c0:	4b79      	ldr	r3, [pc, #484]	; (80034a8 <GetCPV+0x600>)
@@ -6404,17 +6404,17 @@ static void GetCPV(void)
  80032c8:	2202      	movs	r2, #2
  80032ca:	701a      	strb	r2, [r3, #0]
 	}
-	if((CM_xPhaseAngle >= 0.0f) && (CM_yPhaseAngle > 0.0f))
+	if((CM_xPhaseAngle > 0.0f) && (CM_yPhaseAngle >= 0.0f))
  80032cc:	4b75      	ldr	r3, [pc, #468]	; (80034a4 <GetCPV+0x5fc>)
  80032ce:	edd3 7a00 	vldr	s15, [r3]
  80032d2:	eef5 7ac0 	vcmpe.f32	s15, #0.0
  80032d6:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80032da:	db0d      	blt.n	80032f8 <GetCPV+0x450>
+ 80032da:	dd0d      	ble.n	80032f8 <GetCPV+0x450>
  80032dc:	4b70      	ldr	r3, [pc, #448]	; (80034a0 <GetCPV+0x5f8>)
  80032de:	edd3 7a00 	vldr	s15, [r3]
  80032e2:	eef5 7ac0 	vcmpe.f32	s15, #0.0
  80032e6:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80032ea:	dd05      	ble.n	80032f8 <GetCPV+0x450>
+ 80032ea:	db05      	blt.n	80032f8 <GetCPV+0x450>
 	{
 		CM_state_quadrant = 6.0f;
  80032ec:	4b6e      	ldr	r3, [pc, #440]	; (80034a8 <GetCPV+0x600>)
@@ -6425,17 +6425,17 @@ static void GetCPV(void)
  80032f4:	2203      	movs	r2, #3
  80032f6:	701a      	strb	r2, [r3, #0]
 	}
-	if((CM_xPhaseAngle < 0.0f) && (CM_yPhaseAngle >= 0.0f))
+	if((CM_xPhaseAngle <= 0.0f) && (CM_yPhaseAngle > 0.0f))
  80032f8:	4b6a      	ldr	r3, [pc, #424]	; (80034a4 <GetCPV+0x5fc>)
  80032fa:	edd3 7a00 	vldr	s15, [r3]
  80032fe:	eef5 7ac0 	vcmpe.f32	s15, #0.0
  8003302:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003306:	d50d      	bpl.n	8003324 <GetCPV+0x47c>
+ 8003306:	d80d      	bhi.n	8003324 <GetCPV+0x47c>
  8003308:	4b65      	ldr	r3, [pc, #404]	; (80034a0 <GetCPV+0x5f8>)
  800330a:	edd3 7a00 	vldr	s15, [r3]
  800330e:	eef5 7ac0 	vcmpe.f32	s15, #0.0
  8003312:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003316:	db05      	blt.n	8003324 <GetCPV+0x47c>
+ 8003316:	dd05      	ble.n	8003324 <GetCPV+0x47c>
 	{
 		CM_state_quadrant = 9.0f;
  8003318:	4b63      	ldr	r3, [pc, #396]	; (80034a8 <GetCPV+0x600>)

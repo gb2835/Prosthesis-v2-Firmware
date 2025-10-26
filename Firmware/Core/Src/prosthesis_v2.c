@@ -703,22 +703,22 @@ static void GetCPV(void)
 	CM_xPhaseAngle = -CM_thighAngle_unbiased[0];
 	CM_yPhaseAngle = -z * CM_thighIntegral_unbiased;
 
-	if((CM_xPhaseAngle <= 0.0f) && (CM_yPhaseAngle < 0.0f))
+	if((CM_xPhaseAngle < 0.0f) && (CM_yPhaseAngle <= 0.0f))
 	{
 		CM_state_quadrant = 0.0f;
 		quadrant[0] = 1;
 	}
-	if((CM_xPhaseAngle > 0.0f) && (CM_yPhaseAngle <= 0.0f))
+	if((CM_xPhaseAngle >= 0.0f) && (CM_yPhaseAngle < 0.0f))
 	{
 		CM_state_quadrant = 3.0f;
 		quadrant[0] = 2;
 	}
-	if((CM_xPhaseAngle >= 0.0f) && (CM_yPhaseAngle > 0.0f))
+	if((CM_xPhaseAngle > 0.0f) && (CM_yPhaseAngle >= 0.0f))
 	{
 		CM_state_quadrant = 6.0f;
 		quadrant[0] = 3;
 	}
-	if((CM_xPhaseAngle < 0.0f) && (CM_yPhaseAngle >= 0.0f))
+	if((CM_xPhaseAngle <= 0.0f) && (CM_yPhaseAngle > 0.0f))
 	{
 		CM_state_quadrant = 9.0f;
 		quadrant[0] = 4;
