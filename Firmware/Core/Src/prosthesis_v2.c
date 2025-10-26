@@ -276,6 +276,7 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		{
 		case Kaden:
 			// ??
+			break;
 		case Winter:
 			CM_KneeJoint.CPC_Params.CPV_1 = 0.717203740538403f;
 			CM_KneeJoint.CPC_Params.CPV_2 = 0.786907375601145f;
@@ -284,6 +285,7 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 			CM_KneeJoint.CPC_Params.P_2 = 64.860000000000000f;
 			CM_KneeJoint.CPC_Params.P_3 = 0.540000000000000f;
 			CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
+			break;
 		}
 
 		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
@@ -781,8 +783,14 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_footSpeed > CM_footSpeedThreshold)
-			state = MidStance;
+		if((Device.Joint == Ankle) || (Device.Joint == Combined))
+		{
+			if(CM_footSpeed > CM_footSpeedThreshold)
+				state = MidStance;
+		}
+		else if(Device.Joint == Knee)
+			if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoSwingThreshold)
+				state = SwingFlexion;
 
 		break;
 
@@ -822,7 +830,7 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_AnkleJoint.speed < CM_AnkleSpeedThreshold)
+		if(CM_AnkleJoint.speed < CM_AnkleSpeedThreshold) // check with angle plot (not speed plot)??
 			state = LateStance;
 
 		break;
@@ -863,7 +871,7 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_AnkleJoint.speed > 0.0f)
+		if(CM_AnkleJoint.speed > 0.0f) // can we use load cell??
 			state = SwingFlexion;
 
 		break;
@@ -904,8 +912,14 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_KneeJoint.speed < 0.0f)
-			state = SwingExtension;
+		if(Device.Joint == Ankle)
+		{
+			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
+				state = EarlyStance;
+		}
+		else if((Device.Joint == Knee) || (Device.Joint == Combined))
+			if(CM_KneeJoint.speed < 0.0f)
+				state = SwingExtension;
 
 		break;
 
@@ -945,8 +959,14 @@ static void RunStateMachine(void)
 			}
 		}
 
-		if(CM_footSpeed < 0.0f)
-			state = SwingDescension;
+		if(Device.Joint == Combined)
+		{
+			if(CM_footSpeed < 0.0f)
+				state = SwingDescension;
+		}
+		else if(Device.Joint == Knee)
+			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
+				state = EarlyStance;
 
 		break;
 
