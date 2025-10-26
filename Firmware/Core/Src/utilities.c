@@ -146,6 +146,14 @@ void Utils_Normalize(float *vector, uint8_t length)
 		vector[i] *= inverseMagnitude;
 }
 
+float Utils_LinearInterpolate(float x, float x1, float y1, float x2, float y2)
+{
+	 // Avoid division by zero if x1 and x2 are the same
+    if (x1 == x2)
+        return y1;
+
+    return y1 + (x - x1) * ((y2 - y1) / (x2 - x1));
+}
 
 /*******************************************************************************
 * END

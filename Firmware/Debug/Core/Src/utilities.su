@@ -4,3 +4,4 @@
 ../Core/Src/utilities.c:90:6:Utils_QuaternionToYPR	72	static
 ../Core/Src/utilities.c:105:20:Utils_RotateQuaternion	144	static
 ../Core/Src/utilities.c:134:6:Utils_Normalize	32	static
+../Core/Src/utilities.c:149:7:Utils_LinearInterpolate	32	static

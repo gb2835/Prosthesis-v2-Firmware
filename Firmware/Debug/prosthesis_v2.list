@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  0002009c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0002020a  00000000  00000000  000200cc  2**0
+ 12 .debug_info   0002026a  00000000  00000000  000200cc  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 0000433b  00000000  00000000  000402d6  2**0
+ 13 .debug_abbrev 00004359  00000000  00000000  00040336  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00001ad0  00000000  00000000  00044618  2**3
+ 14 .debug_aranges 00001ad8  00000000  00000000  00044690  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 000018d8  00000000  00000000  000460e8  2**3
+ 15 .debug_ranges 000018e0  00000000  00000000  00046168  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0002dc47  00000000  00000000  000479c0  2**0
+ 16 .debug_macro  0002dc47  00000000  00000000  00047a48  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0001cc57  00000000  00000000  00075607  2**0
+ 17 .debug_line   0001cc84  00000000  00000000  0007568f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00111d01  00000000  00000000  0009225e  2**0
+ 18 .debug_str    00111d19  00000000  00000000  00092313  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  001a3f5f  2**0
+ 19 .comment      00000050  00000000  00000000  001a402c  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000075e4  00000000  00000000  001a3fb0  2**2
+ 20 .debug_frame  0000760c  00000000  00000000  001a407c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -4124,7 +4124,10 @@ void RunProsthesisControl(void)
 	ProcessInputs();
  8001edc:	f000 f9b0 	bl	8002240 <ProcessInputs>
 
-	static float cpv[3], a1[4], a2[4], a3[3];
+	static float cpv[3] = {0.0f, 0.0f, 0.0f};
+	static float a1[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+	static float a2[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+	static float a3[3] = {0.0f, 0.0f, 0.0f};
 	if(toeOff)
  8001ee0:	4b15      	ldr	r3, [pc, #84]	; (8001f38 <RunProsthesisControl+0x64>)
  8001ee2:	781b      	ldrb	r3, [r3, #0]

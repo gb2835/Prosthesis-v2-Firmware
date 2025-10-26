@@ -305,7 +305,10 @@ void RunProsthesisControl(void)
 	GetInputs();
 	ProcessInputs();
 
-	static float cpv[3], a1[4], a2[4], a3[3];
+	static float cpv[3] = {0.0f, 0.0f, 0.0f};
+	static float a1[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+	static float a2[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+	static float a3[3] = {0.0f, 0.0f, 0.0f};
 	if(toeOff)
 	{
 		toeOff = 0;
@@ -547,7 +550,7 @@ static void ProcessInputs(void)
 
 		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
 
-		if(!CPV_Simulation)
+		if(testProgram != CPV_Simulation)
 			CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 		else
 		{
