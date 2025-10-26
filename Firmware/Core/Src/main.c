@@ -242,7 +242,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(CPV_Simulation);
+	RequireTestProgram(CPV_Simulation_WinterUnsteady);
 
 	if(testProgram == None)
 	{

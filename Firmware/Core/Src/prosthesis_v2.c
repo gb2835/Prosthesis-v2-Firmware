@@ -552,7 +552,7 @@ static void ProcessInputs(void)
 
 		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
 
-		if(testProgram != CPV_Simulation)
+		if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
 			CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 		else
 			GetSimulatedThighAngle();
@@ -563,50 +563,67 @@ static void ProcessInputs(void)
 
 static void GetSimulatedThighAngle(void)
 {
-//	static double time = 0.0;
-//	CM_thighAngle[0] = 20.0*cos(M_PI*time) + 5.0*cos(5.0*time);
-//
-//	// Check derivative of thigh angle for pseudo heel strike detection. Phase shifted to be more biomechanically representative
-//	if(((-20.0*M_PI*sin(M_PI*time-0.2) - 25.0*sin(5.0*time-0.2)) <= 0.0) && ((-20.0*M_PI*sin(M_PI*(time-DT)-0.2) - 25.0*sin(5.0*(time-DT)-0.2)) > 0.0))
-//		heelStrike = 1;
-//
-//	time = time + DT;
-
 	static double time = 0.0;
 
-	static float winter[51][2];
-	if(isFirst)
+	double stridePeriod = 2.0;	// User may edit this to change stride period in seconds
+	if(testProgram == CPV_Simulation_Ideal)
 	{
-		for(uint8_t row = 0; row <= 51; row++)
-		{
-			winter[row][0] = winterBioData[row][Winter_Stride] * (2.0f/100.f);
-			winter[row][1] = winterBioData[row][Winter_HipAngle];
-		}
-	}
+		double w = 2 * M_PI / stridePeriod;
 
-	static uint8_t row = 1;
-	if(time == 0.0)
-	{
-		heelStrike = 1;
-		CM_thighAngle[0] = winterBioData[0][Winter_HipAngle];
+		CM_thighAngle[0] = 20.0*cos(w*time);
+
+		if(((-20.0*w*sin(w*time)) <= 0.0) && ((-20.0*w*sin(w*(time-DT))) > 0.0))
+			heelStrike = 1;
+
+		time += DT;
 	}
 	else
 	{
-		for(row = start; row < 51; row++)
-			if((time > winter[row][0]) && (time < winter[row+1][0]))
-				break;
+		static double cosTime = 0.0;
 
-		if(row == 51)
-			row = 1;
+		double unsteady;
+		if(testProgram == CPV_Simulation_WinterUnsteady)
+		{
+			double w = (2 * M_PI / stridePeriod) * (5.0 / M_PI);
+			unsteady = 5.0*cos(w*cosTime);
+		}
+		else
+			unsteady = 0.0;
 
-		CM_thighAngle[0] = Utils_LinearInterpolate(time, winter[row][0], winter[row][1], winter[row+1][0], winter[row+1][1]);
-	}
+		static float winter[51][2];
+		if(isFirst)
+		{
+			for(uint8_t row = 0; row < 51; row++)
+			{
+				winter[row][0] = winterBioData[row][Winter_Stride] * (stridePeriod/100.f);
+				winter[row][1] = winterBioData[row][Winter_HipAngle];
+			}
+		}
 
-	time = time + DT;
-	if(time >= 2.0)
-	{
-		time = 0.0;
-		row = 1;
+		static uint8_t start = 0;
+		if(time == 0.0)
+		{
+			heelStrike = 1;
+			CM_thighAngle[0] = winterBioData[0][Winter_HipAngle] + unsteady;
+		}
+		else
+		{
+			static uint8_t row;
+			for(row = start; row < (51-1); row++)
+				if((time > winter[row][0]) && (time < winter[row+1][0]))
+					break;
+
+			CM_thighAngle[0] = Utils_LinearInterpolate(time, winter[row][0], winter[row][1], winter[row+1][0], winter[row+1][1]) + unsteady;
+		}
+
+		time += DT;
+		if(time >= stridePeriod)
+		{
+			time = 0.0;
+			start = 0;
+		}
+
+		cosTime += DT;
 	}
 }
 
@@ -642,10 +659,11 @@ static void GetCPV(void)
 			firstCall = 0;
 		else
 		{
+			thighAngle_bias = thighIntegral / dtime;
+
 			if(CM_healthyStride)
 			{
 				CM_healthyStride = 0;
-				thighAngle_bias = thighIntegral / dtime;
 				z = fabs(maxThighAngle_unbiased - minThighAngle_unbiased) / fabs(maxThighIntegral_unbiased - minThighIntegral_unbiased);
 			}
 		}
@@ -969,7 +987,7 @@ static void RunStateMachine(void)
 			{
 				state = EarlyStance;
 
-				if(testProgram != CPV_Simulation)
+				if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
 					heelStrike = 1;
 			}
 
@@ -1026,7 +1044,7 @@ static void RunStateMachine(void)
 			{
 				state = EarlyStance;
 
-				if(testProgram != CPV_Simulation)
+				if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
 					heelStrike = 1;
 			}
 
@@ -1073,7 +1091,7 @@ static void RunStateMachine(void)
 		{
 			state = EarlyStance;
 
-			if(testProgram != CPV_Simulation)
+			if((testProgram != CPV_Simulation_Ideal) && (testProgram != CPV_Simulation_Winter) && (testProgram != CPV_Simulation_WinterUnsteady))
 				heelStrike = 1;
 		}
 

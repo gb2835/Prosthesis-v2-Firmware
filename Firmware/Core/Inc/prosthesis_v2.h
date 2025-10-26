@@ -63,7 +63,9 @@ typedef enum
 typedef enum
 {
 	None,
-	CPV_Simulation,
+	CPV_Simulation_Ideal,
+	CPV_Simulation_Winter,
+	CPV_Simulation_WinterUnsteady,
 	ReadOnly,
 	ImpedanceControl
 } TestProgram_e;
