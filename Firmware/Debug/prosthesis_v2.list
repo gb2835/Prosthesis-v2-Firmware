@@ -39,11 +39,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_line   0001cde4  00000000  00000000  00075b79  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00111de8  00000000  00000000  0009295d  2**0
+ 18 .debug_str    00111de7  00000000  00000000  0009295d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  001a4745  2**0
+ 19 .comment      00000050  00000000  00000000  001a4744  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00007638  00000000  00000000  001a4798  2**2
+ 20 .debug_frame  00007638  00000000  00000000  001a4794  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -3432,8 +3432,8 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(ImpedanceControl);
- 8001ade:	2005      	movs	r0, #5
+	RequireTestProgram(CPC_Simulation_Ideal);
+ 8001ade:	2001      	movs	r0, #1
  8001ae0:	f000 f9de 	bl	8001ea0 <RequireTestProgram>
 
 	if(testProgram == None)
@@ -6091,9 +6091,9 @@ static void GetCPV(void)
  8002fd6:	f04f 0200 	mov.w	r2, #0
  8002fda:	f04f 0300 	mov.w	r3, #0
  8002fde:	e9c1 2300 	strd	r2, r3, [r1]
-		CM_healthyStride = 10;
+		CM_healthyStride = 9;
  8002fe2:	4b91      	ldr	r3, [pc, #580]	; (8003228 <GetCPV+0x380>)
- 8002fe4:	220a      	movs	r2, #10
+ 8002fe4:	2209      	movs	r2, #9
  8002fe6:	701a      	strb	r2, [r3, #0]
 		CM_cpv = 0.0f;
  8002fe8:	4b96      	ldr	r3, [pc, #600]	; (8003244 <GetCPV+0x39c>)
@@ -6395,7 +6395,7 @@ static void GetCPV(void)
  80032ba:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
  80032be:	d805      	bhi.n	80032cc <GetCPV+0x424>
 	{
-		CM_state_quadrant = 3.3f;
+		CM_state_quadrant = 3.0f;
  80032c0:	4b79      	ldr	r3, [pc, #484]	; (80034a8 <GetCPV+0x600>)
  80032c2:	4a7b      	ldr	r2, [pc, #492]	; (80034b0 <GetCPV+0x608>)
  80032c4:	601a      	str	r2, [r3, #0]
@@ -6416,7 +6416,7 @@ static void GetCPV(void)
  80032e6:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
  80032ea:	dd05      	ble.n	80032f8 <GetCPV+0x450>
 	{
-		CM_state_quadrant = 6.7f;
+		CM_state_quadrant = 6.0f;
  80032ec:	4b6e      	ldr	r3, [pc, #440]	; (80034a8 <GetCPV+0x600>)
  80032ee:	4a71      	ldr	r2, [pc, #452]	; (80034b4 <GetCPV+0x60c>)
  80032f0:	601a      	str	r2, [r3, #0]
@@ -6437,7 +6437,7 @@ static void GetCPV(void)
  8003312:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
  8003316:	db05      	blt.n	8003324 <GetCPV+0x47c>
 	{
-		CM_state_quadrant = 10.0f;
+		CM_state_quadrant = 9.0f;
  8003318:	4b63      	ldr	r3, [pc, #396]	; (80034a8 <GetCPV+0x600>)
  800331a:	4a67      	ldr	r2, [pc, #412]	; (80034b8 <GetCPV+0x610>)
  800331c:	601a      	str	r2, [r3, #0]
@@ -6473,9 +6473,9 @@ static void GetCPV(void)
  8003348:	785b      	ldrb	r3, [r3, #1]
  800334a:	429a      	cmp	r2, r3
  800334c:	d303      	bcc.n	8003356 <GetCPV+0x4ae>
-			CM_healthyStride = 10;
+			CM_healthyStride = 9;
  800334e:	4b5b      	ldr	r3, [pc, #364]	; (80034bc <GetCPV+0x614>)
- 8003350:	220a      	movs	r2, #10
+ 8003350:	2209      	movs	r2, #9
  8003352:	701a      	strb	r2, [r3, #0]
  8003354:	e002      	b.n	800335c <GetCPV+0x4b4>
 		else
@@ -6562,10 +6562,10 @@ static void GetCPV(void)
  800341a:	4a29      	ldr	r2, [pc, #164]	; (80034c0 <GetCPV+0x618>)
  800341c:	6013      	str	r3, [r2, #0]
 
-	CM_cpvx10 = CM_cpv * 10.0f;
+	CM_cpvx9 = CM_cpv * 9.0f;
  800341e:	4b28      	ldr	r3, [pc, #160]	; (80034c0 <GetCPV+0x618>)
  8003420:	edd3 7a00 	vldr	s15, [r3]
- 8003424:	eeb2 7a04 	vmov.f32	s14, #36	; 0x41200000  10.0
+ 8003424:	eeb2 7a02 	vmov.f32	s14, #34	; 0x41100000  9.0
  8003428:	ee67 7a87 	vmul.f32	s15, s15, s14
  800342c:	4b25      	ldr	r3, [pc, #148]	; (80034c4 <GetCPV+0x61c>)
  800342e:	edc3 7a00 	vstr	s15, [r3]
@@ -6619,9 +6619,9 @@ static void GetCPV(void)
  80034a4:	20000574 	.word	0x20000574
  80034a8:	2000056c 	.word	0x2000056c
  80034ac:	200008e0 	.word	0x200008e0
- 80034b0:	40533333 	.word	0x40533333
- 80034b4:	40d66666 	.word	0x40d66666
- 80034b8:	41200000 	.word	0x41200000
+ 80034b0:	40400000 	.word	0x40400000
+ 80034b4:	40c00000 	.word	0x40c00000
+ 80034b8:	41100000 	.word	0x41100000
  80034bc:	200006d4 	.word	0x200006d4
  80034c0:	200006cc 	.word	0x200006cc
  80034c4:	20000568 	.word	0x20000568

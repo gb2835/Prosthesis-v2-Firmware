@@ -242,7 +242,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(ImpedanceControl);
+	RequireTestProgram(CPC_Simulation_Ideal);
 
 	if(testProgram == None)
 	{

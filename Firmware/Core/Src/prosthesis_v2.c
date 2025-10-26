@@ -148,7 +148,7 @@ static uint8_t toeOff = 0;
 
 static AnkleJoint_t CM_AnkleJoint;
 static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1
-static float CM_cpvx10;
+static float CM_cpvx9;
 static float CM_state_quadrant;
 static float CM_trajectory;
 static float CM_xPhaseAngle, CM_yPhaseAngle;
@@ -673,7 +673,7 @@ static void GetCPV(void)
 
 		thighIntegral = 0.0f;
 		CM_thighIntegral_unbiased = 0.0f;
-		CM_healthyStride = 10;
+		CM_healthyStride = 9;
 		CM_cpv = 0.0f;
 
 		maxThighAngle_unbiased = CM_thighAngle[0] - thighAngle_bias;
@@ -710,17 +710,17 @@ static void GetCPV(void)
 	}
 	if((CM_xPhaseAngle > 0.0f) && (CM_yPhaseAngle <= 0.0f))
 	{
-		CM_state_quadrant = 3.3f;
+		CM_state_quadrant = 3.0f;
 		quadrant[0] = 2;
 	}
 	if((CM_xPhaseAngle >= 0.0f) && (CM_yPhaseAngle > 0.0f))
 	{
-		CM_state_quadrant = 6.7f;
+		CM_state_quadrant = 6.0f;
 		quadrant[0] = 3;
 	}
 	if((CM_xPhaseAngle < 0.0f) && (CM_yPhaseAngle >= 0.0f))
 	{
-		CM_state_quadrant = 10.0f;
+		CM_state_quadrant = 9.0f;
 		quadrant[0] = 4;
 	}
 
@@ -729,7 +729,7 @@ static void GetCPV(void)
 		if((quadrant[0] == 1) && (quadrant[1] == 4))
 			quadrant[0] = 4;
 		if(quadrant[0] >= quadrant[1])
-			CM_healthyStride = 10;
+			CM_healthyStride = 9;
 		else
 			CM_healthyStride = 0;
 	}
@@ -737,7 +737,7 @@ static void GetCPV(void)
 	if(CM_cpv < ((atan2(CM_yPhaseAngle, CM_xPhaseAngle) + M_PI) / (2.0f*M_PI)))
 		CM_cpv = (atan2(CM_yPhaseAngle, CM_xPhaseAngle) + M_PI) / (2.0f*M_PI);
 
-	CM_cpvx10 = CM_cpv * 10.0f;
+	CM_cpvx9 = CM_cpv * 9.0f;
 
 	CM_thighAngle[1] = CM_thighAngle[0];
 	CM_thighAngle_unbiased[1] = CM_thighAngle_unbiased[0];
