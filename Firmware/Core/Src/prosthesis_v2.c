@@ -547,7 +547,7 @@ static void ProcessInputs(void)
 
 		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
 
-		if(!CPC_Simulation)
+		if(!CPV_Simulation)
 			CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 		else
 		{
@@ -924,7 +924,7 @@ static void RunStateMachine(void)
 			{
 				state = EarlyStance;
 
-				if(testProgram != CPC_Simulation)
+				if(testProgram != CPV_Simulation)
 					heelStrike = 1;
 			}
 
@@ -981,7 +981,7 @@ static void RunStateMachine(void)
 			{
 				state = EarlyStance;
 
-				if(testProgram != CPC_Simulation)
+				if(testProgram != CPV_Simulation)
 					heelStrike = 1;
 			}
 
@@ -1028,7 +1028,7 @@ static void RunStateMachine(void)
 		{
 			state = EarlyStance;
 
-			if(testProgram != CPC_Simulation)
+			if(testProgram != CPV_Simulation)
 				heelStrike = 1;
 		}
 

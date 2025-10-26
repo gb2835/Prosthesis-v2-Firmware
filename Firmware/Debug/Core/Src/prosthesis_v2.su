@@ -17,9 +17,9 @@
 ../Core/Src/prosthesis_v2.c:725:13:GetSecondOrderSegmentConstants	40	static
 ../Core/Src/prosthesis_v2.c:733:13:GetTrajectory	24	static
 ../Core/Src/prosthesis_v2.c:745:13:RunStateMachine	4	static
-../Core/Src/prosthesis_v2.c:1043:13:CheckMotorCalls	16	static
-../Core/Src/prosthesis_v2.c:1087:13:ServiceMotor	24	static
-../Core/Src/prosthesis_v2.c:1149:6:HAL_SPI_TxCpltCallback	16	static
-../Core/Src/prosthesis_v2.c:1154:6:HAL_SPI_RxCpltCallback	16	static
-../Core/Src/prosthesis_v2.c:1159:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
-../Core/Src/prosthesis_v2.c:1169:6:HAL_CAN_RxFifo1MsgPendingCallback	48	static
+../Core/Src/prosthesis_v2.c:1039:13:CheckMotorCalls	16	static
+../Core/Src/prosthesis_v2.c:1083:13:ServiceMotor	24	static
+../Core/Src/prosthesis_v2.c:1145:6:HAL_SPI_TxCpltCallback	16	static
+../Core/Src/prosthesis_v2.c:1150:6:HAL_SPI_RxCpltCallback	16	static
+../Core/Src/prosthesis_v2.c:1155:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
+../Core/Src/prosthesis_v2.c:1165:6:HAL_CAN_RxFifo1MsgPendingCallback	48	static

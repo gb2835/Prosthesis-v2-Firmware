@@ -63,7 +63,7 @@ typedef enum
 typedef enum
 {
 	None,
-	CPC_Simulation,
+	CPV_Simulation,
 	ReadOnly,
 	ImpedanceControl
 } TestProgram_e;

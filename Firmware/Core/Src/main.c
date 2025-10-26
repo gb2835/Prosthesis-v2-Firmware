@@ -242,7 +242,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(CPC_Simulation);
+	RequireTestProgram(CPV_Simulation);
 
 	if(testProgram == None)
 	{
