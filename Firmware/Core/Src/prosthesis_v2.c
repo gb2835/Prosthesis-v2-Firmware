@@ -188,6 +188,7 @@ static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3);
 static void GetThirdOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float v_2, float *a);
 static void GetSecondOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float *a);
 static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3);
+static void RunCPC_Simulation(void);
 static void RunStateMachine(void);
 static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
@@ -319,7 +320,9 @@ void RunProsthesisControl(void)
 
 	GetTrajectory(cpv, a1, a2, a3);
 
-	if(testProgram == None)
+	if((testProgram == CPC_Simulation_Ideal) || (testProgram == CPC_Simulation_Winter) || (testProgram == CPC_Simulation_WinterUnsteady))
+		RunCPC_Simulation();
+	else if(testProgram == None)
 		RunStateMachine();
 
 	CheckMotorCalls();
@@ -582,24 +585,24 @@ static void GetSimulatedThighAngle(void)
 	}
 	else
 	{
-		static double cosTime = 0.0;
+		static double unsteadyTime = 0.0;
 
 		double unsteady;
 		if(testProgram == CPC_Simulation_WinterUnsteady)
 		{
-			double w = (2 * M_PI / stridePeriod) * (5.0 / M_PI);
-			unsteady = 5.0*cos(w*cosTime);
+			double w = (2 * M_PI / stridePeriod) * (5.0 / M_PI);	// This ratio works well to generate unsteady gait cycles for a given stride period
+			unsteady = 5.0*cos(w*unsteadyTime);
 		}
 		else
 			unsteady = 0.0;
 
-		static float winter[51][2];
+		static double winterHipAngle[51][2];
 		if(isFirst)
 		{
 			for(uint8_t row = 0; row < 51; row++)
 			{
-				winter[row][0] = winterBioData[row][Winter_Stride] * (stridePeriod/100.f);
-				winter[row][1] = winterBioData[row][Winter_HipAngle];
+				winterHipAngle[row][0] = winterBioData[row][Winter_Stride] * (stridePeriod/100.0);
+				winterHipAngle[row][1] = winterBioData[row][Winter_HipAngle];
 			}
 		}
 
@@ -607,16 +610,16 @@ static void GetSimulatedThighAngle(void)
 		if(time == 0.0)
 		{
 			heelStrike = 1;
-			CM_thighAngle[0] = winterBioData[0][Winter_HipAngle] + unsteady;
+			CM_thighAngle[0] = winterHipAngle[0][1] + unsteady;
 		}
 		else
 		{
 			static uint8_t row;
 			for(row = start; row < (51-1); row++)
-				if((time > winter[row][0]) && (time < winter[row+1][0]))
+				if((time > winterHipAngle[row][0]) && (time < winterHipAngle[row+1][0]))
 					break;
 
-			CM_thighAngle[0] = Utils_LinearInterpolate(time, winter[row][0], winter[row][1], winter[row+1][0], winter[row+1][1]) + unsteady;
+			CM_thighAngle[0] = Utils_LinearInterpolate(time, winterHipAngle[row][0], winterHipAngle[row][1], winterHipAngle[row+1][0], winterHipAngle[row+1][1]) + unsteady;
 		}
 
 		time += DT;
@@ -626,7 +629,7 @@ static void GetSimulatedThighAngle(void)
 			start = 0;
 		}
 
-		cosTime += DT;
+		unsteadyTime += DT;
 	}
 }
 
@@ -806,6 +809,39 @@ static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3)
 		CM_trajectory = a3[0] + a3[1]*CM_cpv + a3[2]*CM_cpv*CM_cpv;
 	else
 		CM_trajectory = 0.0f;
+}
+
+static void RunCPC_Simulation(void)
+{
+	static float time = 0.0f;
+
+	float stridePeriod = 2.0;	// ??
+	static float winterKneeAngle[51][2];
+	if(isFirst)
+	{
+		for(uint8_t row = 0; row < 51; row++)
+		{
+			winterKneeAngle[row][0] = winterBioData[row][Winter_Stride] * (stridePeriod/100.0f);
+			winterKneeAngle[row][1] = winterBioData[row][Winter_KneeAngle];
+		}
+	}
+
+	static uint8_t row;
+	static uint8_t start = 0;
+	for(row = start; row < (51-1); row++)
+		if((time > winterKneeAngle[row][0]) && (time < winterKneeAngle[row+1][0]))
+			break;
+
+	CM_KneeJoint.ProsCtrl.kd = 0.0f;
+	CM_KneeJoint.ProsCtrl.kp = 0.0f;
+	CM_KneeJoint.ProsCtrl.position = Utils_LinearInterpolate(time, winterKneeAngle[row][0], winterKneeAngle[row][1], winterKneeAngle[row+1][0], winterKneeAngle[row+1][1]);
+
+	time += DT;
+	if(time >= stridePeriod)
+	{
+		time = 0.0;
+		start = 0;
+	}
 }
 
 static void RunStateMachine(void)
