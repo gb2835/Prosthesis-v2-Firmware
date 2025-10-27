@@ -53,7 +53,8 @@ typedef enum
 	LateStance,
 	SwingFlexion,
 	SwingExtension,
-	SwingDescension
+	SwingDescension,
+	CPC
 } StateMachine_e;
 
 typedef struct
@@ -66,6 +67,7 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t SwingDescCtrl;
+	AKxx_x_WriteData_t CPC_Ctrl;
 	float position;
 	float speed;
 	float torque;
@@ -107,6 +109,7 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t SwingDescCtrl;
+	AKxx_x_WriteData_t CPC_Ctrl;
 	CPC_Params_t CPC_Params;
 	float position;
 	float speed;
@@ -166,6 +169,7 @@ static float CM_cpv = 0.0f;
 static float CM_footSpeed = 0.0f;
 static float CM_AnkleSpeedThreshold = -5.0f;
 static float CM_footSpeedThreshold = -5.0f;
+static uint8_t CM__StartCPC = 0;
 static uint8_t CM_healthyStride = 0;
 
 static const int8_t state_angles[3][6] = {{-20, -14, -8, -2,  4, 10},	// Ankle only
@@ -239,6 +243,10 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_AnkleJoint.SwingDescCtrl.kp = startKp;
 		CM_AnkleJoint.SwingDescCtrl.position = startPos;
 
+		CM_AnkleJoint.CPC_Ctrl.kd = startKd;
+		CM_AnkleJoint.CPC_Ctrl.kp = startKp;
+		CM_AnkleJoint.CPC_Ctrl.position = startPos;
+
 		MPU925x_SetChipSelect(0);
 		MPU925x_StartReadIMU_IT(0);
 
@@ -275,6 +283,9 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_KneeJoint.SwingDescCtrl.kd = startKd;
 		CM_KneeJoint.SwingDescCtrl.kp = startKp;
 		CM_KneeJoint.SwingDescCtrl.position = startPos;
+
+		CM_KneeJoint.CPC_Ctrl.kd = startKd;
+		CM_KneeJoint.CPC_Ctrl.kp = startKp;
 
 		switch(Device.CPC_Spec)
 		{
@@ -968,7 +979,11 @@ static void RunStateMachine(void)
 
 		if(CM_AnkleJoint.speed > 0.0f) // can we use load cell??
 		{
-			state = SwingFlexion;
+			if(CM__StartCPC)
+				state = CPC;
+			else
+				state = SwingFlexion;
+
 			toeOff = 1;
 		}
 
@@ -1012,9 +1027,7 @@ static void RunStateMachine(void)
 			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 			{
 				state = EarlyStance;
-
-				if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
-					heelStrike = 1;
+				heelStrike = 1;
 			}
 
 		}
@@ -1066,9 +1079,7 @@ static void RunStateMachine(void)
 			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 			{
 				state = EarlyStance;
-
-				if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
-					heelStrike = 1;
+				heelStrike = 1;
 			}
 
 
@@ -1110,12 +1121,50 @@ static void RunStateMachine(void)
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 		{
 			state = EarlyStance;
-
-			if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
-				heelStrike = 1;
+			heelStrike = 1;
 		}
 
 		break;
+
+	case CPC:
+		CM_state_loadCells = state_loadCells[CPC];
+		CM_state_speeds = state_speeds[CPC];
+
+		if(Device.Joint == Ankle)
+		{
+			CM_state_angles = state_angles[Ankle][CPC];
+			CM_state_torques = state_torques[Ankle][CPC];
+		}
+		if(Device.Joint == Knee)
+		{
+			CM_state_angles = state_angles[Knee][CPC];
+			CM_state_torques = state_torques[Knee][CPC];
+		}
+		if(Device.Joint == Combined)
+		{
+			CM_state_angles = state_angles[Combined][CPC];
+			CM_state_torques = state_torques[Combined][CPC];
+		}
+
+		if((Device.Joint == Ankle) || (Device.Joint == Combined))
+		{
+			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.CPC_Ctrl.kd;
+			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.CPC_Ctrl.kp;
+			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.CPC_Ctrl.position;
+		}
+		if((Device.Joint == Knee) || (Device.Joint == Combined))
+		{
+			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.CPC_Ctrl.kd;
+			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.CPC_Ctrl.kp;
+			CM_KneeJoint.ProsCtrl.position = CM_trajectory;
+		}
+
+		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
+		{
+			state = EarlyStance;
+			heelStrike = 1;
+		}
+
 	}
 }
 
