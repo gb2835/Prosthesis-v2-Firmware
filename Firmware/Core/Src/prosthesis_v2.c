@@ -134,7 +134,7 @@ typedef struct
 } LoadCell_t;
 
 static AKxx_x_WriteData_t MotorTxData;
-static float kneeAngleAtHeelStrike;
+static float kneeAngleAtHeelStrike = 3.97f;
 static MPU925x_IMU_Data_t IMU_Data;
 static Prosthesis_Init_t Device;
 
@@ -144,6 +144,7 @@ static uint8_t imuDataReceived = 0;
 static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
+static double stridePeriod = 2.0;			// Used for CPC simulations
 static uint8_t toeOff = 0;
 
 static AnkleJoint_t CM_AnkleJoint;
@@ -307,6 +308,7 @@ void RunProsthesisControl(void)
 {
 	GetInputs();
 	ProcessInputs();
+	GetCPV();
 
 	static float cpv[3] = {0.0f, 0.0f, 0.0f};
 	static float a1[4] = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -562,8 +564,6 @@ static void ProcessInputs(void)
 			CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 		else
 			GetSimulatedThighAngle();
-
-		GetCPV();
 	}
 }
 
@@ -571,7 +571,6 @@ static void GetSimulatedThighAngle(void)
 {
 	static double time = 0.0;
 
-	double stridePeriod = 2.0;	// User may edit this to change stride period in seconds
 	if(testProgram == CPC_Simulation_Ideal)
 	{
 		double w = 2 * M_PI / stridePeriod;
@@ -607,20 +606,12 @@ static void GetSimulatedThighAngle(void)
 		}
 
 		static uint8_t start = 0;
-		if(time == 0.0)
-		{
-			heelStrike = 1;
-			CM_thighAngle[0] = winterHipAngle[0][1] + unsteady;
-		}
-		else
-		{
-			static uint8_t row;
-			for(row = start; row < (51-1); row++)
-				if((time > winterHipAngle[row][0]) && (time < winterHipAngle[row+1][0]))
-					break;
+		static uint8_t row;
+		for(row = start; row < (51-1); row++)
+			if((time > winterHipAngle[row][0]) && (time < winterHipAngle[row+1][0]))
+				break;
 
-			CM_thighAngle[0] = Utils_LinearInterpolate(time, winterHipAngle[row][0], winterHipAngle[row][1], winterHipAngle[row+1][0], winterHipAngle[row+1][1]) + unsteady;
-		}
+		CM_thighAngle[0] = Utils_LinearInterpolate(time, winterHipAngle[row][0], winterHipAngle[row][1], winterHipAngle[row+1][0], winterHipAngle[row+1][1]) + unsteady;
 
 		time += DT;
 		if(time >= stridePeriod)
@@ -656,6 +647,7 @@ static void GetCPV(void)
 	if(heelStrike)
 	{
 		heelStrike = 0;
+		kneeAngleAtHeelStrike = CM_KneeJoint.position;
 		quadrant[0] = 0;
 		quadrant[1] = 0;
 
@@ -815,7 +807,6 @@ static void RunCPC_Simulation(void)
 {
 	static float time = 0.0f;
 
-	float stridePeriod = 2.0;	// ??
 	static float winterKneeAngle[51][2];
 	if(isFirst)
 	{
@@ -834,7 +825,15 @@ static void RunCPC_Simulation(void)
 
 	CM_KneeJoint.ProsCtrl.kd = 0.0f;
 	CM_KneeJoint.ProsCtrl.kp = 0.0f;
-	CM_KneeJoint.ProsCtrl.position = Utils_LinearInterpolate(time, winterKneeAngle[row][0], winterKneeAngle[row][1], winterKneeAngle[row+1][0], winterKneeAngle[row+1][1]);
+
+	float initialPosition;
+	if(isFirst)
+		initialPosition = CM_KneeJoint.position;
+
+	if(time < (stridePeriod/100.0f * 0.66f))	// Stance phase
+		CM_KneeJoint.ProsCtrl.position = Utils_LinearInterpolate(time, winterKneeAngle[row][0], winterKneeAngle[row][1], winterKneeAngle[row+1][0], winterKneeAngle[row+1][1]) + (initialPosition - winterKneeAngle[0][1]);
+	else
+		CM_KneeJoint.ProsCtrl.position = CM_trajectory;
 
 	time += DT;
 	if(time >= stridePeriod)
