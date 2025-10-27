@@ -165,9 +165,9 @@ static LoadCell_t CM_LoadCell;
 static double CM_thighAngle_unbiased[2] = {0.0, 0.0};	// [0] = k-0, [1] = k-1
 static double CM_thighIntegral_unbiased = 0.0;
 static Error_e CM_ledCode = NoError;
+static float CM_ankleSpeedThreshold = -5.0f;
 static float CM_cpv = 0.0f;
 static float CM_footSpeed = 0.0f;
-static float CM_AnkleSpeedThreshold = -5.0f;
 static float CM_footSpeedThreshold = -5.0f;
 static uint8_t CM__StartCPC = 0;
 static uint8_t CM_healthyStride = 0;
@@ -287,12 +287,18 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_KneeJoint.CPC_Ctrl.kd = startKd;
 		CM_KneeJoint.CPC_Ctrl.kp = startKp;
 
-		switch(Device.CPC_Spec)
+		if(testProgram == CPC_Simulation_Ideal)
 		{
-		case Kaden:
-			// ??
-			break;
-		case Winter:
+			CM_KneeJoint.CPC_Params.CPV_1 = 0.660000000000000f;
+			CM_KneeJoint.CPC_Params.CPV_2 = 0.720000000000000f;
+			CM_KneeJoint.CPC_Params.CPV_3 = 0.980000000000000f;
+			CM_KneeJoint.CPC_Params.P_1 = 57.540000000000000f;
+			CM_KneeJoint.CPC_Params.P_2 = 64.860000000000000f;
+			CM_KneeJoint.CPC_Params.P_3 = 0.540000000000000f;
+			CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
+		}
+		else if((testProgram == CPC_Simulation_Winter || (testProgram == CPC_Simulation_WinterUnsteady)))
+		{
 			CM_KneeJoint.CPC_Params.CPV_1 = 0.717203740538403f;
 			CM_KneeJoint.CPC_Params.CPV_2 = 0.786907375601145f;
 			CM_KneeJoint.CPC_Params.CPV_3 = 0.980305166790268f;
@@ -300,8 +306,23 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 			CM_KneeJoint.CPC_Params.P_2 = 64.860000000000000f;
 			CM_KneeJoint.CPC_Params.P_3 = 0.540000000000000f;
 			CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
-			break;
 		}
+		else
+			switch(Device.CPC_Spec)
+			{
+			case Kaden:
+				// ??
+				break;
+			case Winter:
+				CM_KneeJoint.CPC_Params.CPV_1 = 0.717203740538403f;
+				CM_KneeJoint.CPC_Params.CPV_2 = 0.786907375601145f;
+				CM_KneeJoint.CPC_Params.CPV_3 = 0.980305166790268f;
+				CM_KneeJoint.CPC_Params.P_1 = 57.540000000000000f;
+				CM_KneeJoint.CPC_Params.P_2 = 64.860000000000000f;
+				CM_KneeJoint.CPC_Params.P_3 = 0.540000000000000f;
+				CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
+				break;
+			}
 
 		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
 			ErrorHandler(KneeMotorError);
@@ -939,7 +960,7 @@ static void RunStateMachine(void)
 			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.MidStanceCtrl.position;
 		}
 
-		if(CM_AnkleJoint.speed < CM_AnkleSpeedThreshold) // check with angle plot (not speed plot)??
+		if(CM_AnkleJoint.speed < CM_ankleSpeedThreshold) // check with angle plot (not speed plot)??
 			state = LateStance;
 
 		break;
