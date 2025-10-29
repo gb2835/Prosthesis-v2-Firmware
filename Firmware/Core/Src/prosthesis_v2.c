@@ -202,7 +202,7 @@ static void GetSecondOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, 
 static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3);
 static void RunCPC_Simulation(void);
 static void RunStateMachine(void);
-static void SetStateVals(Joint_e joint, StateMachine_e state);
+static void SetStateMachineVals(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_t AnkleMotorWriteData, AKxx_x_WriteData_t KneeMotorWriteData);
 static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
 
@@ -902,20 +902,7 @@ static void RunStateMachine(void)
 	switch(state)
 	{
 	case EarlyStance:
-		SetStateVals(Device.Joint, state);
-
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-		{
-			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.EarlyStanceCtrl.kd;
-			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.EarlyStanceCtrl.kp;
-			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.EarlyStanceCtrl.position;
-		}
-		if((Device.Joint == Knee) || (Device.Joint == Combined))
-		{
-			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.EarlyStanceCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.EarlyStanceCtrl.kp;
-			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.EarlyStanceCtrl.position;
-		}
+		SetStateMachineVals(Device.Joint, state, CM_AnkleJoint.EarlyStanceCtrl, CM_KneeJoint.EarlyStanceCtrl);
 
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
@@ -932,20 +919,7 @@ static void RunStateMachine(void)
 		break;
 
 	case MidStance:
-		SetStateVals(Device.Joint, state);
-
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-		{
-			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.MidStanceCtrl.kd;
-			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.MidStanceCtrl.kp;
-			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.MidStanceCtrl.position;
-		}
-		if((Device.Joint == Knee) || (Device.Joint == Combined))
-		{
-			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.MidStanceCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.MidStanceCtrl.kp;
-			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.MidStanceCtrl.position;
-		}
+		SetStateMachineVals(Device.Joint, state, CM_AnkleJoint.MidStanceCtrl, CM_KneeJoint.MidStanceCtrl);
 
 		if(CM_AnkleJoint.speed < CM_ankleSpeedThreshold) // check with angle plot (not speed plot)??
 			state = LateStance;
@@ -953,20 +927,7 @@ static void RunStateMachine(void)
 		break;
 
 	case LateStance:
-		SetStateVals(Device.Joint, state);
-
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-		{
-			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.LateStanceCtrl.kd;
-			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.LateStanceCtrl.kp;
-			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.LateStanceCtrl.position;
-		}
-		if((Device.Joint == Knee) || (Device.Joint == Combined))
-		{
-			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.LateStanceCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.LateStanceCtrl.kp;
-			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.LateStanceCtrl.position;
-		}
+		SetStateMachineVals(Device.Joint, state, CM_AnkleJoint.LateStanceCtrl, CM_KneeJoint.LateStanceCtrl);
 
 		if(CM_AnkleJoint.speed > 0.0f) // can we use load cell??
 		{
@@ -981,20 +942,7 @@ static void RunStateMachine(void)
 		break;
 
 	case SwingFlexion:
-		SetStateVals(Device.Joint, state);
-
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-		{
-			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingFlexCtrl.kd;
-			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingFlexCtrl.kp;
-			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingFlexCtrl.position;
-		}
-		if((Device.Joint == Knee) || (Device.Joint == Combined))
-		{
-			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingFlexCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingFlexCtrl.kp;
-			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingFlexCtrl.position;
-		}
+		SetStateMachineVals(Device.Joint, state, CM_AnkleJoint.SwingFlexCtrl, CM_KneeJoint.SwingFlexCtrl);
 
 		if(Device.Joint == Ankle)
 		{
@@ -1012,20 +960,7 @@ static void RunStateMachine(void)
 		break;
 
 	case SwingExtension:
-		SetStateVals(Device.Joint, state);
-
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-		{
-			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingExtCtrl.kd;
-			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingExtCtrl.kp;
-			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingExtCtrl.position;
-		}
-		if((Device.Joint == Knee) || (Device.Joint == Combined))
-		{
-			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingExtCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingExtCtrl.kp;
-			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingExtCtrl.position;
-		}
+		SetStateMachineVals(Device.Joint, state, CM_AnkleJoint.SwingExtCtrl, CM_KneeJoint.SwingExtCtrl);
 
 		if(Device.Joint == Combined)
 		{
@@ -1043,20 +978,7 @@ static void RunStateMachine(void)
 		break;
 
 	case SwingDescension:
-		SetStateVals(Device.Joint, state);
-
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-		{
-			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.SwingDescCtrl.kd;
-			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.SwingDescCtrl.kp;
-			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.SwingDescCtrl.position;
-		}
-		if((Device.Joint == Knee) || (Device.Joint == Combined))
-		{
-			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.SwingDescCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.SwingDescCtrl.kp;
-			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.SwingDescCtrl.position;
-		}
+		SetStateMachineVals(Device.Joint, state, CM_AnkleJoint.SwingDescCtrl, CM_KneeJoint.SwingDescCtrl);
 
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 		{
@@ -1067,20 +989,7 @@ static void RunStateMachine(void)
 		break;
 
 	case CPC:
-		SetStateVals(Device.Joint, state);
-
-		if((Device.Joint == Ankle) || (Device.Joint == Combined))
-		{
-			CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.CPC_Ctrl.kd;
-			CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.CPC_Ctrl.kp;
-			CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.CPC_Ctrl.position;
-		}
-		if((Device.Joint == Knee) || (Device.Joint == Combined))
-		{
-			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.CPC_Ctrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.CPC_Ctrl.kp;
-			CM_KneeJoint.ProsCtrl.position = CM_trajectory;
-		}
+		SetStateMachineVals(Device.Joint, state, CM_AnkleJoint.CPC_Ctrl, CM_KneeJoint.CPC_Ctrl);
 
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 		{
@@ -1091,7 +1000,7 @@ static void RunStateMachine(void)
 	}
 }
 
-static void SetStateVals(Joint_e joint, StateMachine_e state)
+static void SetStateMachineVals(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_t AnkleMotorWriteData, AKxx_x_WriteData_t KneeMotorWriteData)
 {
 	CM_state_loadCell = state_loadCell[state];
 	CM_state_speed = state_speed[state];
@@ -1100,16 +1009,40 @@ static void SetStateVals(Joint_e joint, StateMachine_e state)
 	{
 		CM_state_angle = state_angle[Ankle][state];
 		CM_state_torque = state_torque[Ankle][state];
+
+		CM_AnkleJoint.ProsCtrl.kd = AnkleMotorWriteData.kd;
+		CM_AnkleJoint.ProsCtrl.kp = AnkleMotorWriteData.kp;
+		CM_AnkleJoint.ProsCtrl.position = AnkleMotorWriteData.position;
 	}
-	if(joint == Knee)
+	else if(joint == Knee)
 	{
 		CM_state_angle = state_angle[Knee][state];
 		CM_state_torque = state_torque[Knee][state];
+
+		CM_KneeJoint.ProsCtrl.kd = KneeMotorWriteData.kd;
+		CM_KneeJoint.ProsCtrl.kp = KneeMotorWriteData.kp;
+
+		if(state == CPC)
+			CM_KneeJoint.ProsCtrl.position = CM_trajectory;
+		else
+			CM_AnkleJoint.ProsCtrl.position = KneeMotorWriteData.position;
 	}
-	if(joint == Combined)
+	else if(joint == Combined)
 	{
 		CM_state_angle = state_angle[Combined][state];
 		CM_state_torque = state_torque[Combined][state];
+
+		CM_AnkleJoint.ProsCtrl.kd = AnkleMotorWriteData.kd;
+		CM_AnkleJoint.ProsCtrl.kp = AnkleMotorWriteData.kp;
+		CM_AnkleJoint.ProsCtrl.position = AnkleMotorWriteData.position;
+
+		CM_KneeJoint.ProsCtrl.kd = KneeMotorWriteData.kd;
+		CM_KneeJoint.ProsCtrl.kp = KneeMotorWriteData.kp;
+
+		if(state == CPC)
+			CM_KneeJoint.ProsCtrl.position = CM_trajectory;
+		else
+			CM_AnkleJoint.ProsCtrl.position = KneeMotorWriteData.position;
 	}
 }
 
