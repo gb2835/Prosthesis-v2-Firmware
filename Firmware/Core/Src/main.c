@@ -169,6 +169,22 @@ int main(void)
 
 
 /*******************************************************************************
+* USER ADDED TEST PROGRAMS
+*******************************************************************************/
+
+	RequireTestProgram(CPC_Simulation_Ideal);
+
+	if(testProgram == None)
+	{
+		while(!CM__StartProgram)
+		{
+			ActivateLED(Blue);
+		}
+		ActivateLED(NoColor);
+	}
+
+
+/*******************************************************************************
 * USER ADDED INITIALIZATIONS
 *******************************************************************************/
 
@@ -236,22 +252,6 @@ int main(void)
 		ErrorHandler(CAN_Error);
 
 	InitProsthesisControl(&Prosthesis_Init);
-
-
-/*******************************************************************************
-* USER ADDED TEST PROGRAMS
-*******************************************************************************/
-
-	RequireTestProgram(CPC_Simulation_Ideal);
-
-	if(testProgram == None)
-	{
-		while(!CM__StartProgram)
-		{
-			ActivateLED(Blue);
-		}
-		ActivateLED(NoColor);
-	}
 
 
 /*******************************************************************************

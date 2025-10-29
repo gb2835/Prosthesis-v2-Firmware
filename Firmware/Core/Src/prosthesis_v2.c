@@ -5,11 +5,11 @@
 * NOTES
 * 1. Unless otherwise specified, units are
 * 		- Accelerometer	= m/s^2
-* 		- Angle			= degrees
-* 		- Gyroscope		= degrees/second
+* 		- Angle			= °
+* 		- Gyroscope		= °/s
 * 		- Load Cell		= ADC
-* 		- Torque		= Nm
-* 		- Speed			= degrees/second
+* 		- Torque		= N·m
+* 		- Speed			= °/s
 *
 *******************************************************************************/
 
@@ -45,6 +45,12 @@ TestProgram_e testProgram = None;
 #define KNEE_GEAR_RATIO									(70.0f / 16.0f)
 #define KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER		10.0f
 #define RAD_TO_DEG										(180.0f / M_PI)
+
+typedef enum
+{
+	Stance,
+	Swing
+} Phase_e;
 
 typedef enum
 {
@@ -122,14 +128,14 @@ typedef struct
 {
 	struct
 	{
-		float bot[3];	// [0] = k-0, [1] = k-1, [2] = k-2
-		float top[3];	// [0] = k-0, [1] = k-1, [2] = k-2
+		float bot[3];	// [0] = k-0, [1] = k-1, [2] = k-2 where k is the current time step
+		float top[3];	// [0] = k-0, [1] = k-1, [2] = k-2 where k is the current time step
 	} Raw;
 
 	struct
 	{
-		float bot[3];	// [0] = k-0, [1] = k-1, [2] = k-2
-		float top[3];	// [0] = k-0, [1] = k-1, [2] = k-2
+		float bot[3];	// [0] = k-0, [1] = k-1, [2] = k-2 where k is the current time step
+		float top[3];	// [0] = k-0, [1] = k-1, [2] = k-2 where k is the current time step
 	} Filtered;
 
 	float intoStanceThreshold;
@@ -141,28 +147,41 @@ static float kneeAngleAtHeelStrike = 3.97f;
 static MPU925x_IMU_Data_t IMU_Data;
 static Prosthesis_Init_t Device;
 
+static double stridePeriod = 2.0;			// Used for CPC simulations
+static Phase_e phase;
 static uint8_t heelStrike = 0;
 static uint8_t imuReadStarted = 0;
 static uint8_t imuDataReceived = 0;
 static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
-static double stridePeriod = 2.0;			// Used for CPC simulations
 static uint8_t toeOff = 0;
 
+static const int8_t state_angle[3][7] = {{-20, -14, -8, -2,  4, 10, 10},	// Ankle only
+									 	 {-20,  -4, 12, 28, 44, 60, 60},	// Combined
+										 {  0,  12, 24, 36, 48, 60, 60}};	// Knee only
+
+static const int8_t state_torque[3][7] = {{-100, -70, -40, -10, 20, 50, 50},	// Ankle only
+										  {-100, -70, -40, -10, 20, 50, 50},	// Combined
+										  { -50, -30, -10,  10, 30, 50, 50}};	// Knee only
+
+static const int16_t state_speed[7] = {-600, -360, -120, 120, 360, 600, 600};
+
+static const uint16_t state_loadCell[7] = {1100, 1200, 1300, 1400, 1500, 1600, 1600};
+
 static AnkleJoint_t CM_AnkleJoint;
-static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1
+static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1 where k is the current time step
 static float CM_cpvx9;
 static float CM_state_quadrant;
 static float CM_trajectory;
 static float CM_xPhaseAngle, CM_yPhaseAngle;
-static int8_t CM_state_angles, CM_state_torques;
-static int16_t CM_state_speeds;
-static uint16_t CM_state_loadCells;
+static int8_t CM_state_angle, CM_state_torque;
+static int16_t CM_state_speed;
+static uint16_t CM_state_loadCell;
 static KneeJoint_t CM_KneeJoint;
 static LoadCell_t CM_LoadCell;
 
-static double CM_thighAngle_unbiased[2] = {0.0, 0.0};	// [0] = k-0, [1] = k-1
+static double CM_thighAngle_unbiased[2] = {0.0, 0.0};	// [0] = k-0, [1] = k-1 where k is the current time step
 static double CM_thighIntegral_unbiased = 0.0;
 static Error_e CM_ledCode = NoError;
 static float CM_ankleSpeedThreshold = -5.0f;
@@ -171,18 +190,6 @@ static float CM_footSpeed = 0.0f;
 static float CM_footSpeedThreshold = -5.0f;
 static uint8_t CM__StartCPC = 0;
 static uint8_t CM_healthyStride = 0;
-
-static const int8_t state_angles[3][6] = {{-20, -14, -8, -2,  4, 10},	// Ankle only
-									 	  {-20,  -4, 12, 28, 44, 60},	// Combined
-										  {  0,  12, 24, 36, 48, 60}};	// Knee only
-
-static const int8_t state_torques[3][6] = {{-100, -70, -40, -10, 20, 50},	// Ankle only
-										   {-100, -70, -40, -10, 20, 50},	// Combined
-										   { -50, -30, -10,  10, 30, 50}};	// Knee only
-
-static const int16_t state_speeds[6] = {-600, -360, -120, 120, 360, 600};
-
-static const uint16_t state_loadCells[6] = {1100, 1200, 1300, 1400, 1500, 1600};
 
 static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
@@ -195,6 +202,7 @@ static void GetSecondOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, 
 static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3);
 static void RunCPC_Simulation(void);
 static void RunStateMachine(void);
+static void SetStateVals(Joint_e joint, StateMachine_e state);
 static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
 
@@ -203,6 +211,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex);
 * PUBLIC FUNCTIONS
 *******************************************************************************/
 
+// User may hard code initial values in this function
 void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 {
 	memcpy(&Device, Device_Init, sizeof(Device));
@@ -211,6 +220,12 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	memset(&CM_KneeJoint, 0, sizeof(CM_KneeJoint));
 
 	CM_LoadCell.intoStanceThreshold = 1325.0f;
+	CM_LoadCell.intoSwingThreshold = 1375.0f;
+
+	CM_state_angle = state_angle[Device.Joint][EarlyStance];
+	CM_state_loadCell = state_loadCell[EarlyStance];
+	CM_state_speed = state_speed[EarlyStance];
+	CM_state_torque = state_torque[Device.Joint][EarlyStance];
 
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
@@ -340,6 +355,12 @@ void RunProsthesisControl(void)
 {
 	GetInputs();
 	ProcessInputs();
+
+	if((testProgram == CPC_Simulation_Ideal) || (testProgram == CPC_Simulation_Winter) || (testProgram == CPC_Simulation_WinterUnsteady))
+		RunCPC_Simulation();
+	else if(testProgram == None)
+		RunStateMachine();
+
 	GetCPV();
 
 	static float cpv[3] = {0.0f, 0.0f, 0.0f};
@@ -352,12 +373,10 @@ void RunProsthesisControl(void)
 		GetSegmentConstants(cpv, a1, a2, a3);
 	}
 
-	GetTrajectory(cpv, a1, a2, a3);
-
-	if((testProgram == CPC_Simulation_Ideal) || (testProgram == CPC_Simulation_Winter) || (testProgram == CPC_Simulation_WinterUnsteady))
-		RunCPC_Simulation();
-	else if(testProgram == None)
-		RunStateMachine();
+	if(phase == Swing)
+		GetTrajectory(cpv, a1, a2, a3);
+	else
+		CM_trajectory = 0.0f;
 
 	CheckMotorCalls();
 
@@ -606,11 +625,7 @@ static void GetSimulatedThighAngle(void)
 	if(testProgram == CPC_Simulation_Ideal)
 	{
 		double w = 2 * M_PI / stridePeriod;
-
 		CM_thighAngle[0] = 20.0*cos(w*time);
-
-		if(((-20.0*w*sin(w*time)) <= 0.0) && ((-20.0*w*sin(w*(time-DT))) > 0.0))
-			heelStrike = 1;
 
 		time += DT;
 	}
@@ -627,23 +642,13 @@ static void GetSimulatedThighAngle(void)
 		else
 			unsteady = 0.0;
 
-		static double winterHipAngle[51][2];
-		if(isFirst)
-		{
-			for(uint8_t row = 0; row < 51; row++)
-			{
-				winterHipAngle[row][0] = winterBioData[row][Winter_Stride] * (stridePeriod/100.0);
-				winterHipAngle[row][1] = winterBioData[row][Winter_HipAngle];
-			}
-		}
-
-		static uint8_t start = 0;
 		static uint8_t row;
+		static uint8_t start = 0;
 		for(row = start; row < (51-1); row++)
-			if((time > winterHipAngle[row][0]) && (time < winterHipAngle[row+1][0]))
+			if((time >= winterBioData[row][Winter_Stride]) && (time < winterBioData[row+1][Winter_Stride]))
 				break;
 
-		CM_thighAngle[0] = Utils_LinearInterpolate(time, winterHipAngle[row][0], winterHipAngle[row][1], winterHipAngle[row+1][0], winterHipAngle[row+1][1]) + unsteady;
+		CM_thighAngle[0] = Utils_LinearInterpolate(time, winterBioData[row][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row][Winter_HipAngle], winterBioData[row+1][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row+1][Winter_HipAngle]) + unsteady;
 
 		time += DT;
 		if(time >= stridePeriod)
@@ -651,6 +656,8 @@ static void GetSimulatedThighAngle(void)
 			time = 0.0;
 			start = 0;
 		}
+		else
+			start = row;
 
 		unsteadyTime += DT;
 	}
@@ -662,7 +669,6 @@ static void GetCPV(void)
 	static double thighIntegral = 0.0;
 	static float maxThighIntegral_unbiased = 0.0f;
 	static float minThighIntegral_unbiased = 0.0f;
-	static float startTime = 0.0f;
 	static float time = 0.0f;
 	static float z = 1.0f;
 	static uint8_t firstCall = 1;
@@ -683,13 +689,11 @@ static void GetCPV(void)
 		quadrant[0] = 0;
 		quadrant[1] = 0;
 
-		float dtime = time - startTime;
-
 		if(firstCall)
 			firstCall = 0;
 		else
 		{
-			thighAngle_bias = thighIntegral / dtime;
+			thighAngle_bias = thighIntegral / time;
 
 			if(CM_healthyStride)
 			{
@@ -708,7 +712,7 @@ static void GetCPV(void)
 		maxThighIntegral_unbiased = 0.0f;
 		minThighIntegral_unbiased = 0.0f;
 
-		startTime = time;
+		time = 0.0;
 	}
 
 	CM_thighAngle_unbiased[0] = CM_thighAngle[0] - thighAngle_bias;
@@ -787,23 +791,23 @@ static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3)
 	float P_4 = CM_KneeJoint.CPC_Params.P_4;
 
 	cpv[0] = CM_cpv;
-	p[0] = CM_KneeJoint.position;
-	v[0] = CM_KneeJoint.speed;
+	p[0] = 57.54f - 10.0f - 3.97f;//??CM_KneeJoint.position;
+	v[0] = 240.25f;//??CM_KneeJoint.speed;
 
-	cpv[1] = p[0] + (CPV_2 - CPV_1)/(1.0f - CPV_1) * (1.0f - cpv[0]);
+	cpv[1] = cpv[0] + (CPV_2 - CPV_1)/(1.0f - CPV_1) * (1.0f - cpv[0]);
 	p[1] = p[0] * P_2/P_1;
 	v[1] = 0.0f;
 
-	p[3] = kneeAngleAtHeelStrike;
+	p[3] = 2.21f - 10.0f - 3.97f;//??kneeAngleAtHeelStrike;
 
 	float dP_34 = P_4 - P_3;
-	cpv[2] = p[0] + (CPV_3 - CPV_1)/(1.0f - CPV_1) * (1.0f - cpv[0]);
+	cpv[2] = cpv[0] + (CPV_3 - CPV_1)/(1.0f - CPV_1) * (1.0f - cpv[0]);
 	p[2] = p[3] - dP_34;
 	v[2] = 0;
 
 	GetThirdOrderSegmentConstants(cpv[0], cpv[1], p[0], p[1], v[0], v[1], a1);
 	GetThirdOrderSegmentConstants(cpv[1], cpv[2], p[1], p[2], v[1], v[2], a2);
-	GetSecondOrderSegmentConstants(cpv[1], cpv[2], p[1], p[2], v[1], a3);
+	GetSecondOrderSegmentConstants(cpv[2], 1, p[2], p[3], v[2], a3);
 }
 
 static void GetThirdOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float v_2, float *a)
@@ -826,53 +830,70 @@ static void GetSecondOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, 
 static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3)
 {
 	if((CM_cpv >= cpv[0]) && (CM_cpv < cpv[1]))
-		CM_trajectory = a1[0] + a1[1]*CM_cpv + a1[2]*CM_cpv*CM_cpv + a1[3]*CM_cpv*CM_cpv*CM_cpv;
-	if((CM_cpv >= cpv[1]) && (CM_cpv < cpv[2]))
-		CM_trajectory = a2[0] + a2[1]*CM_cpv + a2[2]*CM_cpv*CM_cpv + a2[3]*CM_cpv*CM_cpv*CM_cpv;
-	if((CM_cpv >= cpv[2]) && (CM_cpv < 1))
-		CM_trajectory = a3[0] + a3[1]*CM_cpv + a3[2]*CM_cpv*CM_cpv;
-	else
-		CM_trajectory = 0.0f;
+		CM_trajectory = a1[0] + a1[1]*(CM_cpv-cpv[0]) + a1[2]*(CM_cpv-cpv[0])*(CM_cpv-cpv[0]) + a1[3]*(CM_cpv-cpv[0])*(CM_cpv-cpv[0])*(CM_cpv-cpv[0]);
+	else if((CM_cpv >= cpv[1]) && (CM_cpv < cpv[2]))
+		CM_trajectory = a2[0] + a2[1]*(CM_cpv-cpv[1]) + a2[2]*(CM_cpv-cpv[1])*(CM_cpv-cpv[1]) + a2[3]*(CM_cpv-cpv[1])*(CM_cpv-cpv[1])*(CM_cpv-cpv[1]);
+	else if((CM_cpv >= cpv[2]) && (CM_cpv <= 1.0f))
+		CM_trajectory = a3[0] + a3[1]*(CM_cpv-cpv[2]) + a3[2]*(CM_cpv-cpv[2])*(CM_cpv-cpv[2]);
 }
 
 static void RunCPC_Simulation(void)
 {
 	static float time = 0.0f;
 
-	static float winterKneeAngle[51][2];
-	if(isFirst)
+	static uint8_t firstCall = 1;
+	if(firstCall)
 	{
-		for(uint8_t row = 0; row < 51; row++)
-		{
-			winterKneeAngle[row][0] = winterBioData[row][Winter_Stride] * (stridePeriod/100.0f);
-			winterKneeAngle[row][1] = winterBioData[row][Winter_KneeAngle];
-		}
+		firstCall = 0;
+		CM_KneeJoint.ProsCtrl.kd = 0.00f;
+		CM_KneeJoint.ProsCtrl.kp = 0.0f;
 	}
 
 	static uint8_t row;
 	static uint8_t start = 0;
 	for(row = start; row < (51-1); row++)
-		if((time > winterKneeAngle[row][0]) && (time < winterKneeAngle[row+1][0]))
+		if((time >= (winterBioData[row][Winter_Stride] * (stridePeriod/100.0f))) && (time < (winterBioData[row+1][Winter_Stride] * (stridePeriod/100.0f))))
 			break;
 
-	CM_KneeJoint.ProsCtrl.kd = 0.0f;
-	CM_KneeJoint.ProsCtrl.kp = 0.0f;
+	static uint8_t heelStrikeTrigger = 1;
+	static uint8_t toeOffTrigger = 1;
+	if(time <= (stridePeriod * 0.66f))
+	{
+		phase = Stance;
 
-	float initialPosition;
-	if(isFirst)
-		initialPosition = CM_KneeJoint.position;
+		if(heelStrikeTrigger)
+		{
+			toeOffTrigger = 1;
+			toeOff = 0;
+			heelStrikeTrigger = 0;
+			heelStrike = 1;
+		}
 
-	if(time < (stridePeriod/100.0f * 0.66f))	// Stance phase
-		CM_KneeJoint.ProsCtrl.position = Utils_LinearInterpolate(time, winterKneeAngle[row][0], winterKneeAngle[row][1], winterKneeAngle[row+1][0], winterKneeAngle[row+1][1]) + (initialPosition - winterKneeAngle[0][1]);
+		CM_KneeJoint.ProsCtrl.position = Utils_LinearInterpolate(time, winterBioData[row][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row][Winter_KneeAngle], winterBioData[row+1][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row+1][Winter_KneeAngle]) + (-KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER - winterBioData[0][Winter_KneeAngle]);
+	}
 	else
+	{
+		phase = Swing;
+
+		if(toeOffTrigger)
+		{
+			toeOffTrigger = 0;
+			toeOff = 1;
+			heelStrikeTrigger = 1;
+			heelStrike = 0;
+		}
+
 		CM_KneeJoint.ProsCtrl.position = CM_trajectory;
+	}
 
 	time += DT;
 	if(time >= stridePeriod)
 	{
-		time = 0.0;
 		start = 0;
+		time = 0.0;
 	}
+	else
+		start = row;
 }
 
 static void RunStateMachine(void)
@@ -881,24 +902,7 @@ static void RunStateMachine(void)
 	switch(state)
 	{
 	case EarlyStance:
-		CM_state_loadCells = state_loadCells[EarlyStance];
-		CM_state_speeds = state_speeds[EarlyStance];
-
-		if(Device.Joint == Ankle)
-		{
-			CM_state_angles = state_angles[Ankle][EarlyStance];
-			CM_state_torques = state_torques[Ankle][EarlyStance];
-		}
-		if(Device.Joint == Knee)
-		{
-			CM_state_angles = state_angles[Knee][EarlyStance];
-			CM_state_torques = state_torques[Knee][EarlyStance];
-		}
-		if(Device.Joint == Combined)
-		{
-			CM_state_angles = state_angles[Combined][EarlyStance];
-			CM_state_torques = state_torques[Combined][EarlyStance];
-		}
+		SetStateVals(Device.Joint, state);
 
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
@@ -921,31 +925,14 @@ static void RunStateMachine(void)
 		else if(Device.Joint == Knee)
 			if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoSwingThreshold)
 			{
-				state = SwingFlexion;
 				toeOff = 1;
+				state = SwingFlexion;
 			}
 
 		break;
 
 	case MidStance:
-		CM_state_loadCells = state_loadCells[MidStance];
-		CM_state_speeds = state_speeds[MidStance];
-
-		if(Device.Joint == Ankle)
-		{
-			CM_state_angles = state_angles[Ankle][MidStance];
-			CM_state_torques = state_torques[Ankle][MidStance];
-		}
-		if(Device.Joint == Knee)
-		{
-			CM_state_angles = state_angles[Knee][MidStance];
-			CM_state_torques = state_torques[Knee][MidStance];
-		}
-		if(Device.Joint == Combined)
-		{
-			CM_state_angles = state_angles[Combined][MidStance];
-			CM_state_torques = state_torques[Combined][MidStance];
-		}
+		SetStateVals(Device.Joint, state);
 
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
@@ -966,24 +953,7 @@ static void RunStateMachine(void)
 		break;
 
 	case LateStance:
-		CM_state_loadCells = state_loadCells[LateStance];
-		CM_state_speeds = state_speeds[LateStance];
-
-		if(Device.Joint == Ankle)
-		{
-			CM_state_angles = state_angles[Ankle][LateStance];
-			CM_state_torques = state_torques[Ankle][LateStance];
-		}
-		if(Device.Joint == Knee)
-		{
-			CM_state_angles = state_angles[Knee][LateStance];
-			CM_state_torques = state_torques[Knee][LateStance];
-		}
-		if(Device.Joint == Combined)
-		{
-			CM_state_angles = state_angles[Combined][LateStance];
-			CM_state_torques = state_torques[Combined][LateStance];
-		}
+		SetStateVals(Device.Joint, state);
 
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
@@ -1000,35 +970,18 @@ static void RunStateMachine(void)
 
 		if(CM_AnkleJoint.speed > 0.0f) // can we use load cell??
 		{
+			toeOff = 1;
+
 			if(CM__StartCPC)
 				state = CPC;
 			else
 				state = SwingFlexion;
-
-			toeOff = 1;
 		}
 
 		break;
 
 	case SwingFlexion:
-		CM_state_loadCells = state_loadCells[SwingFlexion];
-		CM_state_speeds = state_speeds[SwingFlexion];
-
-		if(Device.Joint == Ankle)
-		{
-			CM_state_angles = state_angles[Ankle][SwingFlexion];
-			CM_state_torques = state_torques[Ankle][SwingFlexion];
-		}
-		if(Device.Joint == Knee)
-		{
-			CM_state_angles = state_angles[Knee][SwingFlexion];
-			CM_state_torques = state_torques[Knee][SwingFlexion];
-		}
-		if(Device.Joint == Combined)
-		{
-			CM_state_angles = state_angles[Combined][SwingFlexion];
-			CM_state_torques = state_torques[Combined][SwingFlexion];
-		}
+		SetStateVals(Device.Joint, state);
 
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
@@ -1047,8 +1000,8 @@ static void RunStateMachine(void)
 		{
 			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 			{
-				state = EarlyStance;
 				heelStrike = 1;
+				state = EarlyStance;
 			}
 
 		}
@@ -1059,24 +1012,7 @@ static void RunStateMachine(void)
 		break;
 
 	case SwingExtension:
-		CM_state_loadCells = state_loadCells[SwingExtension];
-		CM_state_speeds = state_speeds[SwingExtension];
-
-		if(Device.Joint == Ankle)
-		{
-			CM_state_angles = state_angles[Ankle][SwingExtension];
-			CM_state_torques = state_torques[Ankle][SwingExtension];
-		}
-		if(Device.Joint == Knee)
-		{
-			CM_state_angles = state_angles[Knee][SwingExtension];
-			CM_state_torques = state_torques[Knee][SwingExtension];
-		}
-		if(Device.Joint == Combined)
-		{
-			CM_state_angles = state_angles[Combined][SwingExtension];
-			CM_state_torques = state_torques[Combined][SwingExtension];
-		}
+		SetStateVals(Device.Joint, state);
 
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
@@ -1099,32 +1035,15 @@ static void RunStateMachine(void)
 		else if(Device.Joint == Knee)
 			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 			{
-				state = EarlyStance;
 				heelStrike = 1;
+				state = EarlyStance;
 			}
 
 
 		break;
 
 	case SwingDescension:
-		CM_state_loadCells = state_loadCells[SwingDescension];
-		CM_state_speeds = state_speeds[SwingDescension];
-
-		if(Device.Joint == Ankle)
-		{
-			CM_state_angles = state_angles[Ankle][SwingDescension];
-			CM_state_torques = state_torques[Ankle][SwingDescension];
-		}
-		if(Device.Joint == Knee)
-		{
-			CM_state_angles = state_angles[Knee][SwingDescension];
-			CM_state_torques = state_torques[Knee][SwingDescension];
-		}
-		if(Device.Joint == Combined)
-		{
-			CM_state_angles = state_angles[Combined][SwingDescension];
-			CM_state_torques = state_torques[Combined][SwingDescension];
-		}
+		SetStateVals(Device.Joint, state);
 
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
@@ -1141,31 +1060,14 @@ static void RunStateMachine(void)
 
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 		{
-			state = EarlyStance;
 			heelStrike = 1;
+			state = EarlyStance;
 		}
 
 		break;
 
 	case CPC:
-		CM_state_loadCells = state_loadCells[CPC];
-		CM_state_speeds = state_speeds[CPC];
-
-		if(Device.Joint == Ankle)
-		{
-			CM_state_angles = state_angles[Ankle][CPC];
-			CM_state_torques = state_torques[Ankle][CPC];
-		}
-		if(Device.Joint == Knee)
-		{
-			CM_state_angles = state_angles[Knee][CPC];
-			CM_state_torques = state_torques[Knee][CPC];
-		}
-		if(Device.Joint == Combined)
-		{
-			CM_state_angles = state_angles[Combined][CPC];
-			CM_state_torques = state_torques[Combined][CPC];
-		}
+		SetStateVals(Device.Joint, state);
 
 		if((Device.Joint == Ankle) || (Device.Joint == Combined))
 		{
@@ -1182,10 +1084,32 @@ static void RunStateMachine(void)
 
 		if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 		{
-			state = EarlyStance;
 			heelStrike = 1;
+			state = EarlyStance;
 		}
 
+	}
+}
+
+static void SetStateVals(Joint_e joint, StateMachine_e state)
+{
+	CM_state_loadCell = state_loadCell[state];
+	CM_state_speed = state_speed[state];
+
+	if(joint == Ankle)
+	{
+		CM_state_angle = state_angle[Ankle][state];
+		CM_state_torque = state_torque[Ankle][state];
+	}
+	if(joint == Knee)
+	{
+		CM_state_angle = state_angle[Knee][state];
+		CM_state_torque = state_torque[Knee][state];
+	}
+	if(joint == Combined)
+	{
+		CM_state_angle = state_angle[Combined][state];
+		CM_state_torque = state_torque[Combined][state];
 	}
 }
 
@@ -1275,7 +1199,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO ;
 
 		uint32_t txMailbox;
-		if((testProgram == None) || (testProgram == ImpedanceControl))
+		if(testProgram != ReadOnly)
 		{
 			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd;
 			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp;
