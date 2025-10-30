@@ -815,6 +815,7 @@ static StateMachine_e RunCPC_Simulation(void)
 		CM_KneeJoint.ProsCtrl.kp = 0.0f;
 	}
 
+	// temp
 	static uint8_t row;
 	static uint8_t start = 0;
 	for(row = start; row < (51-1); row++)
