@@ -66,15 +66,15 @@ typedef enum
 	CPC_Simulation_Ideal,
 	CPC_Simulation_Winter,
 	CPC_Simulation_WinterUnsteady,
-	ReadOnly,
-	ImpedanceControl
+	BypassStateMachine,
+	ReadOnly
 } TestProgram_e;
 
 typedef struct
 {
+	CPC_Specs_e CPC_Spec;
 	Joint_e Joint;
 	Side_e Side;
-	CPC_Specs_e CPC_Spec;
 } Prosthesis_Init_t;
 
 extern TestProgram_e testProgram;

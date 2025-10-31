@@ -77,7 +77,7 @@ void SystemClock_Config(void);
 
 #define LPTIM2_PERIOD	0x3F	// Timer frequency = timer clock frequency / (prescaler * (period + 1))
 
-static uint8_t CM__StartProgram = 0;
+static uint8_t CM__startProgram = 0;
 uint8_t isProsthesisControlRequired = 0;
 
 
@@ -163,9 +163,9 @@ int main(void)
 	AnkleIMU_Init.csPin = ANKLE_IMU_CS_Pin;
 
 	Prosthesis_Init_t Prosthesis_Init;
+	Prosthesis_Init.CPC_Spec = Winter;
 	Prosthesis_Init.Joint = Knee;
 	Prosthesis_Init.Side = Right;
-	Prosthesis_Init.CPC_Spec = Winter;
 
 
 /*******************************************************************************
@@ -173,15 +173,6 @@ int main(void)
 *******************************************************************************/
 
 	RequireTestProgram(CPC_Simulation_Ideal);
-
-	if(testProgram == None)
-	{
-		while(!CM__StartProgram)
-		{
-			ActivateLED(Blue);
-		}
-		ActivateLED(NoColor);
-	}
 
 
 /*******************************************************************************
@@ -257,6 +248,15 @@ int main(void)
 /*******************************************************************************
 * USER ADDED MAIN LOOP
 *******************************************************************************/
+
+	if(testProgram == None)
+	{
+		while(!CM__startProgram)
+		{
+			ActivateLED(Blue);
+		}
+		ActivateLED(NoColor);
+	}
 
 	while(1)
 	{
