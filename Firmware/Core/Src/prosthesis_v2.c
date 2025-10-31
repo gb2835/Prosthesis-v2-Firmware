@@ -32,7 +32,7 @@
 * PUBLIC DEFINITIONS
 *******************************************************************************/
 
-TestProgram_e testProgram = None;
+TestProgram_e testProgram = NoTestProgram;
 
 
 /*******************************************************************************
@@ -49,14 +49,12 @@ TestProgram_e testProgram = None;
 
 typedef enum
 {
-	NoStateMachine,
 	EarlyStance,
 	MidStance,
 	LateStance,
 	SwingFlexion,
 	SwingExtension,
 	SwingDescension,
-	Stance,				// Only used in CPC simulations
 	CPC
 } StateMachine_e;
 
@@ -70,6 +68,7 @@ typedef struct
 {
 	AKxx_x_ReadData_t MotorReadData;
 	AKxx_x_WriteData_t ProsCtrl;
+	AKxx_x_WriteData_t BypassStateMachineCtrl;
 	AKxx_x_WriteData_t EarlyStanceCtrl;
 	AKxx_x_WriteData_t MidStanceCtrl;
 	AKxx_x_WriteData_t LateStanceCtrl;
@@ -77,8 +76,6 @@ typedef struct
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t SwingDescCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
-	AKxx_x_WriteData_t NoStateMachineCtrl;
-	AKxx_x_WriteData_t CPC_SimulationCtrl;
 	float position;
 	float speed;
 	float torque;
@@ -114,15 +111,13 @@ typedef struct
 {
 	AKxx_x_ReadData_t MotorReadData;
 	AKxx_x_WriteData_t ProsCtrl;
+	AKxx_x_WriteData_t BypassStateMachineCtrl;
 	AKxx_x_WriteData_t EarlyStanceCtrl;
 	AKxx_x_WriteData_t MidStanceCtrl;
 	AKxx_x_WriteData_t LateStanceCtrl;
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
-	AKxx_x_WriteData_t SwingDescCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
-	AKxx_x_WriteData_t NoStateMachineCtrl;
-	AKxx_x_WriteData_t CPC_SimulationCtrl;
 	CPC_Params_t CPC_Params;
 	float position;
 	float speed;
@@ -150,11 +145,10 @@ typedef struct
 } LoadCell_t;
 
 static AKxx_x_WriteData_t MotorTxData;
-static float kneeAngleAtHeelStrike = 3.97f;
+static float kneeAngleAtHeelStrike;
 static MPU925x_IMU_Data_t IMU_Data;
 static Prosthesis_Init_t Device;
 
-static double stridePeriod = 5.0;			// Only used for CPC simulations
 static uint8_t heelStrike = 0;
 static uint8_t imuReadStarted = 0;
 static uint8_t imuDataReceived = 0;
@@ -163,17 +157,17 @@ static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
 static uint8_t toeOff = 0;
 
-static const int8_t state_angle[3][9] = {{-20, -20, -14, -8, -2,  4, 10, -20, 10},	// Ankle only
-									 	 {-20, -20,  -4, 12, 28, 44, 60, -20, 60},	// Combined
-										 {-20, -20,  12, 24, 36, 48, 60, -20, 60}};	// Knee only
+static const int8_t state_angle[3][7] = {{-20, -14, -8, -2,  4, 10, 10},	// Ankle only
+									 	 {-20,  -4, 12, 28, 44, 60, 60},	// Combined
+										 {-20,  12, 24, 36, 48, 60, 60}};	// Knee only
 
-static const int8_t state_torque[3][9] = {{-100, -100, -70, -40, -10, 20, 50, -100, 50},	// Ankle only
-										  {-100, -100, -70, -40, -10, 20, 50, -100, 50},	// Combined
-										  { -50, -50, -30, -10,  10, 30, 50,  -50, 50}};	// Knee only
+static const int8_t state_torque[3][7] = {{-100, -70, -40, -10, 20, 50, 50},	// Ankle only
+										  {-100, -70, -40, -10, 20, 50, 50},	// Combined
+										  { -50, -30, -10,  10, 30, 50, 50}};	// Knee only
 
-static const int16_t state_speed[9] = {-600, -600, -360, -120, 120, 360, 600, -600, 600};
+static const int16_t state_speed[7] = {-600, -360, -120, 120, 360, 600, 600};
 
-static const uint16_t state_loadCell[9] = {1100, 1100, 1200, 1300, 1400, 1500, 1600, 1100, 1600};
+static const uint16_t state_loadCell[7] = {1100, 1200, 1300, 1400, 1500, 1600, 1600};
 
 static AnkleJoint_t CM_AnkleJoint;
 static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1 where k is the current time step
@@ -200,8 +194,6 @@ static uint8_t CM_healthyStride = 0;
 static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
-static void GetSimulatedThighAngle(void);
-static StateMachine_e RunStateMachine_Simulation(StateMachineMethod_e method);
 static StateMachine_e RunStateMachine(StateMachineMethod_e method);
 static void GetCPV(void);
 static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3);
@@ -228,10 +220,10 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	CM_LoadCell.intoStanceThreshold = 1325.0f;
 	CM_LoadCell.intoSwingThreshold = 1375.0f;
 
-	CM_state_angle = state_angle[Device.Joint][NoStateMachine];
-	CM_state_loadCell = state_loadCell[NoStateMachine];
-	CM_state_speed = state_speed[NoStateMachine];
-	CM_state_torque = state_torque[Device.Joint][NoStateMachine];
+	CM_state_angle = state_angle[Device.Joint][EarlyStance];
+	CM_state_loadCell = state_loadCell[EarlyStance];
+	CM_state_speed = state_speed[EarlyStance];
+	CM_state_torque = state_torque[Device.Joint][EarlyStance];
 
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
@@ -274,24 +266,14 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		if(AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox))
 			ErrorHandler(AnkleMotorError);
 	}
-
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-		CM_KneeJoint.CPC_SimulationCtrl.kd = 0.00f;
-		CM_KneeJoint.CPC_SimulationCtrl.kp = 0.2f;
-
-		if(testProgram == CPC_Simulation_Ideal)
+		switch(Device.CPC_Spec)
 		{
-			CM_KneeJoint.CPC_Params.CPV_1 = 0.660000000000000f;
-			CM_KneeJoint.CPC_Params.CPV_2 = 0.720000000000000f;
-			CM_KneeJoint.CPC_Params.CPV_3 = 0.980000000000000f;
-			CM_KneeJoint.CPC_Params.P_1 = 57.540000000000000f;
-			CM_KneeJoint.CPC_Params.P_2 = 64.860000000000000f;
-			CM_KneeJoint.CPC_Params.P_3 = 0.540000000000000f;
-			CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
-		}
-		else if((testProgram == CPC_Simulation_Winter || (testProgram == CPC_Simulation_WinterUnsteady)))
-		{
+		case Kaden:
+			// ??
+			break;
+		case Winter:
 			CM_KneeJoint.CPC_Params.CPV_1 = 0.717203740538403f;
 			CM_KneeJoint.CPC_Params.CPV_2 = 0.786907375601145f;
 			CM_KneeJoint.CPC_Params.CPV_3 = 0.980305166790268f;
@@ -299,33 +281,18 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 			CM_KneeJoint.CPC_Params.P_2 = 64.860000000000000f;
 			CM_KneeJoint.CPC_Params.P_3 = 0.540000000000000f;
 			CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
+			break;
 		}
-		else
-			switch(Device.CPC_Spec)
-			{
-			case Kaden:
-				// ??
-				break;
-			case Winter:
-				CM_KneeJoint.CPC_Params.CPV_1 = 0.717203740538403f;
-				CM_KneeJoint.CPC_Params.CPV_2 = 0.786907375601145f;
-				CM_KneeJoint.CPC_Params.CPV_3 = 0.980305166790268f;
-				CM_KneeJoint.CPC_Params.P_1 = 57.540000000000000f;
-				CM_KneeJoint.CPC_Params.P_2 = 64.860000000000000f;
-				CM_KneeJoint.CPC_Params.P_3 = 0.540000000000000f;
-				CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
-				break;
-			}
 
-		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
-			ErrorHandler(KneeMotorError);
+	if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
+		ErrorHandler(KneeMotorError);
 	}
 }
 
 void RequireTestProgram(TestProgram_e option)
 {
 	testProgram = option;
-	if(testProgram != None)
+	if(testProgram != NoTestProgram)
 		isTestProgramRequired = 1;
 }
 
@@ -335,9 +302,7 @@ void RunProsthesisControl(void)
 	ProcessInputs();
 
 	StateMachine_e state;
-	if((testProgram == CPC_Simulation_Ideal) || (testProgram == CPC_Simulation_Winter) || (testProgram == CPC_Simulation_WinterUnsteady))
-		state = RunStateMachine_Simulation(StateVals);
-	else if(testProgram == None)
+	if(testProgram == NoTestProgram)
 		state = RunStateMachine(StateVals);
 
 	GetCPV();
@@ -357,12 +322,10 @@ void RunProsthesisControl(void)
 	else
 		CM_trajectory = 0.0f;
 
-	if((testProgram == CPC_Simulation_Ideal) || (testProgram == CPC_Simulation_Winter) || (testProgram == CPC_Simulation_WinterUnsteady))
-		RunStateMachine_Simulation(CtrlParams);
-	else if(testProgram == None)
+	if(testProgram == NoTestProgram)
 		RunStateMachine(CtrlParams);
 	else if(testProgram == BypassStateMachine)
-		SetCtrlParams(Device.Joint, NoStateMachine, CM_AnkleJoint.NoStateMachineCtrl, CM_KneeJoint.NoStateMachineCtrl);
+		SetCtrlParams(Device.Joint, 0, CM_AnkleJoint.BypassStateMachineCtrl, CM_KneeJoint.BypassStateMachineCtrl);
 
 	CheckMotorCalls();
 
@@ -596,108 +559,8 @@ static void ProcessInputs(void)
 		}
 
 		CM_footSpeed = CM_AnkleJoint.speed + CM_AnkleJoint.IMU_Data.Struct.gz;
-
-		if((testProgram != CPC_Simulation_Ideal) && (testProgram != CPC_Simulation_Winter) && (testProgram != CPC_Simulation_WinterUnsteady))
-			CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
-		else
-			GetSimulatedThighAngle();
+		CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 	}
-}
-
-static void GetSimulatedThighAngle(void)
-{
-	static double time = 0.0;
-
-	if(testProgram == CPC_Simulation_Ideal)
-	{
-		double w = 2 * M_PI / stridePeriod;
-		CM_thighAngle[0] = 20.0*cos(w*time);
-
-		time += DT;
-	}
-	else
-	{
-		static double unsteadyTime = 0.0;
-
-		double unsteady;
-		if(testProgram == CPC_Simulation_WinterUnsteady)
-		{
-			double w = (2 * M_PI / stridePeriod) * (5.0 / M_PI);	// This ratio works well to generate unsteady gait cycles for a given stride period
-			unsteady = 5.0*cos(w*unsteadyTime);
-		}
-		else
-			unsteady = 0.0;
-
-		static uint8_t row;
-		static uint8_t start = 0;
-		for(row = start; row < (51-1); row++)
-			if((time >= winterBioData[row][Winter_Stride]) && (time < winterBioData[row+1][Winter_Stride]))
-				break;
-
-		CM_thighAngle[0] = Utils_LinearInterpolate(time, winterBioData[row][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row][Winter_HipAngle], winterBioData[row+1][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row+1][Winter_HipAngle]) + unsteady;
-
-		time += DT;
-		if(time >= stridePeriod)
-		{
-			time = 0.0;
-			start = 0;
-		}
-		else
-			start = row;
-
-		unsteadyTime += DT;
-	}
-}
-
-static StateMachine_e RunStateMachine_Simulation(StateMachineMethod_e method)
-{
-	static float time = 0.0f;
-
-	static StateMachine_e state = Stance;
-	switch(state)
-	{
-	case Stance:
-		if(method == StateVals)
-		{
-			SetStateVals(Device.Joint, state);
-
-			time += DT;
-			if(time >= (stridePeriod * 0.66f))
-			{
-				state = CPC;
-				toeOff = 1;
-			}
-		}
-		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.CPC_SimulationCtrl, CM_KneeJoint.CPC_SimulationCtrl);
-
-		break;
-
-	case CPC:
-		if(method == StateVals)
-		{
-			SetStateVals(Device.Joint, state);
-
-			time += DT;
-			if(time >= stridePeriod)
-				time = 0.0;
-
-			if(time < (stridePeriod * 0.66f))
-			{
-				state = Stance;
-				heelStrike = 1;
-			}
-		}
-		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.CPC_SimulationCtrl, CM_KneeJoint.CPC_SimulationCtrl);
-
-		break;
-
-	default:	// Not all enums are listed
-		break;
-	}
-
-	return state;
 }
 
 static StateMachine_e RunStateMachine(StateMachineMethod_e method)
@@ -817,7 +680,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 			}
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.SwingDescCtrl, CM_KneeJoint.SwingDescCtrl);
+			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.SwingDescCtrl, CM_KneeJoint.SwingExtCtrl);	// Knee joint has no unique swing descent state
 
 		break;
 
@@ -989,14 +852,14 @@ static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3)
 	float P_4 = CM_KneeJoint.CPC_Params.P_4;
 
 	cpv[0] = CM_cpv;
-	p[0] = CM_KneeJoint.position;//??57.54f - 10.0f - 3.97f;//??CM_KneeJoint.position;
-	v[0] = CM_KneeJoint.speed;//??240.25f * stridePeriod;//??CM_KneeJoint.speed;
+	p[0] = CM_KneeJoint.position;
+	v[0] = CM_KneeJoint.speed;
 
 	cpv[1] = cpv[0] + (CPV_2 - CPV_1)/(1.0f - CPV_1) * (1.0f - cpv[0]);
 	p[1] = p[0] * P_2/P_1;
 	v[1] = 0.0f;
 
-	p[3] = 2.21f - 10.0f - 3.97f;//??kneeAngleAtHeelStrike;
+	p[3] = kneeAngleAtHeelStrike;
 
 	float dP_34 = P_4 - P_3;
 	cpv[2] = cpv[0] + (CPV_3 - CPV_1)/(1.0f - CPV_1) * (1.0f - cpv[0]);
@@ -1046,33 +909,9 @@ static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_
 	if((joint == Knee) || (joint == Combined))
 	{
 		CM_KneeJoint.ProsCtrl.kd = KneeMotorWriteData.kd;
-		CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.CPC_SimulationCtrl.kp;//??KneeMotorWriteData.kp;
+		CM_KneeJoint.ProsCtrl.kp = KneeMotorWriteData.kp;
 
-		if((testProgram == CPC_Simulation_Ideal) || (testProgram == CPC_Simulation_Winter) || (testProgram == CPC_Simulation_WinterUnsteady))
-		{
-			static float time = 0.0f;
-
-			static uint8_t row;
-			static uint8_t start = 0;
-			for(row = start; row < (51-1); row++)
-				if((time >= (winterBioData[row][Winter_Stride] * (stridePeriod/100.0f))) && (time < (winterBioData[row+1][Winter_Stride] * (stridePeriod/100.0f))))
-					break;
-
-			if(state == Stance)
-				CM_KneeJoint.ProsCtrl.position = Utils_LinearInterpolate(time, winterBioData[row][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row][Winter_KneeAngle], winterBioData[row+1][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row+1][Winter_KneeAngle]) + (-KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER - winterBioData[0][Winter_KneeAngle]);// = unsteady;??
-			else if(state == CPC)
-				CM_KneeJoint.ProsCtrl.position = Utils_LinearInterpolate(time, winterBioData[row][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row][Winter_KneeAngle], winterBioData[row+1][Winter_Stride] * (stridePeriod/100.0f), winterBioData[row+1][Winter_KneeAngle]) + (-KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER - winterBioData[0][Winter_KneeAngle]);//??CM_trajectory;
-
-			time += DT;
-			if(time >= stridePeriod)
-			{
-				start = 0;
-				time = 0.0;
-			}
-			else
-				start = row;
-		}
-		else if(state == CPC)
+		if(state == CPC)
 			CM_KneeJoint.ProsCtrl.position = CM_trajectory;
 		else
 			CM_AnkleJoint.ProsCtrl.position = KneeMotorWriteData.position;

@@ -249,7 +249,7 @@ int main(void)
 * USER ADDED MAIN LOOP
 *******************************************************************************/
 
-	if(testProgram == None)
+	if(testProgram == NoTestProgram)
 	{
 		while(!CM__startProgram)
 		{

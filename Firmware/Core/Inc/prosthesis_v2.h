@@ -62,7 +62,7 @@ typedef enum
 
 typedef enum
 {
-	None,
+	NoTestProgram,
 	CPC_Simulation_Ideal,
 	CPC_Simulation_Winter,
 	CPC_Simulation_WinterUnsteady,
