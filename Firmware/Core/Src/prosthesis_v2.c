@@ -118,7 +118,8 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
-	AKxx_x_WriteData_t PassiveEmulationCtrl;
+	AKxx_x_WriteData_t PassEmulFlexCtrl;
+	AKxx_x_WriteData_t PassEmulExtCtrl;
 	CPC_Params_t CPC_Params;
 	float position;
 	float speed;
@@ -921,9 +922,22 @@ static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_
 
 static void RunPassiveEmulation(void)
 {
-	CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassiveEmulationCtrl.kd;
-	CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassiveEmulationCtrl.kp;
-	CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassiveEmulationCtrl.position;
+	if(CM_KneeJoint.position > CM_KneeJoint.PassEmulExtCtrl.position)
+	{
+		CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
+		CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.kp;
+
+		if(CM_KneeJoint.position > CM_KneeJoint.PassEmulExtCtrl.position + CM_KneeJoint.PassEmulFlexCtrl.position)
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulExtCtrl.position - CM_KneeJoint.PassEmulFlexCtrl.position;
+		else
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulExtCtrl.position;
+	}
+	else
+	{
+		CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
+		CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.kp;
+		CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulExtCtrl.position;
+	}
 }
 
 static void CheckMotorCalls(void)
