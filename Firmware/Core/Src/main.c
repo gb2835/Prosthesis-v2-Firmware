@@ -172,7 +172,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(CPC_Simulation_Ideal);
+	RequireTestProgram(PassiveEmulation);
 
 
 /*******************************************************************************

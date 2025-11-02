@@ -63,10 +63,8 @@ typedef enum
 typedef enum
 {
 	NoTestProgram,
-	CPC_Simulation_Ideal,
-	CPC_Simulation_Winter,
-	CPC_Simulation_WinterUnsteady,
 	BypassStateMachine,
+	PassiveEmulation,
 	ReadOnly
 } TestProgram_e;
 

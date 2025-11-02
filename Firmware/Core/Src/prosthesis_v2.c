@@ -32,7 +32,7 @@
 * PUBLIC DEFINITIONS
 *******************************************************************************/
 
-TestProgram_e testProgram = NoTestProgram;
+TestProgram_e testProgram = ReadOnly;
 
 
 /*******************************************************************************
@@ -118,6 +118,7 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
+	AKxx_x_WriteData_t PassiveEmulationCtrl;
 	CPC_Params_t CPC_Params;
 	float position;
 	float speed;
@@ -201,7 +202,8 @@ static void GetThirdOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, f
 static void GetSecondOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float *a);
 static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3);
 static void SetStateVals(Joint_e joint, StateMachine_e state);
-static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_t AnkleMotorWriteData, AKxx_x_WriteData_t KneeMotorWriteData);
+static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_t *AnkleMotorWriteData, AKxx_x_WriteData_t *KneeMotorWriteData);
+static void RunPassiveEmulation(void);
 static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
 
@@ -284,8 +286,8 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 			break;
 		}
 
-	if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
-		ErrorHandler(KneeMotorError);
+		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
+			ErrorHandler(KneeMotorError);
 	}
 }
 
@@ -317,7 +319,7 @@ void RunProsthesisControl(void)
 		GetSegmentConstants(cpv, a1, a2, a3);
 	}
 
-	if(state == CPC)
+	if((state == SwingFlexion) || (state == SwingExtension) || (state == SwingDescension) || (state == CPC))
 		GetTrajectory(cpv, a1, a2, a3);
 	else
 		CM_trajectory = 0.0f;
@@ -325,7 +327,9 @@ void RunProsthesisControl(void)
 	if(testProgram == NoTestProgram)
 		RunStateMachine(CtrlParams);
 	else if(testProgram == BypassStateMachine)
-		SetCtrlParams(Device.Joint, 0, CM_AnkleJoint.BypassStateMachineCtrl, CM_KneeJoint.BypassStateMachineCtrl);
+		SetCtrlParams(Device.Joint, 0, &CM_AnkleJoint.BypassStateMachineCtrl, &CM_KneeJoint.BypassStateMachineCtrl);
+	else if(testProgram == PassiveEmulation)
+		RunPassiveEmulation();
 
 	CheckMotorCalls();
 
@@ -579,14 +583,14 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 					state = MidStance;
 			}
 			else if(Device.Joint == Knee)
-				if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoSwingThreshold)
+				if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoSwingThreshold) //does this work??
 				{
 					toeOff = 1;
 					state = SwingFlexion;
 				}
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.EarlyStanceCtrl, CM_KneeJoint.EarlyStanceCtrl);
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.EarlyStanceCtrl, &CM_KneeJoint.EarlyStanceCtrl);
 
 		break;
 
@@ -599,7 +603,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 				state = LateStance;
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.MidStanceCtrl, CM_KneeJoint.MidStanceCtrl);
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.MidStanceCtrl, &CM_KneeJoint.MidStanceCtrl);
 
 		break;
 
@@ -619,7 +623,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 			}
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.LateStanceCtrl, CM_KneeJoint.LateStanceCtrl);
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.LateStanceCtrl, &CM_KneeJoint.LateStanceCtrl);
 
 		break;
 
@@ -642,7 +646,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 					state = SwingExtension;
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.SwingFlexCtrl, CM_KneeJoint.SwingFlexCtrl);
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingFlexCtrl, &CM_KneeJoint.SwingFlexCtrl);
 
 		break;
 
@@ -664,7 +668,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 				}
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.SwingExtCtrl, CM_KneeJoint.SwingExtCtrl);
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingExtCtrl, &CM_KneeJoint.SwingExtCtrl);
 
 		break;
 
@@ -680,7 +684,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 			}
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.SwingDescCtrl, CM_KneeJoint.SwingExtCtrl);	// Knee joint has no unique swing descent state
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingDescCtrl, &CM_KneeJoint.SwingExtCtrl);	// Knee joint has no unique swing descent state
 
 		break;
 
@@ -696,11 +700,8 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 			}
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, CM_AnkleJoint.CPC_Ctrl, CM_KneeJoint.CPC_Ctrl);
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.CPC_Ctrl, &CM_KneeJoint.CPC_Ctrl);
 
-		break;
-
-	default:	// Not all enums are listed
 		break;
 	}
 
@@ -898,24 +899,31 @@ static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3)
 		CM_trajectory = a3[0] + a3[1]*(CM_cpv-cpv[2]) + a3[2]*(CM_cpv-cpv[2])*(CM_cpv-cpv[2]);
 }
 
-static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_t AnkleMotorWriteData, AKxx_x_WriteData_t KneeMotorWriteData)
+static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_t *AnkleMotorWriteData, AKxx_x_WriteData_t *KneeMotorWriteData)
 {
 	if((joint == Ankle) || (joint == Combined))
 	{
-		CM_AnkleJoint.ProsCtrl.kd = AnkleMotorWriteData.kd;
-		CM_AnkleJoint.ProsCtrl.kp = AnkleMotorWriteData.kp;
-		CM_AnkleJoint.ProsCtrl.position = AnkleMotorWriteData.position;
+		CM_AnkleJoint.ProsCtrl.kd = AnkleMotorWriteData->kd;
+		CM_AnkleJoint.ProsCtrl.kp = AnkleMotorWriteData->kp;
+		CM_AnkleJoint.ProsCtrl.position = AnkleMotorWriteData->position;
 	}
 	if((joint == Knee) || (joint == Combined))
 	{
-		CM_KneeJoint.ProsCtrl.kd = KneeMotorWriteData.kd;
-		CM_KneeJoint.ProsCtrl.kp = KneeMotorWriteData.kp;
+		CM_KneeJoint.ProsCtrl.kd = KneeMotorWriteData->kd;
+		CM_KneeJoint.ProsCtrl.kp = KneeMotorWriteData->kp;
 
 		if(state == CPC)
 			CM_KneeJoint.ProsCtrl.position = CM_trajectory;
 		else
-			CM_AnkleJoint.ProsCtrl.position = KneeMotorWriteData.position;
+			CM_KneeJoint.ProsCtrl.position = KneeMotorWriteData->position;
 	}
+}
+
+static void RunPassiveEmulation(void)
+{
+	CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassiveEmulationCtrl.kd;
+	CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassiveEmulationCtrl.kp;
+	CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassiveEmulationCtrl.position;
 }
 
 static void CheckMotorCalls(void)
@@ -978,7 +986,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 
 		CM_AnkleJoint.position = -CM_AnkleJoint.MotorReadData.position / ANKLE_GEAR_RATIO * RAD_TO_DEG - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER;
 		CM_AnkleJoint.speed = -CM_AnkleJoint.MotorReadData.speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
-		CM_AnkleJoint.torque = -CM_AnkleJoint.MotorReadData.torque * ANKLE_GEAR_RATIO ;
+		CM_AnkleJoint.torque = -CM_AnkleJoint.MotorReadData.torque * ANKLE_GEAR_RATIO;
 
 		uint32_t txMailbox;
 		if(testProgram != ReadOnly)
@@ -1001,7 +1009,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 
 		CM_KneeJoint.position = -CM_KneeJoint.MotorReadData.position / KNEE_GEAR_RATIO * RAD_TO_DEG - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER;
 		CM_KneeJoint.speed = -CM_KneeJoint.MotorReadData.speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
-		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO ;
+		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO;
 
 		uint32_t txMailbox;
 		if(testProgram != ReadOnly)
