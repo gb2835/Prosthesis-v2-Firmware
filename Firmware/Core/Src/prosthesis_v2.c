@@ -1058,22 +1058,18 @@ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-	AKxx_x_ReadData_t temp;
-	if(AKxx_x_ReadMotor(CAN_RX_FIFO0, &temp))
-		ErrorHandler(MotorReadError);
-
 	CM_AnkleJoint.motorDataReceived = 1;
-	memcpy(&CM_AnkleJoint.MotorReadData, &temp, sizeof(AKxx_x_ReadData_t));
+
+	if(AKxx_x_ReadMotor(CAN_RX_FIFO0, &CM_AnkleJoint.MotorReadData))
+		ErrorHandler(MotorReadError);
 }
 
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-	AKxx_x_ReadData_t temp;
-	if(AKxx_x_ReadMotor(CAN_RX_FIFO1, &temp))
-		ErrorHandler(MotorReadError);
-
 	CM_KneeJoint.motorDataReceived = 1;
-	memcpy(&CM_KneeJoint.MotorReadData, &temp, sizeof(AKxx_x_ReadData_t));
+
+	if(AKxx_x_ReadMotor(CAN_RX_FIFO1, &CM_KneeJoint.MotorReadData))
+		ErrorHandler(MotorReadError);
 }
 
 

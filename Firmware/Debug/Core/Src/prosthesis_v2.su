@@ -24,5 +24,5 @@
 ../Core/Src/prosthesis_v2.c:987:13:ServiceMotor	24	static
 ../Core/Src/prosthesis_v2.c:1049:6:HAL_SPI_TxCpltCallback	16	static
 ../Core/Src/prosthesis_v2.c:1054:6:HAL_SPI_RxCpltCallback	16	static
-../Core/Src/prosthesis_v2.c:1059:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
-../Core/Src/prosthesis_v2.c:1069:6:HAL_CAN_RxFifo1MsgPendingCallback	48	static
+../Core/Src/prosthesis_v2.c:1059:6:HAL_CAN_RxFifo0MsgPendingCallback	16	static
+../Core/Src/prosthesis_v2.c:1067:6:HAL_CAN_RxFifo1MsgPendingCallback	16	static
