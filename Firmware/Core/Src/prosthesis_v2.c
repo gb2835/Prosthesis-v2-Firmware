@@ -305,7 +305,7 @@ void RunProsthesisControl(void)
 	ProcessInputs();
 
 	StateMachine_e state;
-	if(testProgram == NoTestProgram)
+	if((testProgram == NoTestProgram) || (testProgram == PassiveEmulation))
 		state = RunStateMachine(StateVals);
 
 	GetCPV();
