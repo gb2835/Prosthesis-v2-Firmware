@@ -164,7 +164,7 @@ int main(void)
 
 	Prosthesis_Init_t Prosthesis_Init;
 	Prosthesis_Init.CPC_Spec = Winter;
-	Prosthesis_Init.Joint = Combined;
+	Prosthesis_Init.Joint = Knee;
 	Prosthesis_Init.Side = Right;
 
 
@@ -172,9 +172,9 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(PassiveEmulation);
+	RequireTestProgram(BypassStateMachine);
 
-	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint != Knee))
+	if(((testProgram == PassiveEmulation) || (testProgram == PassiveEmulationWithSwing)) && (Prosthesis_Init.Joint != Knee))
 		ErrorHandler(PassiveEmulationError);
 
 

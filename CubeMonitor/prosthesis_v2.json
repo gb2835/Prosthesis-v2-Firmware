@@ -663,7 +663,7 @@
         "frequencyType": "0",
         "snapshotheader": "",
         "mode": "direct",
-        "lastImportedTime": 1762103323315,
+        "lastImportedTime": 1762341075297,
         "openStatus": true,
         "x": 380,
         "y": 620,
@@ -898,7 +898,7 @@
         "type": "function",
         "z": "11c381a008bd6835",
         "name": "Error Decoder",
-        "func": "switch (msg.payload)\n{\n    case 0:\n        msg.payload = \"No Error\";\n        break;\n    case 1:\n        msg.payload = \"Ankle IMU Error\"\n        break;\n    case 2:\n        msg.payload = \"Ankle Motor Error\"\n        break;\n    case 3:\n        msg.payload = \"CAN_Error\"\n        break;\n    case 4:\n        msg.payload = \"Knee IMU Error\"\n        break;\n    case 5:\n        msg.payload = \"Knee Motor Error\"\n        break;\n    case 6:\n        msg.payload = \"Motor Read Error\"\n        break;\n}\n\nreturn msg;",
+        "func": "switch (msg.payload)\n{\n    case 0:\n        msg.payload = \"No Error\";\n        break;\n    case 1:\n        msg.payload = \"Ankle IMU Error\"\n        break;\n    case 2:\n        msg.payload = \"Ankle Motor Error\"\n        break;\n    case 3:\n        msg.payload = \"CAN_Error\"\n        break;\n    case 4:\n        msg.payload = \"Knee IMU Error\"\n        break;\n    case 5:\n        msg.payload = \"Knee Motor Error\"\n        break;\n    case 6:\n        msg.payload = \"Motor Read Error\"\n        break;\n    case 7:\n        msg.payload = \"Passive Emulation Error\"\n        break;\n}\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -928,7 +928,7 @@
         "frequencyType": "0",
         "snapshotheader": "",
         "mode": "direct",
-        "lastImportedTime": 1762100805801,
+        "lastImportedTime": 1762341064740,
         "openStatus": true,
         "x": 340,
         "y": 40,
@@ -40282,7 +40282,7 @@
         "expand": false,
         "filename": "prosthesis_v2.elf",
         "exeModifiedTime": 1762103278424,
-        "configLastUpdate": 1762103322772
+        "configLastUpdate": 1762341074867
     },
     {
         "id": "61830ad2ade8ed08",
@@ -43047,61 +43047,61 @@
             },
             {
                 "address": "0x2000033c",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_extension.kd",
+                "name": "CM_KneeJoint.PassEmulExtCtrl.kd",
                 "type": 9,
                 "checked": true
             },
             {
                 "address": "0x20000340",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_extension.kp",
+                "name": "CM_KneeJoint.PassEmulExtCtrl.kp",
                 "type": 9,
                 "checked": true
             },
             {
                 "address": "0x20000344",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_extension.position",
+                "name": "CM_KneeJoint.PassEmulExtCtrl.position",
                 "type": 9,
                 "checked": true
             },
             {
                 "address": "0x20000348",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_extension.speed",
+                "name": "CM_KneeJoint.PassEmulExtCtrl.speed",
                 "type": 9,
                 "checked": true
             },
             {
                 "address": "0x2000034c",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_extension.torque",
+                "name": "CM_KneeJoint.PassEmulExtCtrl.torque",
                 "type": 9,
                 "checked": true
             },
             {
                 "address": "0x20000328",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_flexion.kd",
+                "name": "CM_KneeJoint.PassEmulFlexCtrl.kd",
                 "type": 9,
                 "checked": true
             },
             {
                 "address": "0x2000032c",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_flexion.kp",
+                "name": "CM_KneeJoint.PassEmulFlexCtrl.kp",
                 "type": 9,
                 "checked": true
             },
             {
                 "address": "0x20000330",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_flexion.position",
+                "name": "CM_KneeJoint.PassEmulFlexCtrl.position",
                 "type": 9,
                 "checked": true
             },
             {
                 "address": "0x20000334",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_flexion.speed",
+                "name": "CM_KneeJoint.PassEmulFlexCtrl.speed",
                 "type": 9,
                 "checked": true
             },
             {
                 "address": "0x20000338",
-                "name": "CM_KneeJoint.PassiveEmulationCtrl_flexion.torque",
+                "name": "CM_KneeJoint.PassEmulFlexCtrl.torque",
                 "type": 9,
                 "checked": true
             },
@@ -43873,22 +43873,22 @@
                 "type": 5
             },
             {
-                "address": "0x0800de6c",
+                "address": "0x0800debc",
                 "name": "setSensorConfigOp.onReset",
                 "type": 5
             },
             {
-                "address": "0x0800de68",
+                "address": "0x0800deb8",
                 "name": "setSensorConfigOp.rx",
                 "type": 5
             },
             {
-                "address": "0x0800de64",
+                "address": "0x0800deb4",
                 "name": "setSensorConfigOp.start",
                 "type": 5
             },
             {
-                "address": "0x0800de60",
+                "address": "0x0800deb0",
                 "name": "setSensorConfigOp.timeout_us",
                 "type": 5
             },
@@ -43923,12 +43923,12 @@
                 "type": 5
             },
             {
-                "address": "0x0800de00",
+                "address": "0x0800de50",
                 "name": "sh2ReportLens[0].id",
                 "type": 1
             },
             {
-                "address": "0x0800de01",
+                "address": "0x0800de51",
                 "name": "sh2ReportLens[0].len",
                 "type": 1
             },
@@ -43943,12 +43943,12 @@
                 "type": 2
             },
             {
-                "address": "0x0800ddf0",
+                "address": "0x0800de40",
                 "name": "state_loadCell[0]",
                 "type": 3
             },
             {
-                "address": "0x0800dde0",
+                "address": "0x0800de30",
                 "name": "state_speed[0]",
                 "type": 4
             },
@@ -43978,7 +43978,7 @@
                 "type": 5
             },
             {
-                "address": "0x0800deb8",
+                "address": "0x0800df08",
                 "name": "txZeros[0]",
                 "type": 1
             },
@@ -44000,8 +44000,8 @@
         ],
         "expand": false,
         "filename": "prosthesis_v2.elf",
-        "exeModifiedTime": 1762100776450,
-        "configLastUpdate": 1762100805012
+        "exeModifiedTime": 1762103278424,
+        "configLastUpdate": 1762341064080
     },
     {
         "id": "2a04926c61b2e7c2",
