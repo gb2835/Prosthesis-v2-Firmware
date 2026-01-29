@@ -13,7 +13,7 @@
 * 3. LED meanings below.
 * 		- Flashing blue = Ankle motor not initialized (most likely no motor power)
 * 		- Flashing white = Knee motor not initialized (most likely no motor power)
-* 		- Solid Blue = waiting for CM__StartProgram to be true (only when RequireTestProgram(None);)
+* 		- Solid Blue = waiting for CM__StartProgram to be true (only when RequireTestProgram(NoTestProgram);)
 * 		- Solid Green = motor(s) are communicating
 * 		- Solid Red = program in error handler
 *
@@ -172,9 +172,9 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(BypassStateMachine);
+	RequireTestProgram(PassiveEmulation);
 
-	if(((testProgram == PassiveEmulation) || (testProgram == PassiveEmulationWithSwing)) && (Prosthesis_Init.Joint != Knee))
+	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint != Knee))
 		ErrorHandler(PassiveEmulationError);
 
 

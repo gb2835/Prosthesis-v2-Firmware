@@ -66,7 +66,6 @@ typedef enum
 	NoTestProgram,
 	BypassStateMachine,
 	PassiveEmulation,
-	PassiveEmulationWithSwing,
 	ReadOnly
 } TestProgram_e;
 
