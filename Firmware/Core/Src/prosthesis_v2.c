@@ -938,20 +938,20 @@ static void RunPassiveEmulation(void)
 		{
 			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
 			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.kp;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.position;
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulFlexCtrl.position;
 		}
 		else
 		{
 			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
 			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.kp;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.position;
+			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulExtCtrl.position;
 		}
 	}
 	else
 	{
 		CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
 		CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.kp;
-		CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.position;
+		CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
 	}
 }
 
