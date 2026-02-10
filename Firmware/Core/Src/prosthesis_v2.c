@@ -121,7 +121,6 @@ typedef struct
 	AKxx_x_WriteData_t PassEmulFlexCtrl;
 	AKxx_x_WriteData_t PassEmulExtCtrl;
 	CPC_Params_t CPC_Params;
-	float passiveStanceThreshold;
 	float position;
 	float speed;
 	float torque;
@@ -142,9 +141,6 @@ typedef struct
 		float bot[3];	// [0] = k-0, [1] = k-1, [2] = k-2 where k is the current time step
 		float top[3];	// [0] = k-0, [1] = k-1, [2] = k-2 where k is the current time step
 	} Filtered;
-
-	float intoStanceThreshold;
-	float intoSwingThreshold;
 } LoadCell_t;
 
 static AKxx_x_WriteData_t MotorTxData;
@@ -177,10 +173,13 @@ static LoadCell_t CM_LoadCell;
 static double CM_thighAngle_unbiased[2] = {0.0, 0.0};	// [0] = k-0, [1] = k-1 where k is the current time step
 static double CM_thighIntegral_unbiased = 0.0;
 static Error_e CM_ledCode = NoError;
-static float CM_ankleSpeedThreshold = -5.0f;
 static float CM_cpv = 0.0f;
 static float CM_footSpeed = 0.0f;
-static float CM_footSpeedThreshold = -5.0f;
+static float CM_threshold_ankleSpeed = -5.0f;
+static float CM_threshold_footSpeed = -5.0f;
+static float CM_threshold_intoStanceLC = 1270.0f;
+static float CM_threshold_intoSwingLC = 1270.0f;
+static float CM_threshold_passiveStancePosition = 10.0f;
 static uint8_t CM__startCPC = 0;
 static uint8_t CM_healthyStride = 0;
 
@@ -211,11 +210,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 
 	memset(&CM_AnkleJoint, 0, sizeof(CM_AnkleJoint));
 	memset(&CM_KneeJoint, 0, sizeof(CM_KneeJoint));
-
-	CM_LoadCell.intoStanceThreshold = 1270.0f;
-	CM_LoadCell.intoSwingThreshold = 1270.0f;
-
-	CM_KneeJoint.passiveStanceThreshold = 10.0f;
 
 	InitStateVals();
 	CM_state_angle = state_angle[Device.Joint][EarlyStance];
@@ -611,11 +605,11 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 
 			if((Device.Joint == Ankle) || (Device.Joint == Combined))
 			{
-				if(CM_footSpeed > CM_footSpeedThreshold)
+				if(CM_footSpeed > CM_threshold_footSpeed)
 					state = MidStance;
 			}
 			else if(Device.Joint == Knee)
-				if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoSwingThreshold)
+				if(CM_LoadCell.Filtered.bot[0] < CM_threshold_intoSwingLC)
 				{
 					toeOff = 1;
 					state = SwingFlexion;
@@ -631,7 +625,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 		{
 			SetStateVals(Device.Joint, state);
 
-			if(CM_AnkleJoint.speed < CM_ankleSpeedThreshold)
+			if(CM_AnkleJoint.speed < CM_threshold_ankleSpeed)
 				state = LateStance;
 		}
 		else if(method == CtrlParams)
@@ -666,7 +660,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 
 			if(Device.Joint == Ankle)
 			{
-				if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
+				if(CM_LoadCell.Filtered.bot[0] > CM_threshold_intoStanceLC)
 				{
 					heelStrike = 1;
 					state = EarlyStance;
@@ -687,7 +681,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 		{
 			SetStateVals(Device.Joint, state);
 
-			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
+			if(CM_LoadCell.Filtered.bot[0] > CM_threshold_intoStanceLC)
 			{
 				heelStrike = 1;
 				state = EarlyStance;
@@ -703,7 +697,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 		{
 			SetStateVals(Device.Joint, state);
 
-			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
+			if(CM_LoadCell.Filtered.bot[0] > CM_threshold_intoStanceLC)
 			{
 				heelStrike = 1;
 				state = EarlyStance;
@@ -933,7 +927,7 @@ static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_
 
 static void RunPassiveEmulation(void)
 {
-	if(CM_KneeJoint.position > CM_KneeJoint.passiveStanceThreshold)
+	if(CM_KneeJoint.position > CM_threshold_passiveStancePosition)
 	{
 		if(CM_KneeJoint.speed >= 0)
 		{
