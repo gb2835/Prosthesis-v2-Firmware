@@ -174,9 +174,6 @@ int main(void)
 
 	RequireTestProgram(PassiveEmulation);
 
-	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint != Knee))
-		ErrorHandler(PassiveEmulationError);
-
 
 /*******************************************************************************
 * USER ADDED INITIALIZATIONS

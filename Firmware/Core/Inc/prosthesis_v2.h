@@ -17,7 +17,7 @@ typedef enum
 
 typedef enum
 {
-	Kaden,
+	Specific,
 	Winter
 } CPC_Specs_e;
 
@@ -36,7 +36,6 @@ typedef enum
 	KneeIMU_Error,
 	KneeMotorError,
 	MotorReadError,
-	PassiveEmulationError
 } Error_e;
 
 typedef enum

@@ -54,7 +54,6 @@ typedef enum
 	LateStance,
 	SwingFlexion,
 	SwingExtension,
-	SwingDescension,
 	CPC
 } StateMachine_e;
 
@@ -74,7 +73,6 @@ typedef struct
 	AKxx_x_WriteData_t LateStanceCtrl;
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
-	AKxx_x_WriteData_t SwingDescCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
 	float position;
 	float speed;
@@ -255,10 +253,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_AnkleJoint.SwingExtCtrl.kp = startKp;
 		CM_AnkleJoint.SwingExtCtrl.position = startPos;
 
-		CM_AnkleJoint.SwingDescCtrl.kd = startKd;
-		CM_AnkleJoint.SwingDescCtrl.kp = startKp;
-		CM_AnkleJoint.SwingDescCtrl.position = startPos;
-
 		CM_AnkleJoint.CPC_Ctrl.kd = startKd;
 		CM_AnkleJoint.CPC_Ctrl.kp = startKp;
 		CM_AnkleJoint.CPC_Ctrl.position = startPos;
@@ -273,7 +267,7 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	{
 		switch(Device.CPC_Spec)
 		{
-		case Kaden:
+		case Specific:
 			// ??
 			break;
 		case Winter:
@@ -321,7 +315,7 @@ void RunProsthesisControl(void)
 			GetSegmentConstants(cpv, a1, a2, a3);
 		}
 
-		if((state == SwingFlexion) || (state == SwingExtension) || (state == SwingDescension) || (state == CPC))
+		if((state == SwingFlexion) || (state == SwingExtension) || (state == CPC))
 			GetTrajectory(cpv, a1, a2, a3);
 		else
 			CM_trajectory = 0.0f;
@@ -587,8 +581,11 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 					state = MidStance;
 			}
 			else if(Device.Joint == Knee)
-				if(CM_LoadCell.Filtered.bot[0] < 1100.0f)
-					state = LateStance;
+				if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoSwingThreshold)
+				{
+					toeOff = 1;
+					state = SwingFlexion;
+				}
 		}
 		else if(method == CtrlParams)
 			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.EarlyStanceCtrl, &CM_KneeJoint.EarlyStanceCtrl);
@@ -600,7 +597,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 		{
 			SetStateVals(Device.Joint, state);
 
-			if(CM_AnkleJoint.speed < CM_ankleSpeedThreshold) // check with angle plot (not speed plot)??
+			if(CM_AnkleJoint.speed < CM_ankleSpeedThreshold)
 				state = LateStance;
 		}
 		else if(method == CtrlParams)
@@ -613,24 +610,15 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 		{
 			SetStateVals(Device.Joint, state);
 
-			if((Device.Joint == Ankle) || (Device.Joint == Combined))
+			if(CM_AnkleJoint.speed > 0.0f) // can we use load cell??
 			{
-				if(CM_AnkleJoint.speed > 0.0f) // can we use load cell??
-				{
-					toeOff = 1;
+				toeOff = 1;
 
-					if(CM__startCPC)
-						state = CPC;
-					else
-						state = SwingFlexion;
-				}
-			}
-			else if(Device.Joint == Knee)
-				if(CM_LoadCell.Filtered.bot[0] < CM_LoadCell.intoSwingThreshold) //does this work??
-				{
-					toeOff = 1;
+				if(CM__startCPC)
+					state = CPC;
+				else
 					state = SwingFlexion;
-				}
+			}
 		}
 		else if(method == CtrlParams)
 			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.LateStanceCtrl, &CM_KneeJoint.LateStanceCtrl);
@@ -665,28 +653,6 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 		{
 			SetStateVals(Device.Joint, state);
 
-			if(Device.Joint == Combined)
-			{
-				if(CM_footSpeed < 0.0f)
-					state = SwingDescension;
-			}
-			else if(Device.Joint == Knee)
-				if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
-				{
-					heelStrike = 1;
-					state = EarlyStance;
-				}
-		}
-		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingExtCtrl, &CM_KneeJoint.SwingExtCtrl);
-
-		break;
-
-	case SwingDescension:
-		if(method == StateVals)
-		{
-			SetStateVals(Device.Joint, state);
-
 			if(CM_LoadCell.Filtered.bot[0] > CM_LoadCell.intoStanceThreshold)
 			{
 				heelStrike = 1;
@@ -694,7 +660,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 			}
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingDescCtrl, &CM_KneeJoint.SwingExtCtrl);	// Knee joint has no unique swing descent state
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingExtCtrl, &CM_KneeJoint.SwingExtCtrl);
 
 		break;
 
@@ -1014,8 +980,8 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		uint32_t txMailbox;
 		if(testProgram != ReadOnly)
 		{
-			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd;//?? / (DEG_TO_RAD);
-			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp;//?? / (DEG_TO_RAD);
+			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd / (DEG_TO_RAD);
+			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp / (DEG_TO_RAD);
 			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 
 			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
@@ -1037,8 +1003,8 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		uint32_t txMailbox;
 		if(testProgram != ReadOnly)
 		{
-			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd;//?? / (DEG_TO_RAD);
-			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp;//?? / (DEG_TO_RAD);
+			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd / (DEG_TO_RAD);
+			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp / (DEG_TO_RAD);
 			MotorTxData.position = (-CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 
 			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
