@@ -74,6 +74,7 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
+	AKxx_x_WriteData_t PassEmulCtrl;
 	float position;
 	float speed;
 	float torque;
@@ -952,6 +953,13 @@ static void RunPassiveEmulation(void)
 		CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
 		CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.kp;
 		CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
+	}
+
+	if(Device.Joint == Combined)
+	{
+		CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.PassEmulCtrl.kd;
+		CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.PassEmulCtrl.kp;
+		CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.PassEmulCtrl.position;
 	}
 }
 

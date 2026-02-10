@@ -36,6 +36,7 @@ typedef enum
 	KneeIMU_Error,
 	KneeMotorError,
 	MotorReadError,
+	PassiveEmulationError
 } Error_e;
 
 typedef enum

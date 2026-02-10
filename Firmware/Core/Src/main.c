@@ -244,6 +244,9 @@ int main(void)
 
 	RequireTestProgram(ReadOnly);
 
+	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint == Ankle))
+		ErrorHandler(PassiveEmulationError);
+
 
 /*******************************************************************************
 * USER ADDED MAIN LOOP
