@@ -146,6 +146,10 @@ typedef struct
 
 static AKxx_x_WriteData_t MotorTxData;
 static float kneeAngleAtHeelStrike;
+static float state_angle[3][6];			// 3 devices, 6 states
+static float state_torque[3][6];		// 3 devices, 6 states
+static float state_speed[3][6];			// 3 devices, 6 states
+static float state_loadCell[6];			// 6 states
 static MPU925x_IMU_Data_t IMU_Data;
 static Prosthesis_Init_t Device;
 
@@ -156,18 +160,6 @@ static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
 static uint8_t toeOff = 0;
-
-static const int8_t state_angle[3][7] = {{-20, -14, -8, -2,  4, 10, 10},	// Ankle only
-									 	 {-20,  -4, 12, 28, 44, 60, 60},	// Combined
-										 {-20,  12, 24, 36, 48, 60, 60}};	// Knee only
-
-static const int8_t state_torque[3][7] = {{-100, -70, -40, -10, 20, 50, 50},	// Ankle only
-										  {-100, -70, -40, -10, 20, 50, 50},	// Combined
-										  { -50, -30, -10,  10, 30, 50, 50}};	// Knee only
-
-static const int16_t state_speed[7] = {-600, -360, -120, 120, 360, 600, 600};
-
-static const uint16_t state_loadCell[7] = {1100, 1200, 1300, 1400, 1500, 1600, 1600};
 
 static AnkleJoint_t CM_AnkleJoint;
 static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1 where k is the current time step
@@ -191,6 +183,7 @@ static float CM_footSpeedThreshold = -5.0f;
 static uint8_t CM__startCPC = 0;
 static uint8_t CM_healthyStride = 0;
 
+static void InitStateVals(void);
 static void GetInputs(void);
 static uint16_t ReadLoadCell(ADC_TypeDef *ADCx);
 static void ProcessInputs(void);
@@ -221,10 +214,11 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	CM_LoadCell.intoStanceThreshold = 1270.0f;
 	CM_LoadCell.intoSwingThreshold = 1270.0f;
 
+	InitStateVals();
 	CM_state_angle = state_angle[Device.Joint][EarlyStance];
-	CM_state_loadCell = state_loadCell[EarlyStance];
-	CM_state_speed = state_speed[EarlyStance];
+	CM_state_speed = state_speed[Device.Joint][EarlyStance];
 	CM_state_torque = state_torque[Device.Joint][EarlyStance];
+	CM_state_loadCell = state_loadCell[EarlyStance];
 
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
@@ -395,6 +389,43 @@ void ErrorHandler(Error_e error)
 /*******************************************************************************
 * PRIVATE FUNCTIONS
 *******************************************************************************/
+
+static void InitStateVals(void)
+{
+	float state_angle_max[3] = { 10.0f,  60.0f, 60.0f};		// {Ankle, Combined, Knee}
+	float state_angle_min[3] = {-20.0f, -20.0f,  0.0f};		// {Ankle, Combined, Knee}
+
+	float state_torque_max[3] = {  50.0f,   50.0f,  50.0f};	// {Ankle, Combined, Knee}
+	float state_torque_min[3] = {-100.0f, -100.0f, -50.0f};	// {Ankle, Combined, Knee}
+
+	float state_speed_max[3] = { 600.0f,  600.0f,  600.0f};	// {Ankle, Combined, Knee}
+	float state_speed_min[3] = {-600.0f, -600.0f, -600.0f};	// {Ankle, Combined, Knee}
+
+	float state_loadCell_max = 1600.0f;
+	float state_loadCell_min = 1100.0f;
+
+	uint8_t nStates = 6;
+	for(uint8_t j = 0; j < nStates-1; j++)
+	{
+		for(uint8_t i = 0; i < 3; i++)
+		{
+			state_angle[i][j] = (state_angle_max[i] - state_angle_min[i]) / (float)(nStates - 2) * j + state_angle_min[i];
+			state_torque[i][j] = (state_torque_max[i] - state_torque_min[i]) / (float)(nStates - 2) * j + state_torque_min[i];
+			state_speed[i][j] = (state_speed_max[i] - state_speed_min[i]) / (float)(nStates - 2) * j + state_speed_min[i];
+		}
+
+		state_loadCell[j] = (state_loadCell_max - state_loadCell_min) / (float)(nStates - 2) * j + state_loadCell_min;
+	}
+
+	for(uint8_t i = 0; i < 3; i++)
+	{
+		state_angle[i][nStates-1] = state_angle_max[i];
+		state_torque[i][nStates-1] = state_torque_max[i];
+		state_speed[i][nStates-1] = state_speed_max[i];
+	}
+
+	state_loadCell[nStates-1] = state_loadCell_max;
+}
 
 static void GetInputs(void)
 {
@@ -687,22 +718,24 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 static void SetStateVals(Joint_e joint, StateMachine_e state)
 {
 	CM_state_loadCell = state_loadCell[state];
-	CM_state_speed = state_speed[state];
 
 	if(joint == Ankle)
 	{
 		CM_state_angle = state_angle[Ankle][state];
 		CM_state_torque = state_torque[Ankle][state];
+		CM_state_speed = state_torque[Ankle][state];
 	}
 	else if(joint == Combined)
 	{
 		CM_state_angle = state_angle[Combined][state];
 		CM_state_torque = state_torque[Combined][state];
+		CM_state_speed = state_torque[Combined][state];
 	}
 	else if(joint == Knee)
 	{
 		CM_state_angle = state_angle[Knee][state];
 		CM_state_torque = state_torque[Knee][state];
+		CM_state_speed = state_torque[Knee][state];
 	}
 }
 

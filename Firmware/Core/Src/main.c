@@ -172,7 +172,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(PassiveEmulation);
+	RequireTestProgram(ReadOnly);
 
 
 /*******************************************************************************
