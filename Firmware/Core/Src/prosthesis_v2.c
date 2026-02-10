@@ -216,6 +216,8 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	CM_LoadCell.intoStanceThreshold = 1270.0f;
 	CM_LoadCell.intoSwingThreshold = 1270.0f;
 
+	CM_KneeJoint.passiveStanceThreshold = 10.0f;
+
 	InitStateVals();
 	CM_state_angle = state_angle[Device.Joint][EarlyStance];
 	CM_state_speed = state_speed[Device.Joint][EarlyStance];
