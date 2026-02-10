@@ -169,9 +169,7 @@ static float CM_cpvx9;
 static float CM_state_quadrant;
 static float CM_trajectory;
 static float CM_xPhaseAngle, CM_yPhaseAngle;
-static int8_t CM_state_angle, CM_state_torque;
-static int16_t CM_state_speed;
-static uint16_t CM_state_loadCell;
+static float CM_state_angle, CM_state_torque, CM_state_speed, CM_state_loadCell;
 static KneeJoint_t CM_KneeJoint;
 static LoadCell_t CM_LoadCell;
 
@@ -1020,18 +1018,20 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_AnkleJoint.torque = -CM_AnkleJoint.MotorReadData.torque * ANKLE_GEAR_RATIO / 0.6f; //divide 0.6??
 
 		uint32_t txMailbox;
-		if(testProgram != ReadOnly)
+		if(testProgram == ReadOnly)
+		{
+			MotorTxData.kd = 0.0f;
+			MotorTxData.kp = 0.0f;
+		}
+		else
 		{
 			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd / (DEG_TO_RAD);
 			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp / (DEG_TO_RAD);
 			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
-
-			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
-				ErrorHandler(AnkleMotorError);
 		}
-		else
-			if(AKxx_x_EnterMotorCtrlMode(deviceIndex, &txMailbox))
-				ErrorHandler(AnkleMotorError);
+
+		if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
+			ErrorHandler(AnkleMotorError);
 	}
 	else if(deviceIndex == KneeIndex)
 	{
@@ -1043,18 +1043,20 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO / 0.6f; //divide 0.6??
 
 		uint32_t txMailbox;
-		if(testProgram != ReadOnly)
+		if(testProgram == ReadOnly)
+		{
+			MotorTxData.kd = 0.0f;
+			MotorTxData.kp = 0.0f;
+		}
+		else
 		{
 			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd / (DEG_TO_RAD);
 			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp / (DEG_TO_RAD);
 			MotorTxData.position = (-CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
-
-			if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
-				ErrorHandler(KneeMotorError);
 		}
-		else
-			if(AKxx_x_EnterMotorCtrlMode(deviceIndex, &txMailbox))
-				ErrorHandler(KneeMotorError);
+
+		if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
+			ErrorHandler(KneeMotorError);
 	}
 }
 
