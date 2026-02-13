@@ -339,7 +339,7 @@ void ActivateLED(LED_Color_e color)
 		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 		LL_GPIO_SetOutputPin(LED_RED_GPIO_Port, LED_RED_Pin);
 	}
-	if(color == Blue)
+	else if(color == Blue)
 	{
 		LL_GPIO_ResetOutputPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
 		LL_GPIO_SetOutputPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
@@ -1017,7 +1017,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 
 		CM_AnkleJoint.position = -CM_AnkleJoint.MotorReadData.position / ANKLE_GEAR_RATIO * RAD_TO_DEG - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER;
 		CM_AnkleJoint.speed = -CM_AnkleJoint.MotorReadData.speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
-		CM_AnkleJoint.torque = -CM_AnkleJoint.MotorReadData.torque * ANKLE_GEAR_RATIO / 0.6f; //divide 0.6??
+		CM_AnkleJoint.torque = -CM_AnkleJoint.MotorReadData.torque * ANKLE_GEAR_RATIO;
 
 		uint32_t txMailbox;
 		if(testProgram == ReadOnly)
