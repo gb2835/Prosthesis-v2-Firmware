@@ -1027,8 +1027,8 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		}
 		else
 		{
-			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd / (DEG_TO_RAD);
-			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp / (DEG_TO_RAD);
+			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd / (ANKLE_GEAR_RATIO * ANKLE_GEAR_RATIO * DEG_TO_RAD);
+			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp / (ANKLE_GEAR_RATIO * ANKLE_GEAR_RATIO * DEG_TO_RAD);
 			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 		}
 
@@ -1052,8 +1052,8 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		}
 		else
 		{
-			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd / (DEG_TO_RAD);
-			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp / (DEG_TO_RAD);
+			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd / (KNEE_GEAR_RATIO * KNEE_GEAR_RATIO * DEG_TO_RAD);
+			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp / (KNEE_GEAR_RATIO * KNEE_GEAR_RATIO * DEG_TO_RAD);
 			MotorTxData.position = (-CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 		}
 
