@@ -13,9 +13,9 @@
 * 3. LED meanings below.
 * 		- Flashing blue = Ankle motor not initialized (most likely no motor power)
 * 		- Flashing white = Knee motor not initialized (most likely no motor power)
-* 		- Solid Blue = waiting for CM__StartProgram to be true (only when RequireTestProgram(NoTestProgram);)
-* 		- Solid Green = motor(s) are communicating
-* 		- Solid Red = program in error handler
+* 		- Solid blue = waiting for CM__StartProgram to be true (only when RequireTestProgram(NoTestProgram);)
+* 		- Solid green = motor(s) are communicating
+* 		- Solid red = program in error handler
 *
 *******************************************************************************/
 
