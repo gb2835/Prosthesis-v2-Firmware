@@ -28,6 +28,7 @@ typedef struct
 	float k;
 } Utils_Quaternion_t;
 
+// Axis-angle representation
 typedef struct
 {
 	float angle;
