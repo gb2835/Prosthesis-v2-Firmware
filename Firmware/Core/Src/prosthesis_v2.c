@@ -200,12 +200,6 @@ static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
 
 
-
-
-Utils_Quaternion_t CM_Q;
-
-
-
 /*******************************************************************************
 * PUBLIC FUNCTIONS
 *******************************************************************************/
@@ -559,18 +553,17 @@ static void ProcessInputs(void)
 			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[3] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
 
-			Utils_Rotation_t RotateX_90 = {-90.0f * M_PI/180.0f, 1.0f, 0.0f, 0.0f};
 			Utils_Quaternion_t Quaternion = {BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9]};
-			Quaternion = Utils_RotateQuaternion(&RotateX_90, &Quaternion);
 
+			// Rotating quaternion helps stabilize values due to IMU being vertically mounted
 			Utils_Rotation_t RotateY_90 = {90.0f * M_PI/180.0f, 0.0f, 1.0f, 0.0f};
 			Quaternion = Utils_RotateQuaternion(&RotateY_90, &Quaternion);
 
 			float yaw, pitch, roll;
 			Utils_QuaternionToYPR(Quaternion.r, Quaternion.i, Quaternion.j, Quaternion.k, &yaw, &pitch, &roll);
-			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG + 90.0f;
-			CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.roll = -roll * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.pitch = roll * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.roll = pitch * RAD_TO_DEG;
 		}
 		else if(Device.Side == Right)
 		{
@@ -581,24 +574,20 @@ static void ProcessInputs(void)
 			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[3] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gz = BNO08x_IMU_Data[5] * RAD_TO_DEG;
 
-//			Utils_Rotation_t RotateY_90 = {90.0f * M_PI/180.0f, 0.0f, 1.0f, 0.0f};
 			Utils_Quaternion_t Quaternion = {BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9]};
-//			Quaternion = Utils_RotateQuaternion(&RotateY_90, &Quaternion);
+
+			// Rotating quaternion helps stabilize values due to IMU being vertically mounted
+			Utils_Rotation_t RotateY_90 = {90.0f * M_PI/180.0f, 0.0f, 1.0f, 0.0f};
+			Quaternion = Utils_RotateQuaternion(&RotateY_90, &Quaternion);
 
 			float yaw, pitch, roll;
 			Utils_QuaternionToYPR(Quaternion.r, Quaternion.i, Quaternion.j, Quaternion.k, &yaw, &pitch, &roll);
-			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG; //yaw * RAD_TO_DEG - 90.f;
-			CM_KneeJoint.IMU_Data.pitch = pitch * RAD_TO_DEG; //pitch * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.roll = roll * RAD_TO_DEG; //-roll * RAD_TO_DEG;
-
-			Quaternion.r = Quaternion.r * 10.0f;
-			Quaternion.i = Quaternion.i * 10.0f;
-			Quaternion.j = Quaternion.j * 10.0f;
-			Quaternion.k = Quaternion.k * 10.0f;
-			CM_Q = Quaternion;
+			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.pitch = -roll * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.roll = -pitch * RAD_TO_DEG;
 		}
 
-		CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
+		CM_thighAngle[0] = -(CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch);
 	}
 }
 

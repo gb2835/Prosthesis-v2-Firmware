@@ -1,7 +1,7 @@
-../Core/Src/utilities.c:29:6:Utils_DelayUs	24	static
-../Core/Src/utilities.c:36:18:Utils_CalibrateIMU	264	static
-../Core/Src/utilities.c:78:8:Utils_CalculateIMU_GlobalAngle	80	static
-../Core/Src/utilities.c:90:6:Utils_QuaternionToYPR	72	static
-../Core/Src/utilities.c:108:20:Utils_RotateQuaternion	136	static
-../Core/Src/utilities.c:135:6:Utils_Normalize	32	static
-../Core/Src/utilities.c:150:7:Utils_LinearInterpolate	32	static
+../Core/Src/utilities.c:30:6:Utils_DelayUs	24	static
+../Core/Src/utilities.c:37:18:Utils_CalibrateIMU	264	static
+../Core/Src/utilities.c:79:8:Utils_CalculateIMU_GlobalAngle	80	static
+../Core/Src/utilities.c:91:6:Utils_QuaternionToYPR	72	static
+../Core/Src/utilities.c:109:20:Utils_RotateQuaternion	136	static
+../Core/Src/utilities.c:136:6:Utils_Normalize	32	static
+../Core/Src/utilities.c:151:7:Utils_LinearInterpolate	32	static
