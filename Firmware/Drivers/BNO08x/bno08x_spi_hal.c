@@ -51,7 +51,7 @@ BNO08x_Error_e BNO08x_Init(void)
 	if(status != SH2_OK)
 		return BNO08x_InitError;
 
-	sh2_setSensorCallback(ReadEvent, NULL); // incompatible??
+	sh2_setSensorCallback(ReadEvent, NULL);
 
   	if(StartReports())
   		return BNO08x_InitError;

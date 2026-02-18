@@ -242,7 +242,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(ReadOnly);
+	RequireTestProgram(PassiveEmulation);
 
 	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint == Ankle))
 		ErrorHandler(PassiveEmulationError);

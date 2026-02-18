@@ -179,7 +179,7 @@ static float CM_threshold_ankleSpeed = -5.0f;
 static float CM_threshold_footSpeed = -5.0f;
 static float CM_threshold_intoStanceLC = 1270.0f;
 static float CM_threshold_intoSwingLC = 1270.0f;
-static float CM_threshold_passiveStancePosition = 10.0f;
+static float CM_threshold_passiveStancePosition = 10.0f; //is this needed??
 static uint8_t CM__startCPC = 0;
 static uint8_t CM_healthyStride = 0;
 
@@ -556,7 +556,7 @@ static void ProcessInputs(void)
 			Utils_Quaternion_t Quaternion = {BNO08x_IMU_Data[6], BNO08x_IMU_Data[7], BNO08x_IMU_Data[8], BNO08x_IMU_Data[9]};
 
 			// Rotating quaternion helps stabilize values due to IMU being vertically mounted
-			Utils_Rotation_t RotateY_90 = {90.0f * M_PI/180.0f, 0.0f, 1.0f, 0.0f};
+			Utils_Rotation_t RotateY_90 = {90.0f * M_PI/180.0f, 1.0f, 0.0f, 0.0f};
 			Quaternion = Utils_RotateQuaternion(&RotateY_90, &Quaternion);
 
 			float yaw, pitch, roll;
@@ -925,7 +925,33 @@ static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_
 
 static void RunPassiveEmulation(void)
 {
-	if(CM_KneeJoint.position < CM_threshold_passiveStancePosition)
+//	if(CM_KneeJoint.position < CM_threshold_passiveStancePosition)
+//	{
+//		CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
+//		CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.kp;
+//		CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
+//	}
+//	else
+//	{
+//		if(CM_KneeJoint.speed >= 0)
+//		{
+//			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
+//			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.kp;
+//			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulFlexCtrl.position;
+//		}
+//		else
+//		{
+//			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
+//			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.kp;
+//			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulExtCtrl.position;
+//		}
+//	}
+
+
+
+
+
+	if(CM_KneeJoint.position < CM_KneeJoint.PassEmulStanceCtrl.position)
 	{
 		CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
 		CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.kp;
@@ -937,15 +963,28 @@ static void RunPassiveEmulation(void)
 		{
 			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
 			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.kp;
-			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulFlexCtrl.position;
+
+			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + CM_KneeJoint.PassEmulFlexCtrl.position)
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position - CM_KneeJoint.PassEmulFlexCtrl.position;
+			else
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
 		}
 		else
 		{
 			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
 			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.kp;
-			CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulExtCtrl.position;
+
+			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + CM_KneeJoint.PassEmulExtCtrl.position)
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position - CM_KneeJoint.PassEmulExtCtrl.position;
+			else
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
 		}
 	}
+
+
+
+
+
 
 	if(Device.Joint == Combined)
 	{
