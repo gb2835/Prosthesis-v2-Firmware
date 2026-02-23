@@ -229,11 +229,11 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
 		CM_KneeJoint.PassEmulExtCtrl.kd = 0.01f;
-		CM_KneeJoint.PassEmulExtCtrl.position = 10.0f;	// Limited to PassEmulStanceCtrl.position + 1.0f
+		CM_KneeJoint.PassEmulExtCtrl.position = 10.0f;
 		CM_KneeJoint.PassEmulExtCtrl.torque = 2.0f;
 
 		CM_KneeJoint.PassEmulFlexCtrl.kd = 0.0f;
-		CM_KneeJoint.PassEmulFlexCtrl.position = 10.0f;	// Limited to PassEmulStanceCtrl.position + 1.0f
+		CM_KneeJoint.PassEmulFlexCtrl.position = 10.0f;
 		CM_KneeJoint.PassEmulFlexCtrl.torque = 2.0f;
 
 		CM_KneeJoint.PassEmulStanceCtrl.kd = 0.05f;
