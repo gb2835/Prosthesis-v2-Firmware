@@ -117,9 +117,9 @@ typedef struct
 	AKxx_x_WriteData_t SwingFlexCtrl;
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
-	AKxx_x_WriteData_t PassEmulStanceCtrl;
-	AKxx_x_WriteData_t PassEmulFlexCtrl;
 	AKxx_x_WriteData_t PassEmulExtCtrl;
+	AKxx_x_WriteData_t PassEmulFlexCtrl;
+	AKxx_x_WriteData_t PassEmulStanceCtrl;
 	CPC_Params_t CPC_Params;
 	float position;
 	float speed;
@@ -229,12 +229,12 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
 		CM_KneeJoint.PassEmulExtCtrl.kd = 0.01f;
-		CM_KneeJoint.PassEmulExtCtrl.kp = 0.2f;
 		CM_KneeJoint.PassEmulExtCtrl.position = 10.0f;
+		CM_KneeJoint.PassEmulExtCtrl.torque = 2.0f;
 
 		CM_KneeJoint.PassEmulFlexCtrl.kd = 0.0f;
-		CM_KneeJoint.PassEmulFlexCtrl.kp = 0.2f;
 		CM_KneeJoint.PassEmulFlexCtrl.position = 10.0f;
+		CM_KneeJoint.PassEmulFlexCtrl.torque = 2.0f;
 
 		CM_KneeJoint.PassEmulStanceCtrl.kd = 0.05f;
 		CM_KneeJoint.PassEmulStanceCtrl.kp = 2.0f;
@@ -909,6 +909,12 @@ static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_
 
 static void RunPassiveEmulation(void)
 {
+	// Avoid unstable kp calcs
+	if(CM_KneeJoint.PassEmulExtCtrl.position < CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f)
+		CM_KneeJoint.PassEmulExtCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f;
+	if(CM_KneeJoint.PassEmulFlexCtrl.position < CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f)
+		CM_KneeJoint.PassEmulFlexCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f;
+
 	if(CM_KneeJoint.position < CM_KneeJoint.PassEmulStanceCtrl.position)
 	{
 		CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
@@ -920,7 +926,7 @@ static void RunPassiveEmulation(void)
 		if(CM_KneeJoint.speed >= 0)
 		{
 			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.kp;
+			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.torque / (CM_KneeJoint.PassEmulFlexCtrl.position - CM_KneeJoint.PassEmulStanceCtrl.position);
 
 			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + CM_KneeJoint.PassEmulFlexCtrl.position)
 				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position - CM_KneeJoint.PassEmulFlexCtrl.position;
@@ -930,7 +936,7 @@ static void RunPassiveEmulation(void)
 		else
 		{
 			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.kp;
+			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.torque / (CM_KneeJoint.PassEmulExtCtrl.position - CM_KneeJoint.PassEmulStanceCtrl.position);
 
 			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + CM_KneeJoint.PassEmulExtCtrl.position)
 				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position - CM_KneeJoint.PassEmulExtCtrl.position;

@@ -21,9 +21,9 @@
 ../Core/Src/prosthesis_v2.c:880:13:GetTrajectory	24	static
 ../Core/Src/prosthesis_v2.c:890:13:SetCtrlParams	24	static
 ../Core/Src/prosthesis_v2.c:910:13:RunPassiveEmulation	4	static
-../Core/Src/prosthesis_v2.c:950:13:CheckMotorCalls	16	static
-../Core/Src/prosthesis_v2.c:993:13:ServiceMotor	24	static
-../Core/Src/prosthesis_v2.c:1058:6:HAL_SPI_TxCpltCallback	16	static
-../Core/Src/prosthesis_v2.c:1063:6:HAL_SPI_RxCpltCallback	16	static
-../Core/Src/prosthesis_v2.c:1068:6:HAL_CAN_RxFifo0MsgPendingCallback	16	static
-../Core/Src/prosthesis_v2.c:1076:6:HAL_CAN_RxFifo1MsgPendingCallback	16	static
+../Core/Src/prosthesis_v2.c:956:13:CheckMotorCalls	16	static
+../Core/Src/prosthesis_v2.c:999:13:ServiceMotor	24	static
+../Core/Src/prosthesis_v2.c:1064:6:HAL_SPI_TxCpltCallback	16	static
+../Core/Src/prosthesis_v2.c:1069:6:HAL_SPI_RxCpltCallback	16	static
+../Core/Src/prosthesis_v2.c:1074:6:HAL_CAN_RxFifo0MsgPendingCallback	16	static
+../Core/Src/prosthesis_v2.c:1082:6:HAL_CAN_RxFifo1MsgPendingCallback	16	static
