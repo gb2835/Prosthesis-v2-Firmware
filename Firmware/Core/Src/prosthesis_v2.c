@@ -179,7 +179,6 @@ static float CM_threshold_ankleSpeed = -5.0f;
 static float CM_threshold_footSpeed = -5.0f;
 static float CM_threshold_intoStanceLC = 1270.0f;
 static float CM_threshold_intoSwingLC = 1270.0f;
-static float CM_threshold_passiveStancePosition = 10.0f; //is this needed??
 static uint8_t CM__startCPC = 0;
 static uint8_t CM_healthyStride = 0;
 
