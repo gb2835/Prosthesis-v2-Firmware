@@ -197,6 +197,7 @@ int main(void)
 	if(HAL_CAN_Start(&hcan1))
 		ErrorHandler(CAN_Error);
 
+	uint32_t txMailbox;
 	if((Prosthesis_Init.Joint == Ankle) || (Prosthesis_Init.Joint == Combined))
 	{
 		LL_mDelay(10);
@@ -204,7 +205,6 @@ int main(void)
 	  		ErrorHandler(AnkleIMU_Error);
 		MPU925x_SetGyroSensitivity(0, MPU925x_GyroSensitivity_1000dps);
 
-		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
 		while(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
 		{
@@ -225,7 +225,6 @@ int main(void)
 	  	if(BNO08x_Init())
 	  		ErrorHandler(KneeIMU_Error);
 
-		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
 		while(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
 		{

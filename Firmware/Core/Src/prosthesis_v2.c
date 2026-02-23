@@ -979,6 +979,7 @@ static void RunPassiveEmulation(void)
 
 static void CheckMotorCalls(void)
 {
+	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
 		static uint8_t missedAnkleMotorCalls = 0;
@@ -993,7 +994,6 @@ static void CheckMotorCalls(void)
 
 		if(missedAnkleMotorCalls >= 5)
 		{
-			uint32_t txMailbox;
 			AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox);
 				if(missedAnkleMotorCalls >= 10)
 					ErrorHandler(AnkleMotorError);
@@ -1013,7 +1013,6 @@ static void CheckMotorCalls(void)
 
 		if(missedKneeMotorCalls >= 5)
 		{
-			uint32_t txMailbox;
 			AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox);
 				if(missedKneeMotorCalls >= 10)
 					ErrorHandler(KneeMotorError);
@@ -1030,6 +1029,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		ActivateLED(Green);
 	}
 
+	uint32_t txMailbox;
 	if(deviceIndex == AnkleIndex)
 	{
 		if(CM_AnkleJoint.MotorReadData.error)
@@ -1051,7 +1051,6 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 		}
 
-		uint32_t txMailbox;
 		if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
 			ErrorHandler(AnkleMotorError);
 	}
@@ -1076,7 +1075,6 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 			MotorTxData.position = (-CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 		}
 
-		uint32_t txMailbox;
 		if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
 			ErrorHandler(KneeMotorError);
 	}
