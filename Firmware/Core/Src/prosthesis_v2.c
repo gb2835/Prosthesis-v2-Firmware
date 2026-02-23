@@ -256,6 +256,21 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
+		if(testProgram == PassiveEmulation)
+		{
+			CM_KneeJoint.PassEmulExtCtrl.kd = 0.0f;
+			CM_KneeJoint.PassEmulExtCtrl.kp = 0.0f;
+			CM_KneeJoint.PassEmulExtCtrl.position = 0.0f;
+
+			CM_KneeJoint.PassEmulFlexCtrl.kd = 0.0f;
+			CM_KneeJoint.PassEmulFlexCtrl.kp = 0.0f;
+			CM_KneeJoint.PassEmulFlexCtrl.position = 0.0f;
+
+			CM_KneeJoint.PassEmulStanceCtrl.kd = 0.0f;
+			CM_KneeJoint.PassEmulStanceCtrl.kp = 0.0f;
+			CM_KneeJoint.PassEmulStanceCtrl.position = 0.0f;
+		}
+
 		switch(Device.CPC_Spec)
 		{
 		case Specific:

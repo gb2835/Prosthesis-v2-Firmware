@@ -169,6 +169,16 @@ int main(void)
 
 
 /*******************************************************************************
+* USER ADDED TEST PROGRAMS
+*******************************************************************************/
+
+	RequireTestProgram(PassiveEmulation);
+
+	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint == Ankle))
+		ErrorHandler(PassiveEmulationError);
+
+
+/*******************************************************************************
 * USER ADDED INITIALIZATIONS
 *******************************************************************************/
 
@@ -236,16 +246,6 @@ int main(void)
 		ErrorHandler(CAN_Error);
 
 	InitProsthesisControl(&Prosthesis_Init);
-
-
-/*******************************************************************************
-* USER ADDED TEST PROGRAMS
-*******************************************************************************/
-
-	RequireTestProgram(PassiveEmulation);
-
-	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint == Ankle))
-		ErrorHandler(PassiveEmulationError);
 
 
 /*******************************************************************************
