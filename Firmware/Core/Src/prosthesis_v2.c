@@ -180,6 +180,7 @@ static float CM_threshold_footSpeed = -5.0f;
 static float CM_threshold_intoStanceLC = 1270.0f;
 static float CM_threshold_intoSwingLC = 1270.0f;
 static uint8_t CM__startCPC = 0;
+static uint8_t CM__startProgram = 0;
 static uint8_t CM_healthyStride = 0;
 
 static void InitStateVals(void);
@@ -227,6 +228,18 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
+		CM_KneeJoint.PassEmulExtCtrl.kd = 0.01f;
+		CM_KneeJoint.PassEmulExtCtrl.kp = 0.2f;
+		CM_KneeJoint.PassEmulExtCtrl.position = 10.0f;
+
+		CM_KneeJoint.PassEmulFlexCtrl.kd = 0.0f;
+		CM_KneeJoint.PassEmulFlexCtrl.kp = 0.2f;
+		CM_KneeJoint.PassEmulFlexCtrl.position = 10.0f;
+
+		CM_KneeJoint.PassEmulStanceCtrl.kd = 0.05f;
+		CM_KneeJoint.PassEmulStanceCtrl.kp = 2.0f;
+		CM_KneeJoint.PassEmulStanceCtrl.position = 0.0f;
+
 		switch(Device.CPC_Spec)
 		{
 		case Specific:
@@ -996,7 +1009,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_AnkleJoint.speed = -CM_AnkleJoint.MotorReadData.speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
 		CM_AnkleJoint.torque = -CM_AnkleJoint.MotorReadData.torque * ANKLE_GEAR_RATIO;
 
-		if(testProgram == ReadOnly)
+		if((testProgram == ReadOnly) || ((testProgram == NoTestProgram) && !CM__startProgram) || ((testProgram == PassiveEmulation) && !CM__startProgram))
 		{
 			MotorTxData.kd = 0.0f;
 			MotorTxData.kp = 0.0f;
@@ -1020,7 +1033,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_KneeJoint.speed = -CM_KneeJoint.MotorReadData.speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
 		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO / 0.6f; //divide 0.6??
 
-		if(testProgram == ReadOnly)
+		if((testProgram == ReadOnly) || ((testProgram == NoTestProgram) && !CM__startProgram) || ((testProgram == PassiveEmulation) && !CM__startProgram))
 		{
 			MotorTxData.kd = 0.0f;
 			MotorTxData.kp = 0.0f;
