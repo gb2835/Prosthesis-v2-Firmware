@@ -1039,7 +1039,6 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_AnkleJoint.speed = -CM_AnkleJoint.MotorReadData.speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
 		CM_AnkleJoint.torque = -CM_AnkleJoint.MotorReadData.torque * ANKLE_GEAR_RATIO;
 
-		uint32_t txMailbox;
 		if(testProgram == ReadOnly)
 		{
 			MotorTxData.kd = 0.0f;
@@ -1052,6 +1051,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 		}
 
+		uint32_t txMailbox;
 		if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
 			ErrorHandler(AnkleMotorError);
 	}
@@ -1064,7 +1064,6 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_KneeJoint.speed = -CM_KneeJoint.MotorReadData.speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
 		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO / 0.6f; //divide 0.6??
 
-		uint32_t txMailbox;
 		if(testProgram == ReadOnly)
 		{
 			MotorTxData.kd = 0.0f;
@@ -1077,6 +1076,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 			MotorTxData.position = (-CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 		}
 
+		uint32_t txMailbox;
 		if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
 			ErrorHandler(KneeMotorError);
 	}
