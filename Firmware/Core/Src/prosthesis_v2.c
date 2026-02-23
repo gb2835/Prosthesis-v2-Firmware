@@ -219,34 +219,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
-		float startKd = 0.00f;
-		float startKp = 0.0f;
-		float startPos = 0.0f;
-
-		CM_AnkleJoint.EarlyStanceCtrl.kd = startKd;
-		CM_AnkleJoint.EarlyStanceCtrl.kp = startKp;
-		CM_AnkleJoint.EarlyStanceCtrl.position = startPos;
-
-		CM_AnkleJoint.MidStanceCtrl.kd = startKd;
-		CM_AnkleJoint.MidStanceCtrl.kp = startKp;
-		CM_AnkleJoint.MidStanceCtrl.position = startPos;
-
-		CM_AnkleJoint.LateStanceCtrl.kd = startKd;
-		CM_AnkleJoint.LateStanceCtrl.kp = startKp;
-		CM_AnkleJoint.LateStanceCtrl.position = startPos;
-
-		CM_AnkleJoint.SwingFlexCtrl.kd = startKd;
-		CM_AnkleJoint.SwingFlexCtrl.kp = startKp;
-		CM_AnkleJoint.SwingFlexCtrl.position = startPos;
-
-		CM_AnkleJoint.SwingExtCtrl.kd = startKd;
-		CM_AnkleJoint.SwingExtCtrl.kp = startKp;
-		CM_AnkleJoint.SwingExtCtrl.position = startPos;
-
-		CM_AnkleJoint.CPC_Ctrl.kd = startKd;
-		CM_AnkleJoint.CPC_Ctrl.kp = startKp;
-		CM_AnkleJoint.CPC_Ctrl.position = startPos;
-
 		MPU925x_SetChipSelect(0);
 		MPU925x_StartReadIMU_IT(0);
 
@@ -255,21 +227,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-		if(testProgram == PassiveEmulation)
-		{
-			CM_KneeJoint.PassEmulExtCtrl.kd = 0.0f;
-			CM_KneeJoint.PassEmulExtCtrl.kp = 0.0f;
-			CM_KneeJoint.PassEmulExtCtrl.position = 0.0f;
-
-			CM_KneeJoint.PassEmulFlexCtrl.kd = 0.0f;
-			CM_KneeJoint.PassEmulFlexCtrl.kp = 0.0f;
-			CM_KneeJoint.PassEmulFlexCtrl.position = 0.0f;
-
-			CM_KneeJoint.PassEmulStanceCtrl.kd = 0.0f;
-			CM_KneeJoint.PassEmulStanceCtrl.kp = 0.0f;
-			CM_KneeJoint.PassEmulStanceCtrl.position = 0.0f;
-		}
-
 		switch(Device.CPC_Spec)
 		{
 		case Specific:

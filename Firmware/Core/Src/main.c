@@ -77,7 +77,6 @@ void SystemClock_Config(void);
 
 #define LPTIM2_PERIOD	0x3F	// Timer frequency = timer clock frequency / (prescaler * (period + 1))
 
-static uint8_t CM__startProgram = 0;
 uint8_t isProsthesisControlRequired = 0;
 
 
@@ -250,15 +249,6 @@ int main(void)
 /*******************************************************************************
 * USER ADDED MAIN LOOP
 *******************************************************************************/
-
-	if(testProgram == NoTestProgram)
-	{
-		while(!CM__startProgram)
-		{
-			ActivateLED(Blue);
-		}
-		ActivateLED(NoColor);
-	}
 
 	while(1)
 	{
