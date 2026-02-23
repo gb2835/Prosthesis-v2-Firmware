@@ -229,11 +229,11 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
 		CM_KneeJoint.PassEmulExtCtrl.kd = 0.01f;
-		CM_KneeJoint.PassEmulExtCtrl.position = 10.0f;
+		CM_KneeJoint.PassEmulExtCtrl.position = 10.0f;	// Limited to PassEmulStanceCtrl.position + 1.0f
 		CM_KneeJoint.PassEmulExtCtrl.torque = 2.0f;
 
 		CM_KneeJoint.PassEmulFlexCtrl.kd = 0.0f;
-		CM_KneeJoint.PassEmulFlexCtrl.position = 10.0f;
+		CM_KneeJoint.PassEmulFlexCtrl.position = 10.0f;	// Limited to PassEmulStanceCtrl.position + 1.0f
 		CM_KneeJoint.PassEmulFlexCtrl.torque = 2.0f;
 
 		CM_KneeJoint.PassEmulStanceCtrl.kd = 0.05f;
@@ -928,8 +928,8 @@ static void RunPassiveEmulation(void)
 			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
 			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.torque / (CM_KneeJoint.PassEmulFlexCtrl.position - CM_KneeJoint.PassEmulStanceCtrl.position);
 
-			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + CM_KneeJoint.PassEmulFlexCtrl.position)
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position - CM_KneeJoint.PassEmulFlexCtrl.position;
+			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulFlexCtrl.position)
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulFlexCtrl.position + CM_KneeJoint.PassEmulStanceCtrl.position;
 			else
 				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
 		}
@@ -938,8 +938,8 @@ static void RunPassiveEmulation(void)
 			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
 			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.torque / (CM_KneeJoint.PassEmulExtCtrl.position - CM_KneeJoint.PassEmulStanceCtrl.position);
 
-			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + CM_KneeJoint.PassEmulExtCtrl.position)
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position - CM_KneeJoint.PassEmulExtCtrl.position;
+			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulExtCtrl.position)
+				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulExtCtrl.position + CM_KneeJoint.PassEmulStanceCtrl.position;
 			else
 				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
 		}
