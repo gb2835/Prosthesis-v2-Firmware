@@ -19,7 +19,7 @@ typedef enum
 {
 	Specific,
 	Winter
-} CPC_Specs_e;
+} CPC_Spec_e;
 
 typedef enum
 {
@@ -71,7 +71,7 @@ typedef enum
 
 typedef struct
 {
-	CPC_Specs_e CPC_Spec;
+	CPC_Spec_e CPC_Spec;
 	Joint_e Joint;
 	Side_e Side;
 } Prosthesis_Init_t;
