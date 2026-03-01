@@ -10,7 +10,7 @@
 * 		- Load Cell		= ADC
 * 		- Torque		= N·m
 * 		- Speed			= °/s
-* 2. Some variables are scaled to 9 to fill the plots more in CubeMonitor.
+* 2. Some variables are scaled to 9 to fill the plots better in CubeMonitor.
 *
 *******************************************************************************/
 
@@ -163,7 +163,7 @@ static uint8_t toeOff = 0;
 static AnkleJoint_t CM_AnkleJoint;
 static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1 where k is the current time step
 static float CM_cpvx9;
-static float CM_state_quadrant;
+static int8_t CM_state_quadrant;
 static float CM_trajectory;
 static float CM_xPhaseAngle, CM_yPhaseAngle;
 static float CM_state_angle, CM_state_torque, CM_state_speed, CM_state_loadCell;
@@ -724,8 +724,9 @@ static void GetCPV(void)
 	static double thighIntegral = 0.0;
 	static float maxThighIntegral_unbiased = 0.0f;
 	static float minThighIntegral_unbiased = 0.0f;
-	static float time = 0.0f;
+	static float strideTime = 0.0f;
 	static float z = 1.0f;
+	static uint8_t firstHeelStrike = 1;
 	static uint8_t quadrant[2] = {0, 0};
 
 	static float maxThighAngle_unbiased;
@@ -740,35 +741,39 @@ static void GetCPV(void)
 	{
 		heelStrike = 0;
 		kneeAngleAtHeelStrike = CM_KneeJoint.position;
-		quadrant[0] = 0;
-		quadrant[1] = 0;
 
-		thighAngle_bias = thighIntegral / time;
-
-		if(CM_healthyStride)
+		if(!firstHeelStrike)
 		{
-			CM_healthyStride = 0;
-			if(maxThighIntegral_unbiased != minThighIntegral_unbiased)
-				z = fabs(maxThighAngle_unbiased - minThighAngle_unbiased) / fabs(maxThighIntegral_unbiased - minThighIntegral_unbiased);
+			if(CM_healthyStride)
+			{
+				if(maxThighIntegral_unbiased != minThighIntegral_unbiased)
+					z = fabs(maxThighAngle_unbiased - minThighAngle_unbiased) / fabs(maxThighIntegral_unbiased - minThighIntegral_unbiased);
+			}
+
+			thighAngle_bias = thighIntegral / strideTime;
 		}
 
 		thighIntegral = 0.0f;
 		CM_thighIntegral_unbiased = 0.0f;
 		CM_healthyStride = 9;
 		CM_cpv = 0.0f;
+		quadrant[0] = 0;
+		quadrant[1] = 0;
 
 		maxThighAngle_unbiased = CM_thighAngle[0] - thighAngle_bias;
 		minThighAngle_unbiased = CM_thighAngle[0] - thighAngle_bias;
 		maxThighIntegral_unbiased = 0.0f;
 		minThighIntegral_unbiased = 0.0f;
 
-		time = 0.0;
+		strideTime = 0.0;
+
+		firstHeelStrike = 0;
 	}
 
 	CM_thighAngle_unbiased[0] = CM_thighAngle[0] - thighAngle_bias;
 	if(CM_thighAngle_unbiased[0] > maxThighAngle_unbiased)
 		maxThighAngle_unbiased = CM_thighAngle_unbiased[0];
-	if(CM_thighAngle_unbiased[0] < minThighAngle_unbiased)
+	else if(CM_thighAngle_unbiased[0] < minThighAngle_unbiased)
 		minThighAngle_unbiased = CM_thighAngle_unbiased[0];
 
 	if(!isFirst)
@@ -777,7 +782,7 @@ static void GetCPV(void)
 		CM_thighIntegral_unbiased += (CM_thighAngle_unbiased[0] + CM_thighAngle_unbiased[1]) * DT/2.0;	// trapezoidal integration used
 		if(CM_thighIntegral_unbiased > maxThighIntegral_unbiased)
 			maxThighIntegral_unbiased = CM_thighIntegral_unbiased;
-		if(CM_thighIntegral_unbiased < minThighIntegral_unbiased)
+		else if(CM_thighIntegral_unbiased < minThighIntegral_unbiased)
 			minThighIntegral_unbiased = CM_thighIntegral_unbiased;
 	}
 
@@ -786,29 +791,37 @@ static void GetCPV(void)
 
 	if((CM_xPhaseAngle < 0.0f) && (CM_yPhaseAngle <= 0.0f))
 	{
-		CM_state_quadrant = 0.0f;
+		CM_state_quadrant = 0;
 		quadrant[0] = 1;
 	}
-	if((CM_xPhaseAngle >= 0.0f) && (CM_yPhaseAngle < 0.0f))
+	else if((CM_xPhaseAngle >= 0.0f) && (CM_yPhaseAngle < 0.0f))
 	{
-		CM_state_quadrant = 3.0f;
+		CM_state_quadrant = 3;
 		quadrant[0] = 2;
 	}
-	if((CM_xPhaseAngle > 0.0f) && (CM_yPhaseAngle >= 0.0f))
+	else if((CM_xPhaseAngle > 0.0f) && (CM_yPhaseAngle >= 0.0f))
 	{
-		CM_state_quadrant = 6.0f;
+		CM_state_quadrant = 6;
 		quadrant[0] = 3;
 	}
-	if((CM_xPhaseAngle <= 0.0f) && (CM_yPhaseAngle > 0.0f))
+	else if((CM_xPhaseAngle <= 0.0f) && (CM_yPhaseAngle > 0.0f))
 	{
-		CM_state_quadrant = 9.0f;
+		CM_state_quadrant = 9;
 		quadrant[0] = 4;
 	}
+	else
+	{
+		CM_healthyStride = 0;
+		CM_state_quadrant = -1;
+		quadrant[0] = 0;
+		quadrant[1] = 0;
+	}
+
+	if((quadrant[0] == 1) && (quadrant[1] == 4))
+		quadrant[0] = 4;
 
 	if(CM_healthyStride)
 	{
-		if((quadrant[0] == 1) && (quadrant[1] == 4))
-			quadrant[0] = 4;
 		if(quadrant[0] >= quadrant[1])
 			CM_healthyStride = 9;
 		else
@@ -824,7 +837,7 @@ static void GetCPV(void)
 	CM_thighAngle_unbiased[1] = CM_thighAngle_unbiased[0];
 	quadrant[1] = quadrant[0];
 
-	time += DT;
+	strideTime += DT;
 }
 
 static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3)
