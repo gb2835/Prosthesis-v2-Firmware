@@ -220,6 +220,10 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
+		CM_AnkleJoint.PassEmulCtrl.kd = 0.0f;
+		CM_AnkleJoint.PassEmulCtrl.kp = 2.0f;
+		CM_AnkleJoint.PassEmulCtrl.position = 0.0f;
+
 		MPU925x_SetChipSelect(0);
 		MPU925x_StartReadIMU_IT(0);
 
@@ -228,13 +232,13 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-		CM_KneeJoint.PassEmulExtCtrl.kd = 0.01f;
-		CM_KneeJoint.PassEmulExtCtrl.position = 10.0f;
-		CM_KneeJoint.PassEmulExtCtrl.torque = 2.0f;
+		CM_KneeJoint.PassEmulExtCtrl.kd = 0.0f;
+		CM_KneeJoint.PassEmulExtCtrl.position = 0.0f;
+		CM_KneeJoint.PassEmulExtCtrl.torque = 0.0f;
 
 		CM_KneeJoint.PassEmulFlexCtrl.kd = 0.0f;
-		CM_KneeJoint.PassEmulFlexCtrl.position = 10.0f;
-		CM_KneeJoint.PassEmulFlexCtrl.torque = 2.0f;
+		CM_KneeJoint.PassEmulFlexCtrl.position = 0.0f;
+		CM_KneeJoint.PassEmulFlexCtrl.torque = 0.0f;
 
 		CM_KneeJoint.PassEmulStanceCtrl.kd = 0.05f;
 		CM_KneeJoint.PassEmulStanceCtrl.kp = 2.0f;
