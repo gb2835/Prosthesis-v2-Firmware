@@ -161,7 +161,7 @@ static uint8_t isTestProgramRequired = 0;
 static uint8_t toeOff = 0;
 
 static AnkleJoint_t CM_AnkleJoint;
-static double CM_thighAngle[2];						// [0] = k-0, [1] = k-1 where k is the current time step
+static double CM_thighAngle[2];														// [0] = k-0, [1] = k-1 where k is the current time step
 static float CM_cpvx9;
 static int8_t CM_state_quadrant;
 static float CM_trajectory;

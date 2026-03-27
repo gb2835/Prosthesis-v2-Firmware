@@ -9,7 +9,7 @@
 * 2. Unless otherwise specified, units are
 * 		- Position		= radians
 * 		- Speed			= rad/s
-* 		- Torque		= Nm
+* 		- Torque		= N·m
 * 3. #define AKK_X_NUMBER_OF_DEVICES must be updated to (at least) the number of devices used.
 * 4. Polling is used for initialization.
 *    If interrupts are desired then HAL_CAN_ActivateNotification() must be called after AKxx_x_Init() in user application.
