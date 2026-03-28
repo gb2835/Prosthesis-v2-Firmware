@@ -4,8 +4,9 @@
 *
 * NOTES
 * 1. This driver is directly from:
-*		https://github.com/ceva-dsp/sh2-demo-nucleo/blob/main/app/demo_app.c
-* 2. Only pin names were changed in the appropriate locations.
+*		https://github.com/ceva-dsp/sh2-demo-nucleo/blob/main/app/demo_app.c;
+* 2. CTRL+F on "* USER MODIFIED " will show code modified code in this file.
+* 3. TIM2 is used for counting microseconds.
 *
 *******************************************************************************/
 
@@ -43,7 +44,7 @@
 
 
 /*******************************************************************************
-* USER ADDED CODE
+* USER MODIFIED CODE ADDED
 *******************************************************************************/
 
 #include "prosthesis_v2.h"
@@ -101,6 +102,10 @@ static bool isOpen = false;
 // ------------------------------------------------------------------------
 // Private methods
 
+/*******************************************************************************
+* USER MODIFIED RENAMED GPIO PORTS AND PINS
+*******************************************************************************/
+
 static void bootn(bool state)
 {
     HAL_GPIO_WritePin(KNEE_IMU_BT_GPIO_Port, KNEE_IMU_BT_Pin,
@@ -130,6 +135,9 @@ static void csn(bool state)
     HAL_GPIO_WritePin(KNEE_IMU_CS_GPIO_Port, KNEE_IMU_CS_Pin,
                       state ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
+
+
+/******************************************************************************/
 
 static uint32_t timeNowUs(void)
 {
@@ -320,21 +328,27 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef * hspi1)
     }
 }
 
-void HAL_SPI_ErrorCallback(SPI_HandleTypeDef * hspi1)
-{
+
 /*******************************************************************************
-* USER ADDED COMMENT OUT
+* USER MODIFIED COMMENT OUT
 *******************************************************************************/
 
+//void HAL_SPI_ErrorCallback(SPI_HandleTypeDef * hspi1)
+//{
+//
 //    // Shouldn't happen
 //    while (1);
-}
+//
+//}
 
 //// Handle SPI1 Global Interrupt
 //void SPI1_IRQHandler(void)
 //{
 //    HAL_SPI_IRQHandler(&hspi1);
 //}
+
+
+/******************************************************************************/
 
 void delayUs(uint32_t delay)
 {
