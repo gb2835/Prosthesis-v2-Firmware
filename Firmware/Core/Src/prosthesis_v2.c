@@ -220,9 +220,25 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
-		CM_AnkleJoint.PassEmulCtrl.kd = 0.0f;
-		CM_AnkleJoint.PassEmulCtrl.kp = 2.0f;
-		CM_AnkleJoint.PassEmulCtrl.position = 0.0f;
+		CM_AnkleJoint.EarlyStanceCtrl.kd = 0.05f;
+		CM_AnkleJoint.EarlyStanceCtrl.kp = 2.0f;
+		CM_AnkleJoint.EarlyStanceCtrl.position = -5.0f;
+
+		CM_AnkleJoint.MidStanceCtrl.kd = 0.05f;
+		CM_AnkleJoint.MidStanceCtrl.kp = 2.0f;
+		CM_AnkleJoint.MidStanceCtrl.position = -5.0f;
+
+		CM_AnkleJoint.LateStanceCtrl.kd = 0.05f;
+		CM_AnkleJoint.LateStanceCtrl.kp = 2.0f;
+		CM_AnkleJoint.LateStanceCtrl.position = -5.0f;
+
+		CM_AnkleJoint.SwingFlexCtrl.kd = 0.05f;
+		CM_AnkleJoint.SwingFlexCtrl.kp = 2.0f;
+		CM_AnkleJoint.SwingFlexCtrl.position = -5.0f;
+
+		CM_AnkleJoint.SwingExtCtrl.kd = 0.05f;
+		CM_AnkleJoint.SwingExtCtrl.kp = 2.0f;
+		CM_AnkleJoint.SwingExtCtrl.position = -5.0f;
 
 		MPU925x_SetChipSelect(0);
 		MPU925x_StartReadIMU_IT(0);
@@ -232,17 +248,25 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-		CM_KneeJoint.PassEmulExtCtrl.kd = 0.0f;
-		CM_KneeJoint.PassEmulExtCtrl.position = 0.0f;
-		CM_KneeJoint.PassEmulExtCtrl.torque = 0.0f;
+		CM_KneeJoint.EarlyStanceCtrl.kd = 0.05f;
+		CM_KneeJoint.EarlyStanceCtrl.kp = 2.0f;
+		CM_KneeJoint.EarlyStanceCtrl.position = 0.0f;
 
-		CM_KneeJoint.PassEmulFlexCtrl.kd = 0.0f;
-		CM_KneeJoint.PassEmulFlexCtrl.position = 0.0f;
-		CM_KneeJoint.PassEmulFlexCtrl.torque = 0.0f;
+		CM_KneeJoint.MidStanceCtrl.kd = 0.05f;
+		CM_KneeJoint.MidStanceCtrl.kp = 2.0f;
+		CM_KneeJoint.MidStanceCtrl.position = 0.0f;
 
-		CM_KneeJoint.PassEmulStanceCtrl.kd = 0.05f;
-		CM_KneeJoint.PassEmulStanceCtrl.kp = 2.0f;
-		CM_KneeJoint.PassEmulStanceCtrl.position = 0.0f;
+		CM_KneeJoint.LateStanceCtrl.kd = 0.05f;
+		CM_KneeJoint.LateStanceCtrl.kp = 2.0f;
+		CM_KneeJoint.LateStanceCtrl.position = 0.0f;
+
+		CM_KneeJoint.SwingFlexCtrl.kd = 0.05f;
+		CM_KneeJoint.SwingFlexCtrl.kp = 2.0f;
+		CM_KneeJoint.SwingFlexCtrl.position = 0.0f;
+
+		CM_KneeJoint.SwingExtCtrl.kd = 0.05f;
+		CM_KneeJoint.SwingExtCtrl.kp = 2.0f;
+		CM_KneeJoint.SwingExtCtrl.position = 0.0f;
 
 		switch(Device.CPC_Spec)
 		{
@@ -924,6 +948,7 @@ static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_
 	}
 }
 
+// do i need this still??
 static void RunPassiveEmulation(void)
 {
 	// Avoid unstable kp calcs

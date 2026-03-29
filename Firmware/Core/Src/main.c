@@ -240,7 +240,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(BypassStateMachine);
+	RequireTestProgram(NoTestProgram);
 
 	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint == Ankle))
 		ErrorHandler(PassiveEmulationError);
