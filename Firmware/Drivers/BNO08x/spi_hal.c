@@ -304,12 +304,21 @@ void HAL_GPIO_EXTI_Callback(uint16_t n)
     spiActivate();
 }
 
+
+
+/*******************************************************************************
+* USER MODIFIED COMMENT OUT
+*******************************************************************************/
+
 // Handle INTN Interrupt through STM32 HAL
 // (It, in turn, calls HAL_GPIO_EXTI_Callback, above)
-void EXTI15_10_IRQHandler(void)
-{
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
-}
+//void EXTI15_10_IRQHandler(void)
+//{
+//    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+//}
+
+
+/******************************************************************************/
 
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef * hspi1)
 {
