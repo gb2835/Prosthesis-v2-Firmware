@@ -6,7 +6,8 @@
 * 1. This driver is based on:
 *		https://github.com/ceva-dsp/sh2-demo-nucleo/blob/main/app/demo_app.c
 * 2. User may add their desired reports to StartReports() and ReadEvent().
-* 3. This driver is setup to work on SPI1.
+* 3. This driver is setup to work on SPI1 and EXTI[9:5].
+* 4. HAL_NVIC_EnableIRQ(EXTI9_5_IRQn) must be used in user application after BNO08x_Init().
 *
 *******************************************************************************/
 
@@ -16,6 +17,7 @@
 #include "sh2_err.h"
 #include "sh2_SensorValue.h"
 #include "sh2_util.h"
+#include "stm32l4xx_hal.h"
 
 #include <string.h>
 
@@ -24,7 +26,7 @@
 * PUBLIC DEFINTIONS
 *******************************************************************************/
 
-float BNO08x_IMU_Data[10] = {0,0,0,0,0,0,0,0,0,0};
+float BNO08x_IMU_Data[10] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 uint8_t BNO08x_resetOccurred = 0;
 
 
@@ -55,6 +57,9 @@ BNO08x_Error_e BNO08x_Init(void)
 
   	if(StartReports())
   		return BNO08x_InitError;
+
+	HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+	HAL_NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
 
   	isInit = 1;
 

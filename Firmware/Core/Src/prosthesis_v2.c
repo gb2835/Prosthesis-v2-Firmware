@@ -243,6 +243,8 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		MPU925x_SetChipSelect(0);
 		MPU925x_StartReadIMU_IT(0);
 
+		if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+			ErrorHandler(CAN_Error);
 		if(AKxx_x_EnterMotorCtrlMode(AnkleIndex, &txMailbox))
 			ErrorHandler(AnkleMotorError);
 	}
@@ -284,6 +286,10 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 			break;
 		}
 
+		HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+		if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
+			ErrorHandler(CAN_Error);
 		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
 			ErrorHandler(KneeMotorError);
 	}
