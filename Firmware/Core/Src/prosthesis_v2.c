@@ -481,20 +481,20 @@ static void GetInputs(void)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-//		static uint8_t missedKneeImuCalls = 0;
-//		if(BNO08x_resetOccurred)
-//		{
-//			BNO08x_resetOccurred = 0;
-//			if(BNO08x_StartReports())
-//				missedKneeImuCalls++;
-//			else
-//				missedKneeImuCalls = 0;
-//
-//			if(missedKneeImuCalls >= 5)
-//				ErrorHandler(KneeIMU_Error);
-//		}
-//
-//		BNO08x_ReadSensors();
+		static uint8_t missedKneeImuCalls = 0;
+		if(BNO08x_resetOccurred)
+		{
+			BNO08x_resetOccurred = 0;
+			if(BNO08x_StartReports())
+				missedKneeImuCalls++;
+			else
+				missedKneeImuCalls = 0;
+
+			if(missedKneeImuCalls >= 5)
+				ErrorHandler(KneeIMU_Error);
+		}
+
+		BNO08x_ReadSensors();
 	}
 }
 
