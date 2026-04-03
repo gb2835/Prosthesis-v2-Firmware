@@ -227,7 +227,7 @@
         "frequencyType": "0",
         "snapshotheader": "",
         "mode": "direct",
-        "lastImportedTime": 1774717191401,
+        "lastImportedTime": 1775058271600,
         "openStatus": true,
         "x": 370,
         "y": 100,
@@ -474,7 +474,7 @@
         "frequencyType": "0",
         "snapshotheader": "",
         "mode": "direct",
-        "lastImportedTime": 1774717202168,
+        "lastImportedTime": 1775057304905,
         "openStatus": true,
         "x": 350,
         "y": 220,
@@ -649,7 +649,7 @@
         "frequencyType": "0",
         "snapshotheader": "",
         "mode": "direct",
-        "lastImportedTime": 1774717256824,
+        "lastImportedTime": 1775058264582,
         "openStatus": true,
         "x": 390,
         "y": 780,
@@ -1193,7 +1193,7 @@
         "frequencyType": "0",
         "snapshotheader": "",
         "mode": "direct",
-        "lastImportedTime": 1774717232838,
+        "lastImportedTime": 1775218136565,
         "openStatus": false,
         "x": 360,
         "y": 520,
@@ -1403,284 +1403,14 @@
         "exefolder": "C:\\GitHub_Workspace\\Prosthesis-v2-Firmware\\Firmware\\Debug",
         "exevariablelist": [
             {
-                "address": "0x200006a5",
-                "name": "_sh2.cmdSeq",
-                "type": 1
-            },
-            {
-                "address": "0x200007e0",
-                "name": "_sh2.emptyPayloads",
-                "type": 5
-            },
-            {
-                "address": "0x200006a8",
-                "name": "_sh2.eventCallback",
-                "type": 5
-            },
-            {
-                "address": "0x200006ac",
-                "name": "_sh2.eventCookie",
-                "type": 5
-            },
-            {
-                "address": "0x200007dc",
-                "name": "_sh2.execBadPayload",
-                "type": 5
-            },
-            {
-                "address": "0x200006b8",
-                "name": "_sh2.frsData[0]",
-                "type": 5
-            },
-            {
-                "address": "0x200007d8",
-                "name": "_sh2.frsDataLen",
-                "type": 3
-            },
-            {
-                "address": "0x200006a4",
-                "name": "_sh2.lastCmdId",
-                "type": 1
-            },
-            {
-                "address": "0x200006a6",
-                "name": "_sh2.nextCmdSeq",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.calConfig.sensors",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.finishCal.status",
-                "type": 2
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.forceFlush.sensorId",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getCalConfig.pSensors",
-                "type": 5
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getCounts.pCounts",
-                "type": 5
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getCounts.sensorId",
-                "type": 1
-            },
-            {
-                "address": "0x200006a0",
-                "name": "_sh2.opData.getErrors.errsRead",
-                "type": 3
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getErrors.pErrors",
-                "type": 5
-            },
-            {
-                "address": "0x2000069c",
-                "name": "_sh2.opData.getErrors.pNumErrors",
-                "type": 5
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getErrors.severity",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getFrs.frsType",
-                "type": 3
-            },
-            {
-                "address": "0x200006a0",
-                "name": "_sh2.opData.getFrs.nextOffset",
-                "type": 3
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getFrs.pData",
-                "type": 5
-            },
-            {
-                "address": "0x2000069c",
-                "name": "_sh2.opData.getFrs.pWords",
-                "type": 5
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getOscType.pOscType",
-                "type": 5
-            },
-            {
-                "address": "0x20000699",
-                "name": "_sh2.opData.getProdIds.expectedEntries",
-                "type": 1
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getProdIds.nextEntry",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getProdIds.pProdIds",
-                "type": 5
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getSensorConfig.pConfig",
-                "type": 5
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getSensorConfig.sensorId",
-                "type": 1
-            },
-            {
-                "address": "0x20000696",
-                "name": "_sh2.opData.sendCmd.req.command",
-                "type": 1
-            },
-            {
-                "address": "0x20000697",
-                "name": "_sh2.opData.sendCmd.req.p[0]",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.sendCmd.req.reportId",
-                "type": 1
-            },
-            {
-                "address": "0x20000695",
-                "name": "_sh2.opData.sendCmd.req.seq",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.setFrs.frsType",
-                "type": 3
-            },
-            {
-                "address": "0x2000069e",
-                "name": "_sh2.opData.setFrs.offset",
-                "type": 3
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.setFrs.pData",
-                "type": 5
-            },
-            {
-                "address": "0x2000069c",
-                "name": "_sh2.opData.setFrs.words",
-                "type": 3
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.setSensorConfig.pConfig",
-                "type": 5
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.setSensorConfig.sensorId",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.startCal.interval_us",
-                "type": 5
-            },
-            {
-                "address": "0x2000069e",
-                "name": "_sh2.opData.wheelRequest.dataType",
-                "type": 1
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.wheelRequest.timestamp",
-                "type": 5
-            },
-            {
-                "address": "0x2000069c",
-                "name": "_sh2.opData.wheelRequest.wheelData",
-                "type": 4
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.wheelRequest.wheelIndex",
-                "type": 1
-            },
-            {
-                "address": "0x20000690",
-                "name": "_sh2.opStatus",
-                "type": 6
-            },
-            {
-                "address": "0x20000670",
-                "name": "_sh2.pHal",
-                "type": 5
-            },
-            {
-                "address": "0x2000068c",
-                "name": "_sh2.pOp",
-                "type": 5
-            },
-            {
-                "address": "0x20000674",
-                "name": "_sh2.pShtp",
-                "type": 5
-            },
-            {
-                "address": "0x20000678",
-                "name": "_sh2.resetComplete",
-                "type": 1
-            },
-            {
-                "address": "0x200006b0",
-                "name": "_sh2.sensorCallback",
-                "type": 5
-            },
-            {
-                "address": "0x200006b4",
-                "name": "_sh2.sensorCookie",
-                "type": 5
-            },
-            {
-                "address": "0x200007e4",
-                "name": "_sh2.unknownReportIds",
-                "type": 5
-            },
-            {
-                "address": "0x20000679",
-                "name": "_sh2.version[0]",
-                "type": 2
-            },
-            {
                 "address": "0x20000028",
                 "name": "accelSensitivity",
                 "type": 10
             },
             {
-                "address": "0x20001124",
+                "address": "0x20000668",
                 "name": "BNO08x_IMU_Data[0]",
                 "type": 9
-            },
-            {
-                "address": "0x2000114c",
-                "name": "BNO08x_resetOccurred",
-                "type": 1
             },
             {
                 "address": "0x20000514",
@@ -2533,19 +2263,109 @@
                 "type": 9
             },
             {
-                "address": "0x20000228",
-                "name": "Device.CPC_Spec",
+                "address": "0x20000638",
+                "name": "Device.InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x2000063a",
+                "name": "Device.InitVals.Motor",
                 "type": 2
             },
             {
-                "address": "0x20000229",
-                "name": "Device.Joint",
+                "address": "0x2000064c",
+                "name": "Device.isInit",
+                "type": 1
+            },
+            {
+                "address": "0x2000063c",
+                "name": "Device.speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device.speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device.torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device.torqueMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000638",
+                "name": "Device[0].InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x20000638",
+                "name": "Device[0].InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x2000063a",
+                "name": "Device[0].InitVals.Motor",
                 "type": 2
             },
             {
-                "address": "0x2000022a",
-                "name": "Device.Side",
+                "address": "0x2000063a",
+                "name": "Device[0].InitVals.Motor",
                 "type": 2
+            },
+            {
+                "address": "0x2000064c",
+                "name": "Device[0].isInit",
+                "type": 1
+            },
+            {
+                "address": "0x2000064c",
+                "name": "Device[0].isInit",
+                "type": 1
+            },
+            {
+                "address": "0x2000063c",
+                "name": "Device[0].speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x2000063c",
+                "name": "Device[0].speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device[0].speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device[0].speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device[0].torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device[0].torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device[0].torqueMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device[0].torqueMin",
+                "type": 9
             },
             {
                 "address": "0x20000030",
@@ -2628,212 +2448,212 @@
                 "type": 1
             },
             {
-                "address": "0x200005d8",
+                "address": "0x200005d0",
                 "name": "hspi1.CRCSize",
                 "type": 5
             },
             {
-                "address": "0x200005f0",
+                "address": "0x200005e8",
                 "name": "hspi1.ErrorCode",
                 "type": 5
             },
             {
-                "address": "0x200005e8",
+                "address": "0x200005e0",
                 "name": "hspi1.hdmarx",
                 "type": 5
             },
             {
-                "address": "0x200005e4",
+                "address": "0x200005dc",
                 "name": "hspi1.hdmatx",
                 "type": 5
             },
             {
-                "address": "0x200005ac",
+                "address": "0x200005a4",
                 "name": "hspi1.Init.BaudRatePrescaler",
                 "type": 5
             },
             {
-                "address": "0x200005a4",
+                "address": "0x2000059c",
                 "name": "hspi1.Init.CLKPhase",
                 "type": 5
             },
             {
-                "address": "0x200005a0",
+                "address": "0x20000598",
                 "name": "hspi1.Init.CLKPolarity",
                 "type": 5
             },
             {
-                "address": "0x200005b8",
+                "address": "0x200005b0",
                 "name": "hspi1.Init.CRCCalculation",
                 "type": 5
             },
             {
-                "address": "0x200005c0",
+                "address": "0x200005b8",
                 "name": "hspi1.Init.CRCLength",
                 "type": 5
             },
             {
-                "address": "0x200005bc",
+                "address": "0x200005b4",
                 "name": "hspi1.Init.CRCPolynomial",
                 "type": 5
             },
             {
-                "address": "0x2000059c",
+                "address": "0x20000594",
                 "name": "hspi1.Init.DataSize",
                 "type": 5
             },
             {
-                "address": "0x20000598",
+                "address": "0x20000590",
                 "name": "hspi1.Init.Direction",
                 "type": 5
             },
             {
-                "address": "0x200005b0",
+                "address": "0x200005a8",
                 "name": "hspi1.Init.FirstBit",
                 "type": 5
             },
             {
-                "address": "0x20000594",
+                "address": "0x2000058c",
                 "name": "hspi1.Init.Mode",
                 "type": 5
             },
             {
-                "address": "0x200005a8",
+                "address": "0x200005a0",
                 "name": "hspi1.Init.NSS",
                 "type": 5
             },
             {
-                "address": "0x200005c4",
+                "address": "0x200005bc",
                 "name": "hspi1.Init.NSSPMode",
                 "type": 5
             },
             {
-                "address": "0x200005b4",
+                "address": "0x200005ac",
                 "name": "hspi1.Init.TIMode",
                 "type": 5
             },
             {
-                "address": "0x20000590",
+                "address": "0x20000588",
                 "name": "hspi1.Instance",
                 "type": 5
             },
             {
-                "address": "0x200005ec",
+                "address": "0x200005e4",
                 "name": "hspi1.Lock",
                 "type": 2
             },
             {
-                "address": "0x200005d0",
+                "address": "0x200005c8",
                 "name": "hspi1.pRxBuffPtr",
                 "type": 5
             },
             {
-                "address": "0x200005c8",
+                "address": "0x200005c0",
                 "name": "hspi1.pTxBuffPtr",
                 "type": 5
             },
             {
-                "address": "0x200005dc",
+                "address": "0x200005d4",
                 "name": "hspi1.RxISR",
                 "type": 5
             },
             {
-                "address": "0x200005d6",
+                "address": "0x200005ce",
                 "name": "hspi1.RxXferCount",
                 "type": 3
             },
             {
-                "address": "0x200005d4",
+                "address": "0x200005cc",
                 "name": "hspi1.RxXferSize",
                 "type": 3
             },
             {
-                "address": "0x200005ed",
+                "address": "0x200005e5",
                 "name": "hspi1.State",
                 "type": 2
             },
             {
-                "address": "0x200005e0",
+                "address": "0x200005d8",
                 "name": "hspi1.TxISR",
                 "type": 5
             },
             {
-                "address": "0x200005ce",
+                "address": "0x200005c6",
                 "name": "hspi1.TxXferCount",
                 "type": 3
             },
             {
-                "address": "0x200005cc",
+                "address": "0x200005c4",
                 "name": "hspi1.TxXferSize",
                 "type": 3
             },
             {
-                "address": "0x20000610",
+                "address": "0x20000608",
                 "name": "htim2.Channel",
                 "type": 2
             },
             {
-                "address": "0x20000638",
+                "address": "0x20000630",
                 "name": "htim2.ChannelNState[0]",
                 "type": 2
             },
             {
-                "address": "0x20000632",
+                "address": "0x2000062a",
                 "name": "htim2.ChannelState[0]",
                 "type": 2
             },
             {
-                "address": "0x2000063c",
+                "address": "0x20000634",
                 "name": "htim2.DMABurstState",
                 "type": 2
             },
             {
-                "address": "0x20000614",
+                "address": "0x2000060c",
                 "name": "htim2.hdma[0]",
                 "type": 5
             },
             {
-                "address": "0x2000060c",
+                "address": "0x20000604",
                 "name": "htim2.Init.AutoReloadPreload",
                 "type": 5
             },
             {
-                "address": "0x20000604",
+                "address": "0x200005fc",
                 "name": "htim2.Init.ClockDivision",
                 "type": 5
             },
             {
-                "address": "0x200005fc",
+                "address": "0x200005f4",
                 "name": "htim2.Init.CounterMode",
                 "type": 5
             },
             {
-                "address": "0x20000600",
+                "address": "0x200005f8",
                 "name": "htim2.Init.Period",
                 "type": 5
             },
             {
-                "address": "0x200005f8",
+                "address": "0x200005f0",
                 "name": "htim2.Init.Prescaler",
                 "type": 5
             },
             {
-                "address": "0x20000608",
+                "address": "0x20000600",
                 "name": "htim2.Init.RepetitionCounter",
                 "type": 5
             },
             {
-                "address": "0x200005f4",
+                "address": "0x200005ec",
                 "name": "htim2.Instance",
                 "type": 5
             },
             {
-                "address": "0x20000630",
+                "address": "0x20000628",
                 "name": "htim2.Lock",
                 "type": 2
             },
             {
-                "address": "0x20000631",
+                "address": "0x20000629",
                 "name": "htim2.State",
                 "type": 2
             },
@@ -2883,114 +2703,9 @@
                 "type": 1
             },
             {
-                "address": "0x20001154",
+                "address": "0x20000698",
                 "name": "inReset",
                 "type": 1
-            },
-            {
-                "address": "0x20001114",
-                "name": "instances[0].badTxChan",
-                "type": 5
-            },
-            {
-                "address": "0x200010a8",
-                "name": "instances[0].chan[0].callback",
-                "type": 5
-            },
-            {
-                "address": "0x200010ac",
-                "name": "instances[0].chan[0].cookie",
-                "type": 5
-            },
-            {
-                "address": "0x200010a5",
-                "name": "instances[0].chan[0].nextInSeq",
-                "type": 1
-            },
-            {
-                "address": "0x200010a4",
-                "name": "instances[0].chan[0].nextOutSeq",
-                "type": 1
-            },
-            {
-                "address": "0x20000810",
-                "name": "instances[0].eventCallback",
-                "type": 5
-            },
-            {
-                "address": "0x20000814",
-                "name": "instances[0].eventCookie",
-                "type": 5
-            },
-            {
-                "address": "0x2000089a",
-                "name": "instances[0].inChan",
-                "type": 1
-            },
-            {
-                "address": "0x20000c9c",
-                "name": "instances[0].inCursor",
-                "type": 3
-            },
-            {
-                "address": "0x2000089b",
-                "name": "instances[0].inPayload[0]",
-                "type": 1
-            },
-            {
-                "address": "0x20000898",
-                "name": "instances[0].inRemaining",
-                "type": 3
-            },
-            {
-                "address": "0x20000ca0",
-                "name": "instances[0].inTimestamp",
-                "type": 5
-            },
-            {
-                "address": "0x20000ca4",
-                "name": "instances[0].inTransfer[0]",
-                "type": 1
-            },
-            {
-                "address": "0x20000818",
-                "name": "instances[0].outTransfer[0]",
-                "type": 1
-            },
-            {
-                "address": "0x2000080c",
-                "name": "instances[0].pHal",
-                "type": 5
-            },
-            {
-                "address": "0x20001104",
-                "name": "instances[0].rxBadChan",
-                "type": 5
-            },
-            {
-                "address": "0x20001110",
-                "name": "instances[0].rxInterruptedPayloads",
-                "type": 5
-            },
-            {
-                "address": "0x20001108",
-                "name": "instances[0].rxShortFragments",
-                "type": 5
-            },
-            {
-                "address": "0x2000110c",
-                "name": "instances[0].rxTooLargePayloads",
-                "type": 5
-            },
-            {
-                "address": "0x20001118",
-                "name": "instances[0].txDiscards",
-                "type": 5
-            },
-            {
-                "address": "0x2000111c",
-                "name": "instances[0].txTooLargePayloads",
-                "type": 5
             },
             {
                 "address": "0x20000001",
@@ -2998,12 +2713,7 @@
                 "type": 1
             },
             {
-                "address": "0x2000114d",
-                "name": "isInit",
-                "type": 1
-            },
-            {
-                "address": "0x200015f8",
+                "address": "0x20000b24",
                 "name": "isOpen",
                 "type": 1
             },
@@ -3054,97 +2764,27 @@
                 "type": 9
             },
             {
-                "address": "0x20001158",
+                "address": "0x2000069c",
                 "name": "rxBuf[0]",
                 "type": 1
             },
             {
-                "address": "0x20001558",
+                "address": "0x20000a9c",
                 "name": "rxBufLen",
                 "type": 5
             },
             {
-                "address": "0x2000155c",
-                "name": "rxDataReady",
-                "type": 1
-            },
-            {
-                "address": "0x20001155",
+                "address": "0x20000699",
                 "name": "rxReady",
                 "type": 1
             },
             {
-                "address": "0x20001150",
+                "address": "0x20000694",
                 "name": "rxTimestamp_us",
                 "type": 5
             },
             {
-                "address": "0x0800dfd4",
-                "name": "setSensorConfigOp.onReset",
-                "type": 5
-            },
-            {
-                "address": "0x0800dfd0",
-                "name": "setSensorConfigOp.rx",
-                "type": 5
-            },
-            {
-                "address": "0x0800dfcc",
-                "name": "setSensorConfigOp.start",
-                "type": 5
-            },
-            {
-                "address": "0x0800dfc8",
-                "name": "setSensorConfigOp.timeout_us",
-                "type": 5
-            },
-            {
-                "address": "0x200007e8",
-                "name": "sh2AsyncEvent.eventId",
-                "type": 5
-            },
-            {
-                "address": "0x200015e8",
-                "name": "sh2Hal.close",
-                "type": 5
-            },
-            {
-                "address": "0x200015f4",
-                "name": "sh2Hal.getTimeUs",
-                "type": 5
-            },
-            {
-                "address": "0x200015e4",
-                "name": "sh2Hal.open",
-                "type": 5
-            },
-            {
-                "address": "0x200015ec",
-                "name": "sh2Hal.read",
-                "type": 5
-            },
-            {
-                "address": "0x200015f0",
-                "name": "sh2Hal.write",
-                "type": 5
-            },
-            {
-                "address": "0x0800df68",
-                "name": "sh2ReportLens[0].id",
-                "type": 1
-            },
-            {
-                "address": "0x0800df69",
-                "name": "sh2ReportLens[0].len",
-                "type": 1
-            },
-            {
-                "address": "0x20001120",
-                "name": "shtp_initialized",
-                "type": 1
-            },
-            {
-                "address": "0x2000114e",
+                "address": "0x20000690",
                 "name": "spiState",
                 "type": 2
             },
@@ -3169,22 +2809,22 @@
                 "type": 1
             },
             {
-                "address": "0x20001560",
+                "address": "0x20000aa0",
                 "name": "txBuf[0]",
                 "type": 1
             },
             {
-                "address": "0x200015e0",
+                "address": "0x20000b20",
                 "name": "txBufLen",
                 "type": 5
             },
             {
-                "address": "0x0800e020",
+                "address": "0x0800b110",
                 "name": "txZeros[0]",
                 "type": 1
             },
             {
-                "address": "0x2000160c",
+                "address": "0x20000b38",
                 "name": "uwTick",
                 "type": 5
             },
@@ -3201,8 +2841,8 @@
         ],
         "expand": false,
         "filename": "prosthesis_v2.elf",
-        "exeModifiedTime": 1774716958791,
-        "configLastUpdate": 1774717191066
+        "exeModifiedTime": 1775058154341,
+        "configLastUpdate": 1775058271272
     },
     {
         "id": "9327f3b77304ff57",
@@ -5021,267 +4661,267 @@
         "exefolder": "C:\\GitHub_Workspace\\Prosthesis-v2-Firmware\\Firmware\\Debug",
         "exevariablelist": [
             {
-                "address": "0x200006a5",
+                "address": "0x2000069d",
                 "name": "_sh2.cmdSeq",
                 "type": 1
             },
             {
-                "address": "0x200007e0",
+                "address": "0x200007d8",
                 "name": "_sh2.emptyPayloads",
                 "type": 5
             },
             {
-                "address": "0x200006a8",
+                "address": "0x200006a0",
                 "name": "_sh2.eventCallback",
                 "type": 5
             },
             {
-                "address": "0x200006ac",
+                "address": "0x200006a4",
                 "name": "_sh2.eventCookie",
                 "type": 5
             },
             {
-                "address": "0x200007dc",
+                "address": "0x200007d4",
                 "name": "_sh2.execBadPayload",
                 "type": 5
             },
             {
-                "address": "0x200006b8",
+                "address": "0x200006b0",
                 "name": "_sh2.frsData[0]",
                 "type": 5
             },
             {
-                "address": "0x200007d8",
+                "address": "0x200007d0",
                 "name": "_sh2.frsDataLen",
                 "type": 3
             },
             {
-                "address": "0x200006a4",
+                "address": "0x2000069c",
                 "name": "_sh2.lastCmdId",
                 "type": 1
             },
             {
-                "address": "0x200006a6",
+                "address": "0x2000069e",
                 "name": "_sh2.nextCmdSeq",
                 "type": 1
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.calConfig.sensors",
                 "type": 1
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.finishCal.status",
                 "type": 2
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.forceFlush.sensorId",
                 "type": 1
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.getCalConfig.pSensors",
                 "type": 5
             },
             {
-                "address": "0x20000698",
+                "address": "0x20000690",
                 "name": "_sh2.opData.getCounts.pCounts",
                 "type": 5
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.getCounts.sensorId",
                 "type": 1
             },
             {
-                "address": "0x200006a0",
+                "address": "0x20000698",
                 "name": "_sh2.opData.getErrors.errsRead",
                 "type": 3
             },
             {
-                "address": "0x20000698",
+                "address": "0x20000690",
                 "name": "_sh2.opData.getErrors.pErrors",
                 "type": 5
             },
             {
-                "address": "0x2000069c",
+                "address": "0x20000694",
                 "name": "_sh2.opData.getErrors.pNumErrors",
                 "type": 5
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.getErrors.severity",
                 "type": 1
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.getFrs.frsType",
                 "type": 3
             },
             {
-                "address": "0x200006a0",
+                "address": "0x20000698",
                 "name": "_sh2.opData.getFrs.nextOffset",
                 "type": 3
             },
             {
-                "address": "0x20000698",
+                "address": "0x20000690",
                 "name": "_sh2.opData.getFrs.pData",
                 "type": 5
             },
             {
-                "address": "0x2000069c",
+                "address": "0x20000694",
                 "name": "_sh2.opData.getFrs.pWords",
                 "type": 5
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.getOscType.pOscType",
                 "type": 5
             },
             {
-                "address": "0x20000699",
+                "address": "0x20000691",
                 "name": "_sh2.opData.getProdIds.expectedEntries",
                 "type": 1
             },
             {
-                "address": "0x20000698",
+                "address": "0x20000690",
                 "name": "_sh2.opData.getProdIds.nextEntry",
                 "type": 1
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.getProdIds.pProdIds",
                 "type": 5
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.getSensorConfig.pConfig",
                 "type": 5
             },
             {
-                "address": "0x20000698",
+                "address": "0x20000690",
                 "name": "_sh2.opData.getSensorConfig.sensorId",
                 "type": 1
             },
             {
-                "address": "0x20000696",
+                "address": "0x2000068e",
                 "name": "_sh2.opData.sendCmd.req.command",
                 "type": 1
             },
             {
-                "address": "0x20000697",
+                "address": "0x2000068f",
                 "name": "_sh2.opData.sendCmd.req.p[0]",
                 "type": 1
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.sendCmd.req.reportId",
                 "type": 1
             },
             {
-                "address": "0x20000695",
+                "address": "0x2000068d",
                 "name": "_sh2.opData.sendCmd.req.seq",
                 "type": 1
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.setFrs.frsType",
                 "type": 3
             },
             {
-                "address": "0x2000069e",
+                "address": "0x20000696",
                 "name": "_sh2.opData.setFrs.offset",
                 "type": 3
             },
             {
-                "address": "0x20000698",
+                "address": "0x20000690",
                 "name": "_sh2.opData.setFrs.pData",
                 "type": 5
             },
             {
-                "address": "0x2000069c",
+                "address": "0x20000694",
                 "name": "_sh2.opData.setFrs.words",
                 "type": 3
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.setSensorConfig.pConfig",
                 "type": 5
             },
             {
-                "address": "0x20000698",
+                "address": "0x20000690",
                 "name": "_sh2.opData.setSensorConfig.sensorId",
                 "type": 1
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.startCal.interval_us",
                 "type": 5
             },
             {
-                "address": "0x2000069e",
+                "address": "0x20000696",
                 "name": "_sh2.opData.wheelRequest.dataType",
                 "type": 1
             },
             {
-                "address": "0x20000698",
+                "address": "0x20000690",
                 "name": "_sh2.opData.wheelRequest.timestamp",
                 "type": 5
             },
             {
-                "address": "0x2000069c",
+                "address": "0x20000694",
                 "name": "_sh2.opData.wheelRequest.wheelData",
                 "type": 4
             },
             {
-                "address": "0x20000694",
+                "address": "0x2000068c",
                 "name": "_sh2.opData.wheelRequest.wheelIndex",
                 "type": 1
             },
             {
-                "address": "0x20000690",
+                "address": "0x20000688",
                 "name": "_sh2.opStatus",
                 "type": 6
             },
             {
-                "address": "0x20000670",
+                "address": "0x20000668",
                 "name": "_sh2.pHal",
                 "type": 5
             },
             {
-                "address": "0x2000068c",
+                "address": "0x20000684",
                 "name": "_sh2.pOp",
                 "type": 5
             },
             {
-                "address": "0x20000674",
+                "address": "0x2000066c",
                 "name": "_sh2.pShtp",
                 "type": 5
             },
             {
-                "address": "0x20000678",
+                "address": "0x20000670",
                 "name": "_sh2.resetComplete",
                 "type": 1
             },
             {
-                "address": "0x200006b0",
+                "address": "0x200006a8",
                 "name": "_sh2.sensorCallback",
                 "type": 5
             },
             {
-                "address": "0x200006b4",
+                "address": "0x200006ac",
                 "name": "_sh2.sensorCookie",
                 "type": 5
             },
             {
-                "address": "0x200007e4",
+                "address": "0x200007dc",
                 "name": "_sh2.unknownReportIds",
                 "type": 5
             },
             {
-                "address": "0x20000679",
+                "address": "0x20000671",
                 "name": "_sh2.version[0]",
                 "type": 2
             },
@@ -5291,12 +4931,12 @@
                 "type": 10
             },
             {
-                "address": "0x20001124",
+                "address": "0x2000111c",
                 "name": "BNO08x_IMU_Data[0]",
                 "type": 9
             },
             {
-                "address": "0x2000114c",
+                "address": "0x20001144",
                 "name": "BNO08x_resetOccurred",
                 "type": 1
             },
@@ -6147,19 +5787,109 @@
                 "type": 9
             },
             {
-                "address": "0x20000228",
-                "name": "Device.CPC_Spec",
+                "address": "0x20000638",
+                "name": "Device.InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x2000063a",
+                "name": "Device.InitVals.Motor",
                 "type": 2
             },
             {
-                "address": "0x20000229",
-                "name": "Device.Joint",
+                "address": "0x2000064c",
+                "name": "Device.isInit",
+                "type": 1
+            },
+            {
+                "address": "0x2000063c",
+                "name": "Device.speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device.speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device.torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device.torqueMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000638",
+                "name": "Device[0].InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x20000638",
+                "name": "Device[0].InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x2000063a",
+                "name": "Device[0].InitVals.Motor",
                 "type": 2
             },
             {
-                "address": "0x2000022a",
-                "name": "Device.Side",
+                "address": "0x2000063a",
+                "name": "Device[0].InitVals.Motor",
                 "type": 2
+            },
+            {
+                "address": "0x2000064c",
+                "name": "Device[0].isInit",
+                "type": 1
+            },
+            {
+                "address": "0x2000064c",
+                "name": "Device[0].isInit",
+                "type": 1
+            },
+            {
+                "address": "0x2000063c",
+                "name": "Device[0].speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x2000063c",
+                "name": "Device[0].speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device[0].speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device[0].speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device[0].torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device[0].torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device[0].torqueMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device[0].torqueMin",
+                "type": 9
             },
             {
                 "address": "0x20000030",
@@ -6242,212 +5972,212 @@
                 "type": 1
             },
             {
-                "address": "0x200005d8",
+                "address": "0x200005d0",
                 "name": "hspi1.CRCSize",
                 "type": 5
             },
             {
-                "address": "0x200005f0",
+                "address": "0x200005e8",
                 "name": "hspi1.ErrorCode",
                 "type": 5
             },
             {
-                "address": "0x200005e8",
+                "address": "0x200005e0",
                 "name": "hspi1.hdmarx",
                 "type": 5
             },
             {
-                "address": "0x200005e4",
+                "address": "0x200005dc",
                 "name": "hspi1.hdmatx",
                 "type": 5
             },
             {
-                "address": "0x200005ac",
+                "address": "0x200005a4",
                 "name": "hspi1.Init.BaudRatePrescaler",
                 "type": 5
             },
             {
-                "address": "0x200005a4",
+                "address": "0x2000059c",
                 "name": "hspi1.Init.CLKPhase",
                 "type": 5
             },
             {
-                "address": "0x200005a0",
+                "address": "0x20000598",
                 "name": "hspi1.Init.CLKPolarity",
                 "type": 5
             },
             {
-                "address": "0x200005b8",
+                "address": "0x200005b0",
                 "name": "hspi1.Init.CRCCalculation",
                 "type": 5
             },
             {
-                "address": "0x200005c0",
+                "address": "0x200005b8",
                 "name": "hspi1.Init.CRCLength",
                 "type": 5
             },
             {
-                "address": "0x200005bc",
+                "address": "0x200005b4",
                 "name": "hspi1.Init.CRCPolynomial",
                 "type": 5
             },
             {
-                "address": "0x2000059c",
+                "address": "0x20000594",
                 "name": "hspi1.Init.DataSize",
                 "type": 5
             },
             {
-                "address": "0x20000598",
+                "address": "0x20000590",
                 "name": "hspi1.Init.Direction",
                 "type": 5
             },
             {
-                "address": "0x200005b0",
+                "address": "0x200005a8",
                 "name": "hspi1.Init.FirstBit",
                 "type": 5
             },
             {
-                "address": "0x20000594",
+                "address": "0x2000058c",
                 "name": "hspi1.Init.Mode",
                 "type": 5
             },
             {
-                "address": "0x200005a8",
+                "address": "0x200005a0",
                 "name": "hspi1.Init.NSS",
                 "type": 5
             },
             {
-                "address": "0x200005c4",
+                "address": "0x200005bc",
                 "name": "hspi1.Init.NSSPMode",
                 "type": 5
             },
             {
-                "address": "0x200005b4",
+                "address": "0x200005ac",
                 "name": "hspi1.Init.TIMode",
                 "type": 5
             },
             {
-                "address": "0x20000590",
+                "address": "0x20000588",
                 "name": "hspi1.Instance",
                 "type": 5
             },
             {
-                "address": "0x200005ec",
+                "address": "0x200005e4",
                 "name": "hspi1.Lock",
                 "type": 2
             },
             {
-                "address": "0x200005d0",
+                "address": "0x200005c8",
                 "name": "hspi1.pRxBuffPtr",
                 "type": 5
             },
             {
-                "address": "0x200005c8",
+                "address": "0x200005c0",
                 "name": "hspi1.pTxBuffPtr",
                 "type": 5
             },
             {
-                "address": "0x200005dc",
+                "address": "0x200005d4",
                 "name": "hspi1.RxISR",
                 "type": 5
             },
             {
-                "address": "0x200005d6",
+                "address": "0x200005ce",
                 "name": "hspi1.RxXferCount",
                 "type": 3
             },
             {
-                "address": "0x200005d4",
+                "address": "0x200005cc",
                 "name": "hspi1.RxXferSize",
                 "type": 3
             },
             {
-                "address": "0x200005ed",
+                "address": "0x200005e5",
                 "name": "hspi1.State",
                 "type": 2
             },
             {
-                "address": "0x200005e0",
+                "address": "0x200005d8",
                 "name": "hspi1.TxISR",
                 "type": 5
             },
             {
-                "address": "0x200005ce",
+                "address": "0x200005c6",
                 "name": "hspi1.TxXferCount",
                 "type": 3
             },
             {
-                "address": "0x200005cc",
+                "address": "0x200005c4",
                 "name": "hspi1.TxXferSize",
                 "type": 3
             },
             {
-                "address": "0x20000610",
+                "address": "0x20000608",
                 "name": "htim2.Channel",
                 "type": 2
             },
             {
-                "address": "0x20000638",
+                "address": "0x20000630",
                 "name": "htim2.ChannelNState[0]",
                 "type": 2
             },
             {
-                "address": "0x20000632",
+                "address": "0x2000062a",
                 "name": "htim2.ChannelState[0]",
                 "type": 2
             },
             {
-                "address": "0x2000063c",
+                "address": "0x20000634",
                 "name": "htim2.DMABurstState",
                 "type": 2
             },
             {
-                "address": "0x20000614",
+                "address": "0x2000060c",
                 "name": "htim2.hdma[0]",
                 "type": 5
             },
             {
-                "address": "0x2000060c",
+                "address": "0x20000604",
                 "name": "htim2.Init.AutoReloadPreload",
                 "type": 5
             },
             {
-                "address": "0x20000604",
+                "address": "0x200005fc",
                 "name": "htim2.Init.ClockDivision",
                 "type": 5
             },
             {
-                "address": "0x200005fc",
+                "address": "0x200005f4",
                 "name": "htim2.Init.CounterMode",
                 "type": 5
             },
             {
-                "address": "0x20000600",
+                "address": "0x200005f8",
                 "name": "htim2.Init.Period",
                 "type": 5
             },
             {
-                "address": "0x200005f8",
+                "address": "0x200005f0",
                 "name": "htim2.Init.Prescaler",
                 "type": 5
             },
             {
-                "address": "0x20000608",
+                "address": "0x20000600",
                 "name": "htim2.Init.RepetitionCounter",
                 "type": 5
             },
             {
-                "address": "0x200005f4",
+                "address": "0x200005ec",
                 "name": "htim2.Instance",
                 "type": 5
             },
             {
-                "address": "0x20000630",
+                "address": "0x20000628",
                 "name": "htim2.Lock",
                 "type": 2
             },
             {
-                "address": "0x20000631",
+                "address": "0x20000629",
                 "name": "htim2.State",
                 "type": 2
             },
@@ -6497,112 +6227,112 @@
                 "type": 1
             },
             {
-                "address": "0x20001154",
+                "address": "0x2000114c",
                 "name": "inReset",
                 "type": 1
             },
             {
-                "address": "0x20001114",
+                "address": "0x2000110c",
                 "name": "instances[0].badTxChan",
                 "type": 5
             },
             {
-                "address": "0x200010a8",
+                "address": "0x200010a0",
                 "name": "instances[0].chan[0].callback",
                 "type": 5
             },
             {
-                "address": "0x200010ac",
+                "address": "0x200010a4",
                 "name": "instances[0].chan[0].cookie",
                 "type": 5
             },
             {
-                "address": "0x200010a5",
+                "address": "0x2000109d",
                 "name": "instances[0].chan[0].nextInSeq",
                 "type": 1
             },
             {
-                "address": "0x200010a4",
+                "address": "0x2000109c",
                 "name": "instances[0].chan[0].nextOutSeq",
                 "type": 1
             },
             {
-                "address": "0x20000810",
+                "address": "0x20000808",
                 "name": "instances[0].eventCallback",
                 "type": 5
             },
             {
-                "address": "0x20000814",
+                "address": "0x2000080c",
                 "name": "instances[0].eventCookie",
                 "type": 5
             },
             {
-                "address": "0x2000089a",
+                "address": "0x20000892",
                 "name": "instances[0].inChan",
                 "type": 1
             },
             {
-                "address": "0x20000c9c",
+                "address": "0x20000c94",
                 "name": "instances[0].inCursor",
                 "type": 3
             },
             {
-                "address": "0x2000089b",
+                "address": "0x20000893",
                 "name": "instances[0].inPayload[0]",
                 "type": 1
             },
             {
-                "address": "0x20000898",
+                "address": "0x20000890",
                 "name": "instances[0].inRemaining",
                 "type": 3
             },
             {
-                "address": "0x20000ca0",
+                "address": "0x20000c98",
                 "name": "instances[0].inTimestamp",
                 "type": 5
             },
             {
-                "address": "0x20000ca4",
+                "address": "0x20000c9c",
                 "name": "instances[0].inTransfer[0]",
                 "type": 1
             },
             {
-                "address": "0x20000818",
+                "address": "0x20000810",
                 "name": "instances[0].outTransfer[0]",
                 "type": 1
             },
             {
-                "address": "0x2000080c",
+                "address": "0x20000804",
                 "name": "instances[0].pHal",
                 "type": 5
             },
             {
-                "address": "0x20001104",
+                "address": "0x200010fc",
                 "name": "instances[0].rxBadChan",
                 "type": 5
             },
             {
-                "address": "0x20001110",
+                "address": "0x20001108",
                 "name": "instances[0].rxInterruptedPayloads",
                 "type": 5
             },
             {
-                "address": "0x20001108",
+                "address": "0x20001100",
                 "name": "instances[0].rxShortFragments",
                 "type": 5
             },
             {
-                "address": "0x2000110c",
+                "address": "0x20001104",
                 "name": "instances[0].rxTooLargePayloads",
                 "type": 5
             },
             {
-                "address": "0x20001118",
+                "address": "0x20001110",
                 "name": "instances[0].txDiscards",
                 "type": 5
             },
             {
-                "address": "0x2000111c",
+                "address": "0x20001114",
                 "name": "instances[0].txTooLargePayloads",
                 "type": 5
             },
@@ -6612,12 +6342,12 @@
                 "type": 1
             },
             {
-                "address": "0x2000114d",
+                "address": "0x20001145",
                 "name": "isInit",
                 "type": 1
             },
             {
-                "address": "0x200015f8",
+                "address": "0x200015f0",
                 "name": "isOpen",
                 "type": 1
             },
@@ -6667,97 +6397,97 @@
                 "type": 9
             },
             {
-                "address": "0x20001158",
+                "address": "0x20001150",
                 "name": "rxBuf[0]",
                 "type": 1
             },
             {
-                "address": "0x20001558",
+                "address": "0x20001550",
                 "name": "rxBufLen",
                 "type": 5
             },
             {
-                "address": "0x2000155c",
+                "address": "0x20001554",
                 "name": "rxDataReady",
                 "type": 1
             },
             {
-                "address": "0x20001155",
+                "address": "0x2000114d",
                 "name": "rxReady",
                 "type": 1
             },
             {
-                "address": "0x20001150",
+                "address": "0x20001148",
                 "name": "rxTimestamp_us",
                 "type": 5
             },
             {
-                "address": "0x0800dfd4",
+                "address": "0x0800e004",
                 "name": "setSensorConfigOp.onReset",
                 "type": 5
             },
             {
-                "address": "0x0800dfd0",
+                "address": "0x0800e000",
                 "name": "setSensorConfigOp.rx",
                 "type": 5
             },
             {
-                "address": "0x0800dfcc",
+                "address": "0x0800dffc",
                 "name": "setSensorConfigOp.start",
                 "type": 5
             },
             {
-                "address": "0x0800dfc8",
+                "address": "0x0800dff8",
                 "name": "setSensorConfigOp.timeout_us",
                 "type": 5
             },
             {
-                "address": "0x200007e8",
+                "address": "0x200007e0",
                 "name": "sh2AsyncEvent.eventId",
                 "type": 5
             },
             {
-                "address": "0x200015e8",
+                "address": "0x200015e0",
                 "name": "sh2Hal.close",
                 "type": 5
             },
             {
-                "address": "0x200015f4",
+                "address": "0x200015ec",
                 "name": "sh2Hal.getTimeUs",
                 "type": 5
             },
             {
-                "address": "0x200015e4",
+                "address": "0x200015dc",
                 "name": "sh2Hal.open",
                 "type": 5
             },
             {
-                "address": "0x200015ec",
+                "address": "0x200015e4",
                 "name": "sh2Hal.read",
                 "type": 5
             },
             {
-                "address": "0x200015f0",
+                "address": "0x200015e8",
                 "name": "sh2Hal.write",
                 "type": 5
             },
             {
-                "address": "0x0800df68",
+                "address": "0x0800df98",
                 "name": "sh2ReportLens[0].id",
                 "type": 1
             },
             {
-                "address": "0x0800df69",
+                "address": "0x0800df99",
                 "name": "sh2ReportLens[0].len",
                 "type": 1
             },
             {
-                "address": "0x20001120",
+                "address": "0x20001118",
                 "name": "shtp_initialized",
                 "type": 1
             },
             {
-                "address": "0x2000114e",
+                "address": "0x20001146",
                 "name": "spiState",
                 "type": 2
             },
@@ -6782,22 +6512,22 @@
                 "type": 1
             },
             {
-                "address": "0x20001560",
+                "address": "0x20001558",
                 "name": "txBuf[0]",
                 "type": 1
             },
             {
-                "address": "0x200015e0",
+                "address": "0x200015d8",
                 "name": "txBufLen",
                 "type": 5
             },
             {
-                "address": "0x0800e020",
+                "address": "0x0800e050",
                 "name": "txZeros[0]",
                 "type": 1
             },
             {
-                "address": "0x2000160c",
+                "address": "0x20001604",
                 "name": "uwTick",
                 "type": 5
             },
@@ -6814,8 +6544,8 @@
         ],
         "expand": false,
         "filename": "prosthesis_v2.elf",
-        "exeModifiedTime": 1774716958791,
-        "configLastUpdate": 1774717201836
+        "exeModifiedTime": 1775056932259,
+        "configLastUpdate": 1775057304566
     },
     {
         "id": "ebd0d510b30d5924",
@@ -35907,285 +35637,15 @@
         "exefolder": "C:\\GitHub_Workspace\\Prosthesis-v2-Firmware\\Firmware\\Debug",
         "exevariablelist": [
             {
-                "address": "0x200006a5",
-                "name": "_sh2.cmdSeq",
-                "type": 1
-            },
-            {
-                "address": "0x200007e0",
-                "name": "_sh2.emptyPayloads",
-                "type": 5
-            },
-            {
-                "address": "0x200006a8",
-                "name": "_sh2.eventCallback",
-                "type": 5
-            },
-            {
-                "address": "0x200006ac",
-                "name": "_sh2.eventCookie",
-                "type": 5
-            },
-            {
-                "address": "0x200007dc",
-                "name": "_sh2.execBadPayload",
-                "type": 5
-            },
-            {
-                "address": "0x200006b8",
-                "name": "_sh2.frsData[0]",
-                "type": 5
-            },
-            {
-                "address": "0x200007d8",
-                "name": "_sh2.frsDataLen",
-                "type": 3
-            },
-            {
-                "address": "0x200006a4",
-                "name": "_sh2.lastCmdId",
-                "type": 1
-            },
-            {
-                "address": "0x200006a6",
-                "name": "_sh2.nextCmdSeq",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.calConfig.sensors",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.finishCal.status",
-                "type": 2
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.forceFlush.sensorId",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getCalConfig.pSensors",
-                "type": 5
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getCounts.pCounts",
-                "type": 5
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getCounts.sensorId",
-                "type": 1
-            },
-            {
-                "address": "0x200006a0",
-                "name": "_sh2.opData.getErrors.errsRead",
-                "type": 3
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getErrors.pErrors",
-                "type": 5
-            },
-            {
-                "address": "0x2000069c",
-                "name": "_sh2.opData.getErrors.pNumErrors",
-                "type": 5
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getErrors.severity",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getFrs.frsType",
-                "type": 3
-            },
-            {
-                "address": "0x200006a0",
-                "name": "_sh2.opData.getFrs.nextOffset",
-                "type": 3
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getFrs.pData",
-                "type": 5
-            },
-            {
-                "address": "0x2000069c",
-                "name": "_sh2.opData.getFrs.pWords",
-                "type": 5
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getOscType.pOscType",
-                "type": 5
-            },
-            {
-                "address": "0x20000699",
-                "name": "_sh2.opData.getProdIds.expectedEntries",
-                "type": 1
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getProdIds.nextEntry",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getProdIds.pProdIds",
-                "type": 5
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.getSensorConfig.pConfig",
-                "type": 5
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.getSensorConfig.sensorId",
-                "type": 1
-            },
-            {
-                "address": "0x20000696",
-                "name": "_sh2.opData.sendCmd.req.command",
-                "type": 1
-            },
-            {
-                "address": "0x20000697",
-                "name": "_sh2.opData.sendCmd.req.p[0]",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.sendCmd.req.reportId",
-                "type": 1
-            },
-            {
-                "address": "0x20000695",
-                "name": "_sh2.opData.sendCmd.req.seq",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.setFrs.frsType",
-                "type": 3
-            },
-            {
-                "address": "0x2000069e",
-                "name": "_sh2.opData.setFrs.offset",
-                "type": 3
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.setFrs.pData",
-                "type": 5
-            },
-            {
-                "address": "0x2000069c",
-                "name": "_sh2.opData.setFrs.words",
-                "type": 3
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.setSensorConfig.pConfig",
-                "type": 5
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.setSensorConfig.sensorId",
-                "type": 1
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.startCal.interval_us",
-                "type": 5
-            },
-            {
-                "address": "0x2000069e",
-                "name": "_sh2.opData.wheelRequest.dataType",
-                "type": 1
-            },
-            {
-                "address": "0x20000698",
-                "name": "_sh2.opData.wheelRequest.timestamp",
-                "type": 5
-            },
-            {
-                "address": "0x2000069c",
-                "name": "_sh2.opData.wheelRequest.wheelData",
-                "type": 4
-            },
-            {
-                "address": "0x20000694",
-                "name": "_sh2.opData.wheelRequest.wheelIndex",
-                "type": 1
-            },
-            {
-                "address": "0x20000690",
-                "name": "_sh2.opStatus",
-                "type": 6
-            },
-            {
-                "address": "0x20000670",
-                "name": "_sh2.pHal",
-                "type": 5
-            },
-            {
-                "address": "0x2000068c",
-                "name": "_sh2.pOp",
-                "type": 5
-            },
-            {
-                "address": "0x20000674",
-                "name": "_sh2.pShtp",
-                "type": 5
-            },
-            {
-                "address": "0x20000678",
-                "name": "_sh2.resetComplete",
-                "type": 1
-            },
-            {
-                "address": "0x200006b0",
-                "name": "_sh2.sensorCallback",
-                "type": 5
-            },
-            {
-                "address": "0x200006b4",
-                "name": "_sh2.sensorCookie",
-                "type": 5
-            },
-            {
-                "address": "0x200007e4",
-                "name": "_sh2.unknownReportIds",
-                "type": 5
-            },
-            {
-                "address": "0x20000679",
-                "name": "_sh2.version[0]",
-                "type": 2
-            },
-            {
                 "address": "0x20000028",
                 "name": "accelSensitivity",
                 "type": 10
             },
             {
-                "address": "0x20001124",
+                "address": "0x20000668",
                 "name": "BNO08x_IMU_Data[0]",
                 "type": 9,
                 "checked": false
-            },
-            {
-                "address": "0x2000114c",
-                "name": "BNO08x_resetOccurred",
-                "type": 1
             },
             {
                 "address": "0x20000514",
@@ -37161,22 +36621,109 @@
                 "checked": false
             },
             {
-                "address": "0x20000228",
-                "name": "Device.CPC_Spec",
-                "type": 2,
-                "checked": false
+                "address": "0x20000638",
+                "name": "Device.InitVals.canId",
+                "type": 3
             },
             {
-                "address": "0x20000229",
-                "name": "Device.Joint",
-                "type": 2,
-                "checked": false
+                "address": "0x2000063a",
+                "name": "Device.InitVals.Motor",
+                "type": 2
             },
             {
-                "address": "0x2000022a",
-                "name": "Device.Side",
-                "type": 2,
-                "checked": false
+                "address": "0x2000064c",
+                "name": "Device.isInit",
+                "type": 1
+            },
+            {
+                "address": "0x2000063c",
+                "name": "Device.speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device.speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device.torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device.torqueMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000638",
+                "name": "Device[0].InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x20000638",
+                "name": "Device[0].InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x2000063a",
+                "name": "Device[0].InitVals.Motor",
+                "type": 2
+            },
+            {
+                "address": "0x2000063a",
+                "name": "Device[0].InitVals.Motor",
+                "type": 2
+            },
+            {
+                "address": "0x2000064c",
+                "name": "Device[0].isInit",
+                "type": 1
+            },
+            {
+                "address": "0x2000064c",
+                "name": "Device[0].isInit",
+                "type": 1
+            },
+            {
+                "address": "0x2000063c",
+                "name": "Device[0].speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x2000063c",
+                "name": "Device[0].speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device[0].speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device[0].speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device[0].torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device[0].torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device[0].torqueMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device[0].torqueMin",
+                "type": 9
             },
             {
                 "address": "0x20000030",
@@ -37275,253 +36822,253 @@
                 "checked": false
             },
             {
-                "address": "0x200005d8",
+                "address": "0x200005d0",
                 "name": "hspi1.CRCSize",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005f0",
+                "address": "0x200005e8",
                 "name": "hspi1.ErrorCode",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005e8",
+                "address": "0x200005e0",
                 "name": "hspi1.hdmarx",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005e4",
+                "address": "0x200005dc",
                 "name": "hspi1.hdmatx",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005ac",
+                "address": "0x200005a4",
                 "name": "hspi1.Init.BaudRatePrescaler",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005a4",
+                "address": "0x2000059c",
                 "name": "hspi1.Init.CLKPhase",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005a0",
+                "address": "0x20000598",
                 "name": "hspi1.Init.CLKPolarity",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005b8",
+                "address": "0x200005b0",
                 "name": "hspi1.Init.CRCCalculation",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005c0",
+                "address": "0x200005b8",
                 "name": "hspi1.Init.CRCLength",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005bc",
+                "address": "0x200005b4",
                 "name": "hspi1.Init.CRCPolynomial",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x2000059c",
+                "address": "0x20000594",
                 "name": "hspi1.Init.DataSize",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x20000598",
+                "address": "0x20000590",
                 "name": "hspi1.Init.Direction",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005b0",
+                "address": "0x200005a8",
                 "name": "hspi1.Init.FirstBit",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x20000594",
+                "address": "0x2000058c",
                 "name": "hspi1.Init.Mode",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005a8",
+                "address": "0x200005a0",
                 "name": "hspi1.Init.NSS",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005c4",
+                "address": "0x200005bc",
                 "name": "hspi1.Init.NSSPMode",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005b4",
+                "address": "0x200005ac",
                 "name": "hspi1.Init.TIMode",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x20000590",
+                "address": "0x20000588",
                 "name": "hspi1.Instance",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005ec",
+                "address": "0x200005e4",
                 "name": "hspi1.Lock",
                 "type": 2,
                 "checked": false
             },
             {
-                "address": "0x200005d0",
+                "address": "0x200005c8",
                 "name": "hspi1.pRxBuffPtr",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005c8",
+                "address": "0x200005c0",
                 "name": "hspi1.pTxBuffPtr",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005dc",
+                "address": "0x200005d4",
                 "name": "hspi1.RxISR",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005d6",
+                "address": "0x200005ce",
                 "name": "hspi1.RxXferCount",
                 "type": 3,
                 "checked": false
             },
             {
-                "address": "0x200005d4",
+                "address": "0x200005cc",
                 "name": "hspi1.RxXferSize",
                 "type": 3,
                 "checked": false
             },
             {
-                "address": "0x200005ed",
+                "address": "0x200005e5",
                 "name": "hspi1.State",
                 "type": 2,
                 "checked": false
             },
             {
-                "address": "0x200005e0",
+                "address": "0x200005d8",
                 "name": "hspi1.TxISR",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005ce",
+                "address": "0x200005c6",
                 "name": "hspi1.TxXferCount",
                 "type": 3,
                 "checked": false
             },
             {
-                "address": "0x200005cc",
+                "address": "0x200005c4",
                 "name": "hspi1.TxXferSize",
                 "type": 3,
                 "checked": false
             },
             {
-                "address": "0x20000610",
+                "address": "0x20000608",
                 "name": "htim2.Channel",
                 "type": 2,
                 "checked": false
             },
             {
-                "address": "0x20000638",
+                "address": "0x20000630",
                 "name": "htim2.ChannelNState[0]",
                 "type": 2,
                 "checked": false
             },
             {
-                "address": "0x20000632",
+                "address": "0x2000062a",
                 "name": "htim2.ChannelState[0]",
                 "type": 2,
                 "checked": false
             },
             {
-                "address": "0x2000063c",
+                "address": "0x20000634",
                 "name": "htim2.DMABurstState",
                 "type": 2,
                 "checked": false
             },
             {
-                "address": "0x20000614",
+                "address": "0x2000060c",
                 "name": "htim2.hdma[0]",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x2000060c",
+                "address": "0x20000604",
                 "name": "htim2.Init.AutoReloadPreload",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x20000604",
+                "address": "0x200005fc",
                 "name": "htim2.Init.ClockDivision",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005fc",
+                "address": "0x200005f4",
                 "name": "htim2.Init.CounterMode",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x20000600",
+                "address": "0x200005f8",
                 "name": "htim2.Init.Period",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005f8",
+                "address": "0x200005f0",
                 "name": "htim2.Init.Prescaler",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x20000608",
+                "address": "0x20000600",
                 "name": "htim2.Init.RepetitionCounter",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x200005f4",
+                "address": "0x200005ec",
                 "name": "htim2.Instance",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x20000630",
+                "address": "0x20000628",
                 "name": "htim2.Lock",
                 "type": 2,
                 "checked": false
             },
             {
-                "address": "0x20000631",
+                "address": "0x20000629",
                 "name": "htim2.State",
                 "type": 2,
                 "checked": false
@@ -37580,115 +37127,10 @@
                 "type": 1
             },
             {
-                "address": "0x20001154",
+                "address": "0x20000698",
                 "name": "inReset",
                 "type": 1,
                 "checked": false
-            },
-            {
-                "address": "0x20001114",
-                "name": "instances[0].badTxChan",
-                "type": 5
-            },
-            {
-                "address": "0x200010a8",
-                "name": "instances[0].chan[0].callback",
-                "type": 5
-            },
-            {
-                "address": "0x200010ac",
-                "name": "instances[0].chan[0].cookie",
-                "type": 5
-            },
-            {
-                "address": "0x200010a5",
-                "name": "instances[0].chan[0].nextInSeq",
-                "type": 1
-            },
-            {
-                "address": "0x200010a4",
-                "name": "instances[0].chan[0].nextOutSeq",
-                "type": 1
-            },
-            {
-                "address": "0x20000810",
-                "name": "instances[0].eventCallback",
-                "type": 5
-            },
-            {
-                "address": "0x20000814",
-                "name": "instances[0].eventCookie",
-                "type": 5
-            },
-            {
-                "address": "0x2000089a",
-                "name": "instances[0].inChan",
-                "type": 1
-            },
-            {
-                "address": "0x20000c9c",
-                "name": "instances[0].inCursor",
-                "type": 3
-            },
-            {
-                "address": "0x2000089b",
-                "name": "instances[0].inPayload[0]",
-                "type": 1
-            },
-            {
-                "address": "0x20000898",
-                "name": "instances[0].inRemaining",
-                "type": 3
-            },
-            {
-                "address": "0x20000ca0",
-                "name": "instances[0].inTimestamp",
-                "type": 5
-            },
-            {
-                "address": "0x20000ca4",
-                "name": "instances[0].inTransfer[0]",
-                "type": 1
-            },
-            {
-                "address": "0x20000818",
-                "name": "instances[0].outTransfer[0]",
-                "type": 1
-            },
-            {
-                "address": "0x2000080c",
-                "name": "instances[0].pHal",
-                "type": 5
-            },
-            {
-                "address": "0x20001104",
-                "name": "instances[0].rxBadChan",
-                "type": 5
-            },
-            {
-                "address": "0x20001110",
-                "name": "instances[0].rxInterruptedPayloads",
-                "type": 5
-            },
-            {
-                "address": "0x20001108",
-                "name": "instances[0].rxShortFragments",
-                "type": 5
-            },
-            {
-                "address": "0x2000110c",
-                "name": "instances[0].rxTooLargePayloads",
-                "type": 5
-            },
-            {
-                "address": "0x20001118",
-                "name": "instances[0].txDiscards",
-                "type": 5
-            },
-            {
-                "address": "0x2000111c",
-                "name": "instances[0].txTooLargePayloads",
-                "type": 5
             },
             {
                 "address": "0x20000001",
@@ -37697,12 +37139,7 @@
                 "checked": false
             },
             {
-                "address": "0x2000114d",
-                "name": "isInit",
-                "type": 1
-            },
-            {
-                "address": "0x200015f8",
+                "address": "0x20000b24",
                 "name": "isOpen",
                 "type": 1,
                 "checked": false
@@ -37762,101 +37199,31 @@
                 "checked": false
             },
             {
-                "address": "0x20001158",
+                "address": "0x2000069c",
                 "name": "rxBuf[0]",
                 "type": 1,
                 "checked": false
             },
             {
-                "address": "0x20001558",
+                "address": "0x20000a9c",
                 "name": "rxBufLen",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x2000155c",
-                "name": "rxDataReady",
-                "type": 1
-            },
-            {
-                "address": "0x20001155",
+                "address": "0x20000699",
                 "name": "rxReady",
                 "type": 1,
                 "checked": false
             },
             {
-                "address": "0x20001150",
+                "address": "0x20000694",
                 "name": "rxTimestamp_us",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x0800dfd4",
-                "name": "setSensorConfigOp.onReset",
-                "type": 5
-            },
-            {
-                "address": "0x0800dfd0",
-                "name": "setSensorConfigOp.rx",
-                "type": 5
-            },
-            {
-                "address": "0x0800dfcc",
-                "name": "setSensorConfigOp.start",
-                "type": 5
-            },
-            {
-                "address": "0x0800dfc8",
-                "name": "setSensorConfigOp.timeout_us",
-                "type": 5
-            },
-            {
-                "address": "0x200007e8",
-                "name": "sh2AsyncEvent.eventId",
-                "type": 5
-            },
-            {
-                "address": "0x200015e8",
-                "name": "sh2Hal.close",
-                "type": 5
-            },
-            {
-                "address": "0x200015f4",
-                "name": "sh2Hal.getTimeUs",
-                "type": 5
-            },
-            {
-                "address": "0x200015e4",
-                "name": "sh2Hal.open",
-                "type": 5
-            },
-            {
-                "address": "0x200015ec",
-                "name": "sh2Hal.read",
-                "type": 5
-            },
-            {
-                "address": "0x200015f0",
-                "name": "sh2Hal.write",
-                "type": 5
-            },
-            {
-                "address": "0x0800df68",
-                "name": "sh2ReportLens[0].id",
-                "type": 1
-            },
-            {
-                "address": "0x0800df69",
-                "name": "sh2ReportLens[0].len",
-                "type": 1
-            },
-            {
-                "address": "0x20001120",
-                "name": "shtp_initialized",
-                "type": 1
-            },
-            {
-                "address": "0x2000114e",
+                "address": "0x20000690",
                 "name": "spiState",
                 "type": 2,
                 "checked": false
@@ -37886,25 +37253,25 @@
                 "checked": false
             },
             {
-                "address": "0x20001560",
+                "address": "0x20000aa0",
                 "name": "txBuf[0]",
                 "type": 1,
                 "checked": false
             },
             {
-                "address": "0x200015e0",
+                "address": "0x20000b20",
                 "name": "txBufLen",
                 "type": 5,
                 "checked": false
             },
             {
-                "address": "0x0800e020",
+                "address": "0x0800b110",
                 "name": "txZeros[0]",
                 "type": 1,
                 "checked": false
             },
             {
-                "address": "0x2000160c",
+                "address": "0x20000b38",
                 "name": "uwTick",
                 "type": 5,
                 "checked": false
@@ -37924,8 +37291,8 @@
         ],
         "expand": false,
         "filename": "prosthesis_v2.elf",
-        "exeModifiedTime": 1774716958791,
-        "configLastUpdate": 1774717256493
+        "exeModifiedTime": 1775058154341,
+        "configLastUpdate": 1775058264253
     },
     {
         "id": "720c0e184737b03f",
@@ -51043,9 +50410,24 @@
                 "type": 10
             },
             {
+                "address": "0x2000022d",
+                "name": "ankleImuRxCplt",
+                "type": 1
+            },
+            {
+                "address": "0x2000022c",
+                "name": "ankleImuTxCplt",
+                "type": 1
+            },
+            {
                 "address": "0x20001124",
                 "name": "BNO08x_IMU_Data[0]",
                 "type": 9
+            },
+            {
+                "address": "0x2000114d",
+                "name": "BNO08x_readEventOccurred",
+                "type": 1
             },
             {
                 "address": "0x2000114c",
@@ -51543,19 +50925,19 @@
                 "address": "0x200004b0",
                 "name": "CM_KneeJoint.IMU_Data.pitch",
                 "type": 9,
-                "checked": false
+                "checked": true
             },
             {
                 "address": "0x200004b4",
                 "name": "CM_KneeJoint.IMU_Data.roll",
                 "type": 9,
-                "checked": false
+                "checked": true
             },
             {
                 "address": "0x200004ac",
                 "name": "CM_KneeJoint.IMU_Data.yaw",
                 "type": 9,
-                "checked": false
+                "checked": true
             },
             {
                 "address": "0x200003e0",
@@ -51903,19 +51285,109 @@
                 "type": 9
             },
             {
-                "address": "0x20000228",
-                "name": "Device.CPC_Spec",
+                "address": "0x20000640",
+                "name": "Device.InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x20000642",
+                "name": "Device.InitVals.Motor",
                 "type": 2
             },
             {
-                "address": "0x20000229",
-                "name": "Device.Joint",
+                "address": "0x20000654",
+                "name": "Device.isInit",
+                "type": 1
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device.speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device.speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x2000064c",
+                "name": "Device.torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000650",
+                "name": "Device.torqueMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device[0].InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x20000640",
+                "name": "Device[0].InitVals.canId",
+                "type": 3
+            },
+            {
+                "address": "0x20000642",
+                "name": "Device[0].InitVals.Motor",
                 "type": 2
             },
             {
-                "address": "0x2000022a",
-                "name": "Device.Side",
+                "address": "0x20000642",
+                "name": "Device[0].InitVals.Motor",
                 "type": 2
+            },
+            {
+                "address": "0x20000654",
+                "name": "Device[0].isInit",
+                "type": 1
+            },
+            {
+                "address": "0x20000654",
+                "name": "Device[0].isInit",
+                "type": 1
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device[0].speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000644",
+                "name": "Device[0].speedMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device[0].speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000648",
+                "name": "Device[0].speedMin",
+                "type": 9
+            },
+            {
+                "address": "0x2000064c",
+                "name": "Device[0].torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x2000064c",
+                "name": "Device[0].torqueMax",
+                "type": 9
+            },
+            {
+                "address": "0x20000650",
+                "name": "Device[0].torqueMin",
+                "type": 9
+            },
+            {
+                "address": "0x20000650",
+                "name": "Device[0].torqueMin",
+                "type": 9
             },
             {
                 "address": "0x20000030",
@@ -52243,16 +51715,6 @@
                 "type": 10
             },
             {
-                "address": "0x2000022d",
-                "name": "imuDataReceived",
-                "type": 1
-            },
-            {
-                "address": "0x2000022c",
-                "name": "imuReadStarted",
-                "type": 1
-            },
-            {
                 "address": "0x20001154",
                 "name": "inReset",
                 "type": 1
@@ -52368,7 +51830,7 @@
                 "type": 1
             },
             {
-                "address": "0x2000114d",
+                "address": "0x2000114e",
                 "name": "isInit",
                 "type": 1
             },
@@ -52448,22 +51910,22 @@
                 "type": 5
             },
             {
-                "address": "0x0800dfd4",
+                "address": "0x0800e13c",
                 "name": "setSensorConfigOp.onReset",
                 "type": 5
             },
             {
-                "address": "0x0800dfd0",
+                "address": "0x0800e138",
                 "name": "setSensorConfigOp.rx",
                 "type": 5
             },
             {
-                "address": "0x0800dfcc",
+                "address": "0x0800e134",
                 "name": "setSensorConfigOp.start",
                 "type": 5
             },
             {
-                "address": "0x0800dfc8",
+                "address": "0x0800e130",
                 "name": "setSensorConfigOp.timeout_us",
                 "type": 5
             },
@@ -52498,12 +51960,12 @@
                 "type": 5
             },
             {
-                "address": "0x0800df68",
+                "address": "0x0800e0d0",
                 "name": "sh2ReportLens[0].id",
                 "type": 1
             },
             {
-                "address": "0x0800df69",
+                "address": "0x0800e0d1",
                 "name": "sh2ReportLens[0].len",
                 "type": 1
             },
@@ -52513,7 +51975,7 @@
                 "type": 1
             },
             {
-                "address": "0x2000114e",
+                "address": "0x2000114f",
                 "name": "spiState",
                 "type": 2
             },
@@ -52548,7 +52010,7 @@
                 "type": 5
             },
             {
-                "address": "0x0800e020",
+                "address": "0x0800e188",
                 "name": "txZeros[0]",
                 "type": 1
             },
@@ -52570,8 +52032,8 @@
         ],
         "expand": false,
         "filename": "prosthesis_v2.elf",
-        "exeModifiedTime": 1774716958791,
-        "configLastUpdate": 1774717232492
+        "exeModifiedTime": 1775218113168,
+        "configLastUpdate": 1775218136232
     },
     {
         "id": "18570196672cb621",
@@ -52589,12 +52051,12 @@
         "type": "ui_tab",
         "name": "Prosthesis v2",
         "icon": "dashboard",
-        "order": 2,
+        "order": 1,
         "disabled": false,
         "hidden": false
     },
     {
-        "id": "8f500a14dcbcca21",
+        "id": "9a634e4d62baeb77",
         "type": "global-config",
         "env": [],
         "modules": {

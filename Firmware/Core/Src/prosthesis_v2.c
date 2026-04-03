@@ -242,7 +242,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_AnkleJoint.SwingExtCtrl.kp = 2.0f;
 		CM_AnkleJoint.SwingExtCtrl.position = -5.0f;
 
-		HAL_NVIC_EnableIRQ(SPI1_IRQn);
 		MPU925x_SetChipSelect(0);
 		MPU925x_StartReadIMU_IT(0);
 
@@ -288,8 +287,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 			CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
 			break;
 		}
-
-		HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
 		if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
 			ErrorHandler(CAN_Error);
@@ -455,7 +452,6 @@ static void GetInputs(void)
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
 		if(!kneeImuInUse)
-		{
 			if(!ankleImuInUse)
 			{
 				ankleImuInUse = 1;
@@ -514,7 +510,7 @@ static void GetInputs(void)
 
 			BNO08x_ReadSensors();
 
-			if(readEventOccurred)
+			if(BNO08x_readEventOccurred)
 			{
 				HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
 				HAL_NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
@@ -522,7 +518,7 @@ static void GetInputs(void)
 				HAL_NVIC_ClearPendingIRQ(SPI1_IRQn);
 				HAL_NVIC_EnableIRQ(SPI1_IRQn);
 
-				readEventOccurred = 0;
+				BNO08x_readEventOccurred = 0;
 				kneeImuInUse = 0;
 			}
 		}
