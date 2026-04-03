@@ -8,6 +8,7 @@
 * 2. User may add their desired reports to StartReports() and ReadEvent().
 * 3. This driver is setup to work on SPI1 and EXTI[9:5].
 * 4. HAL_NVIC_EnableIRQ(EXTI9_5_IRQn) must be used in user application after BNO08x_Init().
+* 4. HAL_NVIC_EnableIRQ(SPI1_IRQn) must be used in user application after BNO08x_Init().
 *
 *******************************************************************************/
 
@@ -28,6 +29,7 @@
 
 float BNO08x_IMU_Data[10] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 uint8_t BNO08x_resetOccurred = 0;
+uint8_t BNO08x_readEventOccurred = 0;
 
 
 /*******************************************************************************
@@ -60,6 +62,8 @@ BNO08x_Error_e BNO08x_Init(void)
 
 	HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
 	HAL_NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
+	HAL_NVIC_DisableIRQ(SPI1_IRQn);
+	HAL_NVIC_ClearPendingIRQ(SPI1_IRQn);
 
   	isInit = 1;
 
@@ -150,6 +154,8 @@ static void ReadEvent(void * cookie, sh2_SensorEvent_t * event)
         	BNO08x_IMU_Data[9] = value.un.gameRotationVector.k;
             break;
     }
+
+    BNO08x_readEventOccurred = 1;
 }
 
 

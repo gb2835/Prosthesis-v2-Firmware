@@ -18,6 +18,7 @@ typedef enum
 
 extern float BNO08x_IMU_Data[10];
 extern uint8_t BNO08x_resetOccurred;
+extern uint8_t BNO08x_readEventOccurred;
 
 BNO08x_Error_e BNO08x_Init(void);
 BNO08x_Error_e BNO08x_StartReports(void);

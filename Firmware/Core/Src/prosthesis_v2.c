@@ -153,8 +153,8 @@ static MPU925x_IMU_Data_t IMU_Data;
 static Prosthesis_Init_t Device;
 
 static uint8_t heelStrike = 0;
-static uint8_t imuReadStarted = 0;
-static uint8_t imuDataReceived = 0;
+static uint8_t ankleImuTxCplt = 0;
+static uint8_t ankleImuRxCplt = 0;
 static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
 static uint8_t isTestProgramRequired = 0;
@@ -217,6 +217,8 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	CM_state_torque = state_torque[Device.Joint][EarlyStance];
 	CM_state_loadCell = state_loadCell[EarlyStance];
 
+	HAL_NVIC_EnableIRQ(SPI1_IRQn);
+
 	uint32_t txMailbox;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
@@ -240,6 +242,7 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_AnkleJoint.SwingExtCtrl.kp = 2.0f;
 		CM_AnkleJoint.SwingExtCtrl.position = -5.0f;
 
+		HAL_NVIC_EnableIRQ(SPI1_IRQn);
 		MPU925x_SetChipSelect(0);
 		MPU925x_StartReadIMU_IT(0);
 
@@ -447,24 +450,34 @@ static void GetInputs(void)
 	CM_LoadCell.Raw.bot[0] = ReadLoadCell(ADC1);
 	CM_LoadCell.Raw.top[0] = ReadLoadCell(ADC2);
 
+	static uint8_t ankleImuInUse = 0;
+	static uint8_t kneeImuInUse = 0;
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
-		static uint8_t tempImuData[14];
-		if(imuReadStarted)
+		if(!kneeImuInUse)
 		{
-			imuReadStarted = 0;
+			if(!ankleImuInUse)
+			{
+				ankleImuInUse = 1;
+				MPU925x_SetChipSelect(0);
+				MPU925x_StartReadIMU_IT(0);
+			}
+
+		static uint8_t tempImuData[14];
+		if(ankleImuTxCplt)
+		{
+			ankleImuTxCplt = 0;
 			MPU925x_ReadIMU_IT(0, tempImuData);
 		}
 
 		static uint8_t missedAnkleImuCalls = 0;
-		if(imuDataReceived)
+		if(ankleImuRxCplt)
 		{
+			ankleImuRxCplt = 0;
 			missedAnkleImuCalls = 0;
-			imuDataReceived = 0;
-			MPU925x_ClearChipSelect(0);
 
-			MPU925x_SetChipSelect(0);
-			MPU925x_StartReadIMU_IT(0);
+			MPU925x_ClearChipSelect(0);
+			ankleImuInUse = 0;
 
 			IMU_Data = MPU925x_ConvertIMU_Data(tempImuData);
 
@@ -481,20 +494,38 @@ static void GetInputs(void)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-//		static uint8_t missedKneeImuCalls = 0;
-//		if(BNO08x_resetOccurred)
-//		{
-//			BNO08x_resetOccurred = 0;
-//			if(BNO08x_StartReports())
-//				missedKneeImuCalls++;
-//			else
-//				missedKneeImuCalls = 0;
-//
-//			if(missedKneeImuCalls >= 5)
-//				ErrorHandler(KneeIMU_Error);
-//		}
-//
-//		BNO08x_ReadSensors();
+		if(!ankleImuInUse)
+		{
+			HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+			kneeImuInUse = 1;
+
+			static uint8_t missedKneeImuCalls = 0;
+			if(BNO08x_resetOccurred)
+			{
+				BNO08x_resetOccurred = 0;
+				if(BNO08x_StartReports())
+					missedKneeImuCalls++;
+				else
+					missedKneeImuCalls = 0;
+
+				if(missedKneeImuCalls >= 5)
+					ErrorHandler(KneeIMU_Error);
+			}
+
+			BNO08x_ReadSensors();
+
+			if(readEventOccurred)
+			{
+				HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+				HAL_NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
+				HAL_NVIC_DisableIRQ(SPI1_IRQn);
+				HAL_NVIC_ClearPendingIRQ(SPI1_IRQn);
+				HAL_NVIC_EnableIRQ(SPI1_IRQn);
+
+				readEventOccurred = 0;
+				kneeImuInUse = 0;
+			}
+		}
 	}
 }
 
@@ -1111,12 +1142,12 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	imuReadStarted = 1;
+	ankleImuTxCplt = 1;
 }
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	imuDataReceived = 1;
+	ankleImuRxCplt = 1;
 }
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
