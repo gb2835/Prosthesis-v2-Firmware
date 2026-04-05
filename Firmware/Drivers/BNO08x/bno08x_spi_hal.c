@@ -5,10 +5,11 @@
 * NOTES
 * 1. This driver is based on:
 *		https://github.com/ceva-dsp/sh2-demo-nucleo/blob/main/app/demo_app.c
-* 2. User may add their desired reports to StartReports() and ReadEvent().
-* 3. This driver is setup to work on SPI1 and EXTI[9:5].
-* 4. HAL_NVIC_EnableIRQ(EXTI9_5_IRQn) must be used in user application after BNO08x_Init().
-* 4. HAL_NVIC_EnableIRQ(SPI1_IRQn) must be used in user application after BNO08x_Init().
+* 2. Global variable BNO08x_IMU_Data receives the reported data.
+* 3. User may add their desired reports to StartReports() and ReadEvent(). Size and/or data type of BNO08x_IMU_Data may need to be adjusted.
+* 4. This driver is setup to work on SPI1 and EXTI[9:5].
+* 5. HAL_NVIC_EnableIRQ(EXTI9_5_IRQn) must be used in user application after BNO08x_Init().
+* 6. HAL_NVIC_EnableIRQ(SPI1_IRQn) must be used in user application after BNO08x_Init().
 *
 *******************************************************************************/
 

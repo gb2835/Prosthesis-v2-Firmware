@@ -4,7 +4,7 @@
 *
 * NOTES
 * 1. Unless otherwise specified, units are
-* 		- Accelerometer	= m/s^2
+* 		- Accelerometer	= g's
 * 		- Angle			= °
 * 		- Gyroscope		= °/s
 * 		- Load Cell		= ADC
@@ -40,11 +40,11 @@ TestProgram_e testProgram = ReadOnly;
 *******************************************************************************/
 
 #define ANKLE_GEAR_RATIO								(90.0f / 15.0f)
-#define ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER	31.0f
+#define ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER	(31.0f)
 #define DEG_TO_RAD										(M_PI / 180.0f)
 #define DT												(1 / 500.0)
 #define KNEE_GEAR_RATIO									(70.0f / 16.0f)
-#define KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER		10.0f
+#define KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER		(10.0f)
 #define RAD_TO_DEG										(180.0f / M_PI)
 
 typedef enum
@@ -101,9 +101,9 @@ typedef struct
 	float gx;
 	float gy;
 	float gz;
-	float yaw;
-	float pitch;
-	float roll;
+	float yaw[2];
+	float pitch[2];
+	float roll[2];
 } KneeIMU_Data_t;
 
 typedef struct
@@ -249,9 +249,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_AnkleJoint.PassEmulCtrl.kd = 0.05f;
 		CM_AnkleJoint.PassEmulCtrl.kp = 2.0f;
 		CM_AnkleJoint.PassEmulCtrl.position = -5.0f;
-
-		MPU925x_SetChipSelect(0);
-		MPU925x_StartReadIMU_IT(0);
 
 		if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
 			ErrorHandler(CAN_Error);
@@ -472,6 +469,7 @@ static void GetInputs(void)
 	if((Device.Joint == Ankle) || (Device.Joint == Combined))
 	{
 		if(!kneeImuInUse)
+		{
 			if(!ankleImuInUse)
 			{
 				ankleImuInUse = 1;
@@ -507,41 +505,42 @@ static void GetInputs(void)
 
 		if(missedAnkleImuCalls >= 5)
 			ErrorHandler(AnkleIMU_Error);
+		}
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-//		if(!ankleImuInUse)
-//		{
-//			HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-//			kneeImuInUse = 1;
-//
-//			static uint8_t missedKneeImuCalls = 0;
-//			if(BNO08x_resetOccurred)
-//			{
-//				BNO08x_resetOccurred = 0;
-//				if(BNO08x_StartReports())
-//					missedKneeImuCalls++;
-//				else
-//					missedKneeImuCalls = 0;
-//
-//				if(missedKneeImuCalls >= 5)
-//					ErrorHandler(KneeIMU_Error);
-//			}
-//
-//			BNO08x_ReadSensors();
-//
-//			if(BNO08x_readEventOccurred)
-//			{
-//				HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
-//				HAL_NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
-//				HAL_NVIC_DisableIRQ(SPI1_IRQn);
-//				HAL_NVIC_ClearPendingIRQ(SPI1_IRQn);
-//				HAL_NVIC_EnableIRQ(SPI1_IRQn);
-//
-//				BNO08x_readEventOccurred = 0;
-//				kneeImuInUse = 0;
-//			}
-//		}
+		if(!ankleImuInUse)
+		{
+			HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+			kneeImuInUse = 1;
+
+			static uint8_t missedKneeImuCalls = 0;
+			if(BNO08x_resetOccurred)
+			{
+				BNO08x_resetOccurred = 0;
+				if(BNO08x_StartReports())
+					missedKneeImuCalls++;
+				else
+					missedKneeImuCalls = 0;
+
+				if(missedKneeImuCalls >= 5)
+					ErrorHandler(KneeIMU_Error);
+			}
+
+			BNO08x_ReadSensors();
+
+			if(BNO08x_readEventOccurred)
+			{
+				HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+				HAL_NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
+				HAL_NVIC_DisableIRQ(SPI1_IRQn);
+				HAL_NVIC_ClearPendingIRQ(SPI1_IRQn);
+				HAL_NVIC_EnableIRQ(SPI1_IRQn);
+
+				BNO08x_readEventOccurred = 0;
+				kneeImuInUse = 0;
+			}
+		}
 	}
 }
 
@@ -611,9 +610,9 @@ static void ProcessInputs(void)
 	{
 		if(Device.Side == Left)
 		{
-			CM_KneeJoint.IMU_Data.ax = BNO08x_IMU_Data[1];
-			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[0];
-			CM_KneeJoint.IMU_Data.az = -BNO08x_IMU_Data[2];
+			CM_KneeJoint.IMU_Data.ax = BNO08x_IMU_Data[1] / 9.81f;
+			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[0] / 9.81f;
+			CM_KneeJoint.IMU_Data.az = -BNO08x_IMU_Data[2] / 9.81f;
 			CM_KneeJoint.IMU_Data.gx = BNO08x_IMU_Data[4] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[3] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gz = -BNO08x_IMU_Data[5] * RAD_TO_DEG;
@@ -626,15 +625,16 @@ static void ProcessInputs(void)
 
 			float yaw, pitch, roll;
 			Utils_QuaternionToYPR(Quaternion.r, Quaternion.i, Quaternion.j, Quaternion.k, &yaw, &pitch, &roll);
-			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.pitch = roll * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.roll = pitch * RAD_TO_DEG;
+
+//			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+//			CM_KneeJoint.IMU_Data.pitch = roll * RAD_TO_DEG;
+//			CM_KneeJoint.IMU_Data.roll = pitch * RAD_TO_DEG;
 		}
 		else if(Device.Side == Right)
 		{
-			CM_KneeJoint.IMU_Data.ax = -BNO08x_IMU_Data[1];
-			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[0];
-			CM_KneeJoint.IMU_Data.az = BNO08x_IMU_Data[2];
+			CM_KneeJoint.IMU_Data.ax = -BNO08x_IMU_Data[1] / 9.81f;
+			CM_KneeJoint.IMU_Data.ay = BNO08x_IMU_Data[0] / 9.81f;
+			CM_KneeJoint.IMU_Data.az = BNO08x_IMU_Data[2] / 9.81f;
 			CM_KneeJoint.IMU_Data.gx = -BNO08x_IMU_Data[4] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gy = BNO08x_IMU_Data[3] * RAD_TO_DEG;
 			CM_KneeJoint.IMU_Data.gz = BNO08x_IMU_Data[5] * RAD_TO_DEG;
@@ -647,12 +647,29 @@ static void ProcessInputs(void)
 
 			float yaw, pitch, roll;
 			Utils_QuaternionToYPR(Quaternion.r, Quaternion.i, Quaternion.j, Quaternion.k, &yaw, &pitch, &roll);
-			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.pitch = -roll * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.roll = -pitch * RAD_TO_DEG;
+
+//			// Filter yaw, pitch, and roll
+//			const float fc = 10.0f;
+//			const float a = DT / (1.0f/(2.0f*M_PI*fc) + DT);
+//			if(isFirst)
+//			{
+//				CM_KneeJoint.IMU_Data.yaw[1] = yaw * RAD_TO_DEG;
+//				CM_KneeJoint.IMU_Data.pitch[1] = -roll * RAD_TO_DEG;
+//				CM_KneeJoint.IMU_Data.roll[1] = -pitch * RAD_TO_DEG;
+//			}
+//			else
+//			{
+//				CM_KneeJoint.IMU_Data.yaw[0] = (1.0f-a)*CM_KneeJoint.IMU_Data.yaw[1] + a*yaw * RAD_TO_DEG;
+//				CM_KneeJoint.IMU_Data.pitch[0] = (1.0f-a)*CM_KneeJoint.IMU_Data.pitch[1] - a*roll * RAD_TO_DEG;
+//				CM_KneeJoint.IMU_Data.roll[0] = (1.0f-a)*CM_KneeJoint.IMU_Data.roll[1] - a*pitch * RAD_TO_DEG;
+//			}
+
+			CM_KneeJoint.IMU_Data.yaw[0] = yaw * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.pitch[0] = -roll * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.roll[0] = -pitch * RAD_TO_DEG;
 		}
 
-		CM_thighAngle[0] = -(CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch);
+		CM_thighAngle[0] = -(CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch[0]);
 	}
 }
 
