@@ -210,8 +210,8 @@ int main(void)
 	}
 	if((Prosthesis_Init.Joint == Knee) || (Prosthesis_Init.Joint == Combined))
 	{
-	  	if(BNO08x_Init())
-	  		ErrorHandler(KneeIMU_Error);
+//	  	if(BNO08x_Init())
+//	  		ErrorHandler(KneeIMU_Error);
 
 		AKxx_x_ReadData_t RxData_Float;
 		while(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
@@ -236,7 +236,7 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(BypassStateMachine);
+	RequireTestProgram(PassiveEmulation);
 
 	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint == Ankle))
 		ErrorHandler(PassiveEmulationError);

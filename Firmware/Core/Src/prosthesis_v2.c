@@ -242,6 +242,14 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_AnkleJoint.SwingExtCtrl.kp = 2.0f;
 		CM_AnkleJoint.SwingExtCtrl.position = -5.0f;
 
+		CM_AnkleJoint.SwingFlexCtrl.kd = 0.05f;
+		CM_AnkleJoint.SwingFlexCtrl.kp = 2.0f;
+		CM_AnkleJoint.SwingFlexCtrl.position = -5.0f;
+
+		CM_AnkleJoint.PassEmulCtrl.kd = 0.05f;
+		CM_AnkleJoint.PassEmulCtrl.kp = 2.0f;
+		CM_AnkleJoint.PassEmulCtrl.position = -5.0f;
+
 		MPU925x_SetChipSelect(0);
 		MPU925x_StartReadIMU_IT(0);
 
@@ -271,6 +279,18 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_KneeJoint.SwingExtCtrl.kd = 0.05f;
 		CM_KneeJoint.SwingExtCtrl.kp = 2.0f;
 		CM_KneeJoint.SwingExtCtrl.position = 0.0f;
+
+		CM_KneeJoint.PassEmulStanceCtrl.kd = 0.05f;
+		CM_KneeJoint.PassEmulStanceCtrl.kp = 5.0f;
+		CM_KneeJoint.PassEmulStanceCtrl.position = 0.0f;
+
+		CM_KneeJoint.PassEmulFlexCtrl.kd = 0.00f;
+		CM_KneeJoint.PassEmulFlexCtrl.position = 0.0f;
+		CM_KneeJoint.PassEmulFlexCtrl.torque = 1.0f;
+
+		CM_KneeJoint.PassEmulExtCtrl.kd = 0.03f;
+		CM_KneeJoint.PassEmulExtCtrl.position = 0.0f;
+		CM_KneeJoint.PassEmulExtCtrl.torque = 10.0f;
 
 		switch(Device.CPC_Spec)
 		{
@@ -407,17 +427,17 @@ void ErrorHandler(Error_e error)
 
 static void InitStateVals(void)
 {
-	float state_angle_max[3] = { 10.0f,  60.0f, 60.0f};		// {Ankle, Combined, Knee}
-	float state_angle_min[3] = {-20.0f, -20.0f,  0.0f};		// {Ankle, Combined, Knee}
+	const float state_angle_max[3] = { 10.0f,  60.0f, 60.0f};		// {Ankle, Combined, Knee}
+	const float state_angle_min[3] = {-20.0f, -20.0f,  0.0f};		// {Ankle, Combined, Knee}
 
-	float state_torque_max[3] = {  50.0f,   50.0f,  50.0f};	// {Ankle, Combined, Knee}
-	float state_torque_min[3] = {-100.0f, -100.0f, -50.0f};	// {Ankle, Combined, Knee}
+	const float state_torque_max[3] = {  50.0f,   50.0f,  50.0f};	// {Ankle, Combined, Knee}
+	const float state_torque_min[3] = {-100.0f, -100.0f, -50.0f};	// {Ankle, Combined, Knee}
 
-	float state_speed_max[3] = { 600.0f,  600.0f,  600.0f};	// {Ankle, Combined, Knee}
-	float state_speed_min[3] = {-600.0f, -600.0f, -600.0f};	// {Ankle, Combined, Knee}
+	const float state_speed_max[3] = { 200.0f,  200.0f,  200.0f};	// {Ankle, Combined, Knee}
+	const float state_speed_min[3] = {-200.0f, -200.0f, -200.0f};	// {Ankle, Combined, Knee}
 
-	float state_loadCell_max = 1600.0f;
-	float state_loadCell_min = 1100.0f;
+	const float state_loadCell_max = 1600.0f;
+	const float state_loadCell_min = 1100.0f;
 
 	uint8_t nStates = 6;
 	for(uint8_t j = 0; j < nStates-1; j++)
@@ -490,38 +510,38 @@ static void GetInputs(void)
 	}
 	if((Device.Joint == Knee) || (Device.Joint == Combined))
 	{
-		if(!ankleImuInUse)
-		{
-			HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-			kneeImuInUse = 1;
-
-			static uint8_t missedKneeImuCalls = 0;
-			if(BNO08x_resetOccurred)
-			{
-				BNO08x_resetOccurred = 0;
-				if(BNO08x_StartReports())
-					missedKneeImuCalls++;
-				else
-					missedKneeImuCalls = 0;
-
-				if(missedKneeImuCalls >= 5)
-					ErrorHandler(KneeIMU_Error);
-			}
-
-			BNO08x_ReadSensors();
-
-			if(BNO08x_readEventOccurred)
-			{
-				HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
-				HAL_NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
-				HAL_NVIC_DisableIRQ(SPI1_IRQn);
-				HAL_NVIC_ClearPendingIRQ(SPI1_IRQn);
-				HAL_NVIC_EnableIRQ(SPI1_IRQn);
-
-				BNO08x_readEventOccurred = 0;
-				kneeImuInUse = 0;
-			}
-		}
+//		if(!ankleImuInUse)
+//		{
+//			HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+//			kneeImuInUse = 1;
+//
+//			static uint8_t missedKneeImuCalls = 0;
+//			if(BNO08x_resetOccurred)
+//			{
+//				BNO08x_resetOccurred = 0;
+//				if(BNO08x_StartReports())
+//					missedKneeImuCalls++;
+//				else
+//					missedKneeImuCalls = 0;
+//
+//				if(missedKneeImuCalls >= 5)
+//					ErrorHandler(KneeIMU_Error);
+//			}
+//
+//			BNO08x_ReadSensors();
+//
+//			if(BNO08x_readEventOccurred)
+//			{
+//				HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+//				HAL_NVIC_ClearPendingIRQ(EXTI9_5_IRQn);
+//				HAL_NVIC_DisableIRQ(SPI1_IRQn);
+//				HAL_NVIC_ClearPendingIRQ(SPI1_IRQn);
+//				HAL_NVIC_EnableIRQ(SPI1_IRQn);
+//
+//				BNO08x_readEventOccurred = 0;
+//				kneeImuInUse = 0;
+//			}
+//		}
 	}
 }
 
@@ -763,19 +783,19 @@ static void SetStateVals(Joint_e joint, StateMachine_e state)
 	{
 		CM_state_angle = state_angle[Ankle][state];
 		CM_state_torque = state_torque[Ankle][state];
-		CM_state_speed = state_torque[Ankle][state];
+		CM_state_speed = state_speed[Ankle][state];
 	}
 	else if(joint == Combined)
 	{
 		CM_state_angle = state_angle[Combined][state];
 		CM_state_torque = state_torque[Combined][state];
-		CM_state_speed = state_torque[Combined][state];
+		CM_state_speed = state_speed[Combined][state];
 	}
 	else if(joint == Knee)
 	{
 		CM_state_angle = state_angle[Knee][state];
 		CM_state_torque = state_torque[Knee][state];
-		CM_state_speed = state_torque[Knee][state];
+		CM_state_speed = state_speed[Knee][state];
 	}
 }
 
