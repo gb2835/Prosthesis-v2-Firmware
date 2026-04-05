@@ -242,13 +242,9 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_AnkleJoint.SwingExtCtrl.kp = 2.0f;
 		CM_AnkleJoint.SwingExtCtrl.position = -5.0f;
 
-		CM_AnkleJoint.SwingFlexCtrl.kd = 0.05f;
-		CM_AnkleJoint.SwingFlexCtrl.kp = 2.0f;
-		CM_AnkleJoint.SwingFlexCtrl.position = -5.0f;
-
 		CM_AnkleJoint.PassEmulCtrl.kd = 0.05f;
 		CM_AnkleJoint.PassEmulCtrl.kp = 2.0f;
-		CM_AnkleJoint.PassEmulCtrl.position = -5.0f;
+		CM_AnkleJoint.PassEmulCtrl.position = -10.0f;
 
 		if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
 			ErrorHandler(CAN_Error);
@@ -283,9 +279,9 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 
 		CM_KneeJoint.PassEmulFlexCtrl.kd = 0.00f;
 		CM_KneeJoint.PassEmulFlexCtrl.position = 0.0f;
-		CM_KneeJoint.PassEmulFlexCtrl.torque = 1.0f;
+		CM_KneeJoint.PassEmulFlexCtrl.torque = 0.0f;
 
-		CM_KneeJoint.PassEmulExtCtrl.kd = 0.03f;
+		CM_KneeJoint.PassEmulExtCtrl.kd = 0.01f;
 		CM_KneeJoint.PassEmulExtCtrl.position = 0.0f;
 		CM_KneeJoint.PassEmulExtCtrl.torque = 10.0f;
 
@@ -433,7 +429,7 @@ static void InitStateVals(void)
 	const float state_speed_max[3] = { 200.0f,  200.0f,  200.0f};	// {Ankle, Combined, Knee}
 	const float state_speed_min[3] = {-200.0f, -200.0f, -200.0f};	// {Ankle, Combined, Knee}
 
-	const float state_loadCell_max = 1600.0f;
+	const float state_loadCell_max = 1400.0f;
 	const float state_loadCell_min = 1100.0f;
 
 	uint8_t nStates = 6;
