@@ -26,7 +26,7 @@
 
 
 /*******************************************************************************
-* USER ADDED CODE
+* USER MODIFIED ADDED CODE
 *******************************************************************************/
 
 #include <stm32l4xx.h>
@@ -169,7 +169,7 @@ static int txProcess(shtp_t *pShtp, uint8_t chan, const uint8_t* pData, uint32_t
 
 
 /*******************************************************************************
-* USER ADDED COMMENT OUT
+* USER MODIFIED COMMENT OUT
 *******************************************************************************/
 
 //        while (status == 0)
@@ -180,7 +180,7 @@ static int txProcess(shtp_t *pShtp, uint8_t chan, const uint8_t* pData, uint32_t
 
 
 /*******************************************************************************
-* USER ADDED CODE
+* USER MODIFIED ADDED CODE
 *******************************************************************************/
 
         uint8_t timeoutOccurred = 1;

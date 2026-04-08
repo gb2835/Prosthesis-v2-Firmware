@@ -17,6 +17,12 @@ typedef enum
 
 typedef enum
 {
+	Specific,
+	Winter
+} CPC_Spec_e;
+
+typedef enum
+{
 	AnkleIndex,
 	KneeIndex
 } DeviceIndex_e;
@@ -29,7 +35,8 @@ typedef enum
 	CAN_Error,
 	KneeIMU_Error,
 	KneeMotorError,
-	MotorReadError
+	MotorReadError,
+	PassiveEmulationError
 } Error_e;
 
 typedef enum
@@ -56,13 +63,15 @@ typedef enum
 
 typedef enum
 {
-	None,
-	ReadOnly,
-	ImpedanceControl
+	NoTestProgram,
+	BypassStateMachine,
+	PassiveEmulation,
+	ReadOnly
 } TestProgram_e;
 
 typedef struct
 {
+	CPC_Spec_e CPC_Spec;
 	Joint_e Joint;
 	Side_e Side;
 } Prosthesis_Init_t;

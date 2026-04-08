@@ -7,10 +7,11 @@
  *
  ******************************************************************************/
 
-#include <math.h>
-#include <stdint.h>
 #include "stm32l476xx.h"
 #include "utilities.h"
+
+#include <math.h>
+#include <stdint.h>
 
 /**
  * Due to overhead faster delays will be less accurate. From observations on scope with TIM6 = 10 MHz:
@@ -102,14 +103,15 @@ void Utils_QuaternionToYPR(float r, float i, float j, float k, float *yaw, float
     *roll = atan2(sinr_cosp, cosr_cosp);
 }
 
+/*
+ * Radians used.
+ * */
 Utils_Quaternion_t Utils_RotateQuaternion(Utils_Rotation_t *Rotation, Utils_Quaternion_t *Quaternion)
 {
     float w = cos(Rotation->angle / 2.0f);
-
-    float factor = sin(Rotation->angle / 2.0f);
-    float x = Rotation->x * factor;
-    float y = Rotation->y * factor;
-    float z = Rotation->z * factor;
+    float x = Rotation->x * sin(Rotation->angle / 2.0f);
+    float y = Rotation->y * sin(Rotation->angle / 2.0f);
+    float z = Rotation->z * sin(Rotation->angle / 2.0f);
 
     float rotation[4] = {w, x, y, z};
     Utils_Normalize(rotation, 4);
@@ -146,6 +148,14 @@ void Utils_Normalize(float *vector, uint8_t length)
 		vector[i] *= inverseMagnitude;
 }
 
+float Utils_LinearInterpolate(float x, float x1, float y1, float x2, float y2)
+{
+	// Avoid division by zero if x1 and x2 are the same
+    if (x1 == x2)
+        return y1;
+
+    return y1 + (x - x1) * ((y2 - y1) / (x2 - x1));
+}
 
 /*******************************************************************************
 * END

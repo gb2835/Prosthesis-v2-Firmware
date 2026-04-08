@@ -13,9 +13,8 @@
 * 3. LED meanings below.
 * 		- Flashing blue = Ankle motor not initialized (most likely no motor power)
 * 		- Flashing white = Knee motor not initialized (most likely no motor power)
-* 		- Solid Blue = waiting for CM__StartProgram to be true (only when RequireTestProgram(None);)
-* 		- Solid Green = motor(s) are communicating
-* 		- Solid Red = program in error handler
+* 		- Solid green = motor(s) are communicating
+* 		- Solid red = program in error handler
 *
 *******************************************************************************/
 
@@ -77,7 +76,6 @@ void SystemClock_Config(void);
 
 #define LPTIM2_PERIOD	0x3F	// Timer frequency = timer clock frequency / (prescaler * (period + 1))
 
-static uint8_t CM__StartProgram = 0;
 uint8_t isProsthesisControlRequired = 0;
 
 
@@ -163,7 +161,8 @@ int main(void)
 	AnkleIMU_Init.csPin = ANKLE_IMU_CS_Pin;
 
 	Prosthesis_Init_t Prosthesis_Init;
-	Prosthesis_Init.Joint = Knee;
+	Prosthesis_Init.CPC_Spec = Winter;
+	Prosthesis_Init.Joint = Combined;
 	Prosthesis_Init.Side = Right;
 
 
@@ -186,6 +185,7 @@ int main(void)
 	if(HAL_CAN_Start(&hcan1))
 		ErrorHandler(CAN_Error);
 
+	uint32_t txMailbox;
 	if((Prosthesis_Init.Joint == Ankle) || (Prosthesis_Init.Joint == Combined))
 	{
 		LL_mDelay(10);
@@ -193,7 +193,6 @@ int main(void)
 	  		ErrorHandler(AnkleIMU_Error);
 		MPU925x_SetGyroSensitivity(0, MPU925x_GyroSensitivity_1000dps);
 
-		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
 		while(AKxx_x_Init(AnkleIndex, &Motor_Init[AnkleIndex]))
 		{
@@ -214,7 +213,6 @@ int main(void)
 	  	if(BNO08x_Init())
 	  		ErrorHandler(KneeIMU_Error);
 
-		uint32_t txMailbox;
 		AKxx_x_ReadData_t RxData_Float;
 		while(AKxx_x_Init(KneeIndex, &Motor_Init[KneeIndex]))
 		{
@@ -231,9 +229,6 @@ int main(void)
 			ErrorHandler(KneeMotorError);
 	}
 
-	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
-		ErrorHandler(CAN_Error);
-
 	InitProsthesisControl(&Prosthesis_Init);
 
 
@@ -241,16 +236,10 @@ int main(void)
 * USER ADDED TEST PROGRAMS
 *******************************************************************************/
 
-	RequireTestProgram(ImpedanceControl);
+	RequireTestProgram(PassiveEmulation);
 
-	if(testProgram == None)
-	{
-		while(!CM__StartProgram)
-		{
-			ActivateLED(Blue);
-		}
-		ActivateLED(NoColor);
-	}
+	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint == Ankle))
+		ErrorHandler(PassiveEmulationError);
 
 
 /*******************************************************************************
@@ -259,8 +248,11 @@ int main(void)
 
 	while(1)
 	{
-		RunProsthesisControl();
-		isProsthesisControlRequired = 0;
+		if(isProsthesisControlRequired)
+		{
+			RunProsthesisControl();
+			isProsthesisControlRequired = 0;
+		}
 
 
 /******************************************************************************/

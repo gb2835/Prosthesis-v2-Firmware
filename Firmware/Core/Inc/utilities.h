@@ -28,6 +28,7 @@ typedef struct
 	float k;
 } Utils_Quaternion_t;
 
+// Axis-angle representation
 typedef struct
 {
 	float angle;
@@ -42,6 +43,7 @@ double Utils_CalculateIMU_GlobalAngle(double accel_1, double accel_2, double acc
 void Utils_QuaternionToYPR(float r, float i, float j, float k, float *yaw, float *pitch, float *roll);
 Utils_Quaternion_t Utils_RotateQuaternion(Utils_Rotation_t *Rotation, Utils_Quaternion_t *Quaternion);
 void Utils_Normalize(float *vector, uint8_t length);
+float Utils_LinearInterpolate(float x, float x1, float y1, float x2, float y2);
 
 
 /*******************************************************************************

@@ -46,7 +46,8 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_gpio.h \
  ../Drivers/MPU-925x/mpu925x_spi_hal.h ../Core/Inc/prosthesis_v2.h \
  ../Core/Inc/utilities.h \
- ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h
+ ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h \
+ ../Core/Inc/winter_bio_data.h
 ../Drivers/AKxx-x/akxx-x.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h:
@@ -97,3 +98,4 @@ Core/Src/prosthesis_v2.o: ../Core/Src/prosthesis_v2.c \
 ../Core/Inc/prosthesis_v2.h:
 ../Core/Inc/utilities.h:
 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l476xx.h:
+../Core/Inc/winter_bio_data.h:
