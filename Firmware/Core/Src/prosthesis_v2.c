@@ -285,7 +285,7 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 
 		switch(Device.CPC_Spec)
 		{
-		case Specific:
+		case GregBerkeley:
 			// ??
 			break;
 		case Winter:
@@ -991,7 +991,7 @@ static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_
 
 static void RunPassiveEmulation(void)
 {
-	if(CM_KneeJoint.position < CM_KneeJoint.PassEmulStanceCtrl.position)
+	if(CM_KneeJoint.position < CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f)
 	{
 		CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
 		CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.kp;
@@ -999,25 +999,18 @@ static void RunPassiveEmulation(void)
 	}
 	else
 	{
+		// test this??
 		if(CM_KneeJoint.speed >= 0)
 		{
 			CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
 			CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.torque;
-
-			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f)
-				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
-			else
-				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
+			CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
 		}
 		else
 		{
 			CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
 			CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.torque;
-
-			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f)
-				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
-			else
-				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
+			CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
 		}
 	}
 

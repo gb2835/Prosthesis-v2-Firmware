@@ -17,7 +17,7 @@ typedef enum
 
 typedef enum
 {
-	Specific,
+	GregBerkeley,
 	Winter
 } CPC_Spec_e;
 
