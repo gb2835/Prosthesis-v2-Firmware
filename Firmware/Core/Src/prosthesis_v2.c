@@ -11,6 +11,7 @@
 * 		- Torque		= N·m
 * 		- Speed			= °/s
 * 2. Some variables are scaled to 9 to fill the plots better in CubeMonitor.
+* 3. Some variable names are abbreviated to show fully in CubeMonitor.
 *
 *******************************************************************************/
 
@@ -66,14 +67,14 @@ typedef enum
 typedef struct
 {
 	AKxx_x_ReadData_t MotorReadData;
-	AKxx_x_WriteData_t ProsCtrl;
+	AKxx_x_WriteData_t ProsthesisCtrl;
 	AKxx_x_WriteData_t EarlyStanceCtrl;
 	AKxx_x_WriteData_t MidStanceCtrl;
 	AKxx_x_WriteData_t LateStanceCtrl;
-	AKxx_x_WriteData_t SwingFlexCtrl;
-	AKxx_x_WriteData_t SwingExtCtrl;
+	AKxx_x_WriteData_t SwingFlexionCtrl;
+	AKxx_x_WriteData_t SwingExtensionCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
-	AKxx_x_WriteData_t PassEmulCtrl;
+	AKxx_x_WriteData_t PassiveEmulationCtrl;
 	AKxx_x_WriteData_t ConstantImpedanceCtrl;
 	float position;
 	float speed;
@@ -109,16 +110,16 @@ typedef struct
 typedef struct
 {
 	AKxx_x_ReadData_t MotorReadData;
-	AKxx_x_WriteData_t ProsCtrl;
+	AKxx_x_WriteData_t ProsthesisCtrl;
 	AKxx_x_WriteData_t EarlyStanceCtrl;
 	AKxx_x_WriteData_t MidStanceCtrl;
 	AKxx_x_WriteData_t LateStanceCtrl;
-	AKxx_x_WriteData_t SwingFlexCtrl;
-	AKxx_x_WriteData_t SwingExtCtrl;
+	AKxx_x_WriteData_t SwingFlexionCtrl;
+	AKxx_x_WriteData_t SwingExtensionCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
-	AKxx_x_WriteData_t PassEmulExtCtrl;
-	AKxx_x_WriteData_t PassEmulFlexCtrl;
 	AKxx_x_WriteData_t PassEmulStanceCtrl;
+	AKxx_x_WriteData_t PassEmulFlexCtrl;
+	AKxx_x_WriteData_t PassEmulExtCtrl;
 	AKxx_x_WriteData_t ConstantImpedanceCtrl;
 	CPC_Params_t CPC_Params;
 	float position;
@@ -233,17 +234,17 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_AnkleJoint.LateStanceCtrl.kp = 2.0f;
 		CM_AnkleJoint.LateStanceCtrl.position = -5.0f;
 
-		CM_AnkleJoint.SwingFlexCtrl.kd = 0.05f;
-		CM_AnkleJoint.SwingFlexCtrl.kp = 2.0f;
-		CM_AnkleJoint.SwingFlexCtrl.position = -5.0f;
+		CM_AnkleJoint.SwingFlexionCtrl.kd = 0.05f;
+		CM_AnkleJoint.SwingFlexionCtrl.kp = 2.0f;
+		CM_AnkleJoint.SwingFlexionCtrl.position = -5.0f;
 
-		CM_AnkleJoint.SwingExtCtrl.kd = 0.05f;
-		CM_AnkleJoint.SwingExtCtrl.kp = 2.0f;
-		CM_AnkleJoint.SwingExtCtrl.position = -5.0f;
+		CM_AnkleJoint.SwingExtensionCtrl.kd = 0.05f;
+		CM_AnkleJoint.SwingExtensionCtrl.kp = 2.0f;
+		CM_AnkleJoint.SwingExtensionCtrl.position = -5.0f;
 
-		CM_AnkleJoint.PassEmulCtrl.kd = 0.05f;
-		CM_AnkleJoint.PassEmulCtrl.kp = 2.0f;
-		CM_AnkleJoint.PassEmulCtrl.position = -10.0f;
+		CM_AnkleJoint.PassiveEmulationCtrl.kd = 0.05f;
+		CM_AnkleJoint.PassiveEmulationCtrl.kp = 2.0f;
+		CM_AnkleJoint.PassiveEmulationCtrl.position = -10.0f;
 
 		if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
 			ErrorHandler(CAN_Error);
@@ -264,24 +265,22 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_KneeJoint.LateStanceCtrl.kp = 2.0f;
 		CM_KneeJoint.LateStanceCtrl.position = 0.0f;
 
-		CM_KneeJoint.SwingFlexCtrl.kd = 0.05f;
-		CM_KneeJoint.SwingFlexCtrl.kp = 2.0f;
-		CM_KneeJoint.SwingFlexCtrl.position = 0.0f;
+		CM_KneeJoint.SwingFlexionCtrl.kd = 0.05f;
+		CM_KneeJoint.SwingFlexionCtrl.kp = 2.0f;
+		CM_KneeJoint.SwingFlexionCtrl.position = 0.0f;
 
-		CM_KneeJoint.SwingExtCtrl.kd = 0.05f;
-		CM_KneeJoint.SwingExtCtrl.kp = 2.0f;
-		CM_KneeJoint.SwingExtCtrl.position = 0.0f;
+		CM_KneeJoint.SwingExtensionCtrl.kd = 0.05f;
+		CM_KneeJoint.SwingExtensionCtrl.kp = 2.0f;
+		CM_KneeJoint.SwingExtensionCtrl.position = 0.0f;
 
 		CM_KneeJoint.PassEmulStanceCtrl.kd = 0.05f;
 		CM_KneeJoint.PassEmulStanceCtrl.kp = 5.0f;
 		CM_KneeJoint.PassEmulStanceCtrl.position = 0.0f;
 
 		CM_KneeJoint.PassEmulFlexCtrl.kd = 0.00f;
-		CM_KneeJoint.PassEmulFlexCtrl.position = 0.0f;
 		CM_KneeJoint.PassEmulFlexCtrl.torque = 0.0f;
 
 		CM_KneeJoint.PassEmulExtCtrl.kd = 0.01f;
-		CM_KneeJoint.PassEmulExtCtrl.position = 0.0f;
 		CM_KneeJoint.PassEmulExtCtrl.torque = 10.0f;
 
 		switch(Device.CPC_Spec)
@@ -335,7 +334,7 @@ void RunProsthesisControl(void)
 			CM_trajectory = 0.0f;
 	}
 
-	if((operationMode == FullProgramWithPE) || (operationMode == FullProgramWithoutPE))
+	if((operationMode == StateMachineCtrlWithPE) || (operationMode == StateMachineCtrlWithoutPE))
 		RunStateMachine(CtrlParams);
 	else if(operationMode == ConstantImpedance)
 		SetCtrlParams(Device.Joint, 0, &CM_AnkleJoint.ConstantImpedanceCtrl, &CM_KneeJoint.ConstantImpedanceCtrl);
@@ -724,7 +723,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 					state = SwingExtension;
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingFlexCtrl, &CM_KneeJoint.SwingFlexCtrl);
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingFlexionCtrl, &CM_KneeJoint.SwingFlexionCtrl);
 
 		break;
 
@@ -740,7 +739,7 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 			}
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingExtCtrl, &CM_KneeJoint.SwingExtCtrl);
+			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.SwingExtensionCtrl, &CM_KneeJoint.SwingExtensionCtrl);
 
 		break;
 
@@ -974,66 +973,59 @@ static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_
 {
 	if((joint == Ankle) || (joint == Combined))
 	{
-		CM_AnkleJoint.ProsCtrl.kd = AnkleMotorWriteData->kd;
-		CM_AnkleJoint.ProsCtrl.kp = AnkleMotorWriteData->kp;
-		CM_AnkleJoint.ProsCtrl.position = AnkleMotorWriteData->position;
+		CM_AnkleJoint.ProsthesisCtrl.kd = AnkleMotorWriteData->kd;
+		CM_AnkleJoint.ProsthesisCtrl.kp = AnkleMotorWriteData->kp;
+		CM_AnkleJoint.ProsthesisCtrl.position = AnkleMotorWriteData->position;
 	}
 	if((joint == Knee) || (joint == Combined))
 	{
-		CM_KneeJoint.ProsCtrl.kd = KneeMotorWriteData->kd;
-		CM_KneeJoint.ProsCtrl.kp = KneeMotorWriteData->kp;
+		CM_KneeJoint.ProsthesisCtrl.kd = KneeMotorWriteData->kd;
+		CM_KneeJoint.ProsthesisCtrl.kp = KneeMotorWriteData->kp;
 
 		if(state == CPC)
-			CM_KneeJoint.ProsCtrl.position = CM_trajectory;
+			CM_KneeJoint.ProsthesisCtrl.position = CM_trajectory;
 		else
-			CM_KneeJoint.ProsCtrl.position = KneeMotorWriteData->position;
+			CM_KneeJoint.ProsthesisCtrl.position = KneeMotorWriteData->position;
 	}
 }
 
-// do i need this still??
 static void RunPassiveEmulation(void)
 {
-	// Avoid unstable kp calcs
-	if(CM_KneeJoint.PassEmulExtCtrl.position < 1.0f)
-		CM_KneeJoint.PassEmulExtCtrl.position = 1.0f;
-	if(CM_KneeJoint.PassEmulFlexCtrl.position < 1.0f)
-		CM_KneeJoint.PassEmulFlexCtrl.position = 1.0f;
-
 	if(CM_KneeJoint.position < CM_KneeJoint.PassEmulStanceCtrl.position)
 	{
-		CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
-		CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.kp;
-		CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
+		CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
+		CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.kp;
+		CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
 	}
 	else
 	{
 		if(CM_KneeJoint.speed >= 0)
 		{
-			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.torque / CM_KneeJoint.PassEmulFlexCtrl.position;
+			CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
+			CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.torque;
 
-			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulFlexCtrl.position + CM_KneeJoint.PassEmulStanceCtrl.position)
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulFlexCtrl.position;
+			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f)
+				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
 			else
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
+				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
 		}
 		else
 		{
-			CM_KneeJoint.ProsCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
-			CM_KneeJoint.ProsCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.torque / CM_KneeJoint.PassEmulExtCtrl.position;
+			CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
+			CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.torque;
 
-			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulExtCtrl.position + CM_KneeJoint.PassEmulStanceCtrl.position)
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulExtCtrl.position;
+			if(CM_KneeJoint.position > CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f)
+				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
 			else
-				CM_KneeJoint.ProsCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
+				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
 		}
 	}
 
 	if(Device.Joint == Combined)
 	{
-		CM_AnkleJoint.ProsCtrl.kd = CM_AnkleJoint.PassEmulCtrl.kd;
-		CM_AnkleJoint.ProsCtrl.kp = CM_AnkleJoint.PassEmulCtrl.kp;
-		CM_AnkleJoint.ProsCtrl.position = CM_AnkleJoint.PassEmulCtrl.position;
+		CM_AnkleJoint.ProsthesisCtrl.kd = CM_AnkleJoint.PassiveEmulationCtrl.kd;
+		CM_AnkleJoint.ProsthesisCtrl.kp = CM_AnkleJoint.PassiveEmulationCtrl.kp;
+		CM_AnkleJoint.ProsthesisCtrl.position = CM_AnkleJoint.PassiveEmulationCtrl.position;
 	}
 }
 
@@ -1099,16 +1091,16 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_AnkleJoint.speed = -CM_AnkleJoint.MotorReadData.speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
 		CM_AnkleJoint.torque = -CM_AnkleJoint.MotorReadData.torque * ANKLE_GEAR_RATIO;
 
-		if((operationMode == ReadOnly) || ((operationMode == FullProgramWithPE) && !CM__startProgram) || ((operationMode == FullProgramWithoutPE) && !CM__startProgram) || ((operationMode == PassiveEmulation) && !CM__startProgram))
+		if((operationMode == ReadOnly) || ((operationMode == StateMachineCtrlWithPE) && !CM__startProgram) || ((operationMode == StateMachineCtrlWithoutPE) && !CM__startProgram) || ((operationMode == PassiveEmulation) && !CM__startProgram))
 		{
 			MotorTxData.kd = 0.0f;
 			MotorTxData.kp = 0.0f;
 		}
 		else
 		{
-			MotorTxData.kd = CM_AnkleJoint.ProsCtrl.kd / (ANKLE_GEAR_RATIO * ANKLE_GEAR_RATIO * DEG_TO_RAD);
-			MotorTxData.kp = CM_AnkleJoint.ProsCtrl.kp / (ANKLE_GEAR_RATIO * ANKLE_GEAR_RATIO * DEG_TO_RAD);
-			MotorTxData.position = (-CM_AnkleJoint.ProsCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
+			MotorTxData.kd = CM_AnkleJoint.ProsthesisCtrl.kd / (ANKLE_GEAR_RATIO * ANKLE_GEAR_RATIO * DEG_TO_RAD);
+			MotorTxData.kp = CM_AnkleJoint.ProsthesisCtrl.kp / (ANKLE_GEAR_RATIO * ANKLE_GEAR_RATIO * DEG_TO_RAD);
+			MotorTxData.position = (-CM_AnkleJoint.ProsthesisCtrl.position - ANKLE_POSITION_OFFSET_FROM_PLANARFLEXION_BUMPER) * ANKLE_GEAR_RATIO * DEG_TO_RAD;
 		}
 
 		if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))
@@ -1123,16 +1115,16 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_KneeJoint.speed = -CM_KneeJoint.MotorReadData.speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
 		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO / 0.6f; //divide 0.6??
 
-		if((operationMode == ReadOnly) || ((operationMode == FullProgramWithPE) && !CM__startProgram) || ((operationMode == FullProgramWithoutPE) && !CM__startProgram) || ((operationMode == PassiveEmulation) && !CM__startProgram))
+		if((operationMode == ReadOnly) || ((operationMode == StateMachineCtrlWithPE) && !CM__startProgram) || ((operationMode == StateMachineCtrlWithoutPE) && !CM__startProgram) || ((operationMode == PassiveEmulation) && !CM__startProgram))
 		{
 			MotorTxData.kd = 0.0f;
 			MotorTxData.kp = 0.0f;
 		}
 		else
 		{
-			MotorTxData.kd = CM_KneeJoint.ProsCtrl.kd / (KNEE_GEAR_RATIO * KNEE_GEAR_RATIO * DEG_TO_RAD);
-			MotorTxData.kp = CM_KneeJoint.ProsCtrl.kp / (KNEE_GEAR_RATIO * KNEE_GEAR_RATIO * DEG_TO_RAD);
-			MotorTxData.position = (-CM_KneeJoint.ProsCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
+			MotorTxData.kd = CM_KneeJoint.ProsthesisCtrl.kd / (KNEE_GEAR_RATIO * KNEE_GEAR_RATIO * DEG_TO_RAD);
+			MotorTxData.kp = CM_KneeJoint.ProsthesisCtrl.kp / (KNEE_GEAR_RATIO * KNEE_GEAR_RATIO * DEG_TO_RAD);
+			MotorTxData.position = (-CM_KneeJoint.ProsthesisCtrl.position - KNEE_POSITION_OFFSET_FROM_EXTENSION_BUMPER) * KNEE_GEAR_RATIO * DEG_TO_RAD;
 		}
 
 		if(AKxx_x_WriteMotor(deviceIndex, &MotorTxData, &txMailbox))

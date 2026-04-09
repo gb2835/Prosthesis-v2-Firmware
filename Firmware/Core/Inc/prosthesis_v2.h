@@ -63,8 +63,8 @@ typedef enum
 
 typedef enum
 {
-	FullProgramWithPE,		// PE = Passive Emulation
-	FullProgramWithoutPE,	// PE = Passive Emulation
+	StateMachineCtrlWithPE,		// PE = Passive Emulation
+	StateMachineCtrlWithoutPE,	// PE = Passive Emulation
 	PassiveEmulation,
 	ConstantImpedance,
 	ReadOnly

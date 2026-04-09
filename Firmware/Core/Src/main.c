@@ -238,7 +238,7 @@ int main(void)
 
 	operationMode = PassiveEmulation;
 
-	if(((operationMode == PassiveEmulation) || (operationMode == FullProgramWithPE)) && (Prosthesis_Init.Joint == Ankle))
+	if(((operationMode == PassiveEmulation) || (operationMode == StateMachineCtrlWithPE)) && (Prosthesis_Init.Joint == Ankle))
 		ErrorHandler(PassiveEmulationError);
 
 
