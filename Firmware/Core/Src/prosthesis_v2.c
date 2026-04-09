@@ -101,9 +101,9 @@ typedef struct
 	float gx;
 	float gy;
 	float gz;
-	float yaw[2];
-	float pitch[2];
-	float roll[2];
+	float yaw;
+	float pitch;
+	float roll;
 } KneeIMU_Data_t;
 
 typedef struct
@@ -622,9 +622,9 @@ static void ProcessInputs(void)
 			float yaw, pitch, roll;
 			Utils_QuaternionToYPR(Quaternion.r, Quaternion.i, Quaternion.j, Quaternion.k, &yaw, &pitch, &roll);
 
-//			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
-//			CM_KneeJoint.IMU_Data.pitch = roll * RAD_TO_DEG;
-//			CM_KneeJoint.IMU_Data.roll = pitch * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.pitch = roll * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.roll = pitch * RAD_TO_DEG;
 		}
 		else if(Device.Side == Right)
 		{
@@ -644,28 +644,12 @@ static void ProcessInputs(void)
 			float yaw, pitch, roll;
 			Utils_QuaternionToYPR(Quaternion.r, Quaternion.i, Quaternion.j, Quaternion.k, &yaw, &pitch, &roll);
 
-//			// Filter yaw, pitch, and roll
-//			const float fc = 10.0f;
-//			const float a = DT / (1.0f/(2.0f*M_PI*fc) + DT);
-//			if(isFirst)
-//			{
-//				CM_KneeJoint.IMU_Data.yaw[1] = yaw * RAD_TO_DEG;
-//				CM_KneeJoint.IMU_Data.pitch[1] = -roll * RAD_TO_DEG;
-//				CM_KneeJoint.IMU_Data.roll[1] = -pitch * RAD_TO_DEG;
-//			}
-//			else
-//			{
-//				CM_KneeJoint.IMU_Data.yaw[0] = (1.0f-a)*CM_KneeJoint.IMU_Data.yaw[1] + a*yaw * RAD_TO_DEG;
-//				CM_KneeJoint.IMU_Data.pitch[0] = (1.0f-a)*CM_KneeJoint.IMU_Data.pitch[1] - a*roll * RAD_TO_DEG;
-//				CM_KneeJoint.IMU_Data.roll[0] = (1.0f-a)*CM_KneeJoint.IMU_Data.roll[1] - a*pitch * RAD_TO_DEG;
-//			}
-
-			CM_KneeJoint.IMU_Data.yaw[0] = yaw * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.pitch[0] = -roll * RAD_TO_DEG;
-			CM_KneeJoint.IMU_Data.roll[0] = -pitch * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.yaw = yaw * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.pitch = -roll * RAD_TO_DEG;
+			CM_KneeJoint.IMU_Data.roll = -pitch * RAD_TO_DEG;
 		}
 
-		CM_thighAngle[0] = -(CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch[0]);
+		CM_thighAngle[0] = -(CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch);
 	}
 }
 
