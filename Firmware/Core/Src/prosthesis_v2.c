@@ -195,7 +195,7 @@ static void GetSecondOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, 
 static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3);
 static void SetStateVals(Joint_e joint, StateMachine_e state);
 static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_t *AnkleMotorWriteData, AKxx_x_WriteData_t *KneeMotorWriteData);
-static void RunPassiveEmulation(void);
+static void RunPassiveEmulation(Joint_e joint);
 static void CheckMotorCalls(void);
 static void ServiceMotor(DeviceIndex_e deviceIndex);
 
@@ -339,7 +339,15 @@ void RunProsthesisControl(void)
 	else if(operationMode == ConstantImpedance)
 		SetCtrlParams(Device.Joint, 0, &CM_AnkleJoint.ConstantImpedanceCtrl, &CM_KneeJoint.ConstantImpedanceCtrl);
 	else if(operationMode == PassiveEmulation)
-		RunPassiveEmulation();
+	{
+		if(Device.Joint == Combined)
+		{
+			RunPassiveEmulation(Ankle);
+			RunPassiveEmulation(Knee);
+		}
+		else if(Device.Joint == Knee)
+			RunPassiveEmulation(Knee);
+	}
 
 	CheckMotorCalls();
 
@@ -667,7 +675,27 @@ static StateMachine_e RunStateMachine(StateMachineMethod_e method)
 				}
 		}
 		else if(method == CtrlParams)
-			SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.EarlyStanceCtrl, &CM_KneeJoint.EarlyStanceCtrl);
+		{
+			if(operationMode == StateMachineCtrlWithoutPE)
+				SetCtrlParams(Device.Joint, state, &CM_AnkleJoint.EarlyStanceCtrl, &CM_KneeJoint.EarlyStanceCtrl);
+			else if(operationMode == StateMachineCtrlWithPE)
+			{
+				AKxx_x_WriteData_t AnkleJointCtrl;
+				AKxx_x_WriteData_t KneeJointCtrl;
+				if(CM_AnkleJoint.EarlyStanceCtrl == 0)
+					RunPassiveEmulation(Ankle);
+				else
+					memcpy(&AnkleJointCtrl, &CM_AnkleJoint.EarlyStanceCtrl, sizeof(AKxx_x_WriteData_t));
+				if(CM_KneeJoint.EarlyStanceCtrl == 0)
+					RunPassiveEmulation(Knee);
+				else
+					memcpy(&KneeJointCtrl, &CM_KneeJoint.EarlyStanceCtrl, sizeof(AKxx_x_WriteData_t));
+
+				SetCtrlParams(Device.Joint, state, &AnkleJointCtrl, &KneeJointCtrl);
+			}
+
+
+		}
 
 		break;
 
@@ -989,37 +1017,37 @@ static void SetCtrlParams(Joint_e joint, StateMachine_e state, AKxx_x_WriteData_
 	}
 }
 
-static void RunPassiveEmulation(void)
+static void RunPassiveEmulation(Joint_e joint)
 {
-	if(CM_KneeJoint.position < CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f)
-	{
-		CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
-		CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.kp;
-		CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
-	}
-	else
-	{
-		// test this??
-		if(CM_KneeJoint.speed >= 0)
-		{
-			CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
-			CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.torque;
-			CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
-		}
-		else
-		{
-			CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
-			CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.torque;
-			CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
-		}
-	}
-
-	if(Device.Joint == Combined)
+	if(joint == Ankle)
 	{
 		CM_AnkleJoint.ProsthesisCtrl.kd = CM_AnkleJoint.PassiveEmulationCtrl.kd;
 		CM_AnkleJoint.ProsthesisCtrl.kp = CM_AnkleJoint.PassiveEmulationCtrl.kp;
 		CM_AnkleJoint.ProsthesisCtrl.position = CM_AnkleJoint.PassiveEmulationCtrl.position;
 	}
+	else if(joint == Knee)
+		if(CM_KneeJoint.position < CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f)
+		{
+			CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulStanceCtrl.kd;
+			CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulStanceCtrl.kp;
+			CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.PassEmulStanceCtrl.position;
+		}
+		else
+		{
+			// test this??
+			if(CM_KneeJoint.speed >= 0)
+			{
+				CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
+				CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.torque;
+				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
+			}
+			else
+			{
+				CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
+				CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.torque;
+				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
+			}
+		}
 }
 
 static void CheckMotorCalls(void)
