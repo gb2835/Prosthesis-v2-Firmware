@@ -32,7 +32,7 @@
 * PUBLIC DEFINITIONS
 *******************************************************************************/
 
-TestProgram_e testProgram = ReadOnly;
+OperationMode_e operationMode = ReadOnly;
 
 
 /*******************************************************************************
@@ -67,7 +67,6 @@ typedef struct
 {
 	AKxx_x_ReadData_t MotorReadData;
 	AKxx_x_WriteData_t ProsCtrl;
-	AKxx_x_WriteData_t BypassStateMachineCtrl;
 	AKxx_x_WriteData_t EarlyStanceCtrl;
 	AKxx_x_WriteData_t MidStanceCtrl;
 	AKxx_x_WriteData_t LateStanceCtrl;
@@ -75,6 +74,7 @@ typedef struct
 	AKxx_x_WriteData_t SwingExtCtrl;
 	AKxx_x_WriteData_t CPC_Ctrl;
 	AKxx_x_WriteData_t PassEmulCtrl;
+	AKxx_x_WriteData_t ConstantImpedanceCtrl;
 	float position;
 	float speed;
 	float torque;
@@ -110,7 +110,6 @@ typedef struct
 {
 	AKxx_x_ReadData_t MotorReadData;
 	AKxx_x_WriteData_t ProsCtrl;
-	AKxx_x_WriteData_t BypassStateMachineCtrl;
 	AKxx_x_WriteData_t EarlyStanceCtrl;
 	AKxx_x_WriteData_t MidStanceCtrl;
 	AKxx_x_WriteData_t LateStanceCtrl;
@@ -120,6 +119,7 @@ typedef struct
 	AKxx_x_WriteData_t PassEmulExtCtrl;
 	AKxx_x_WriteData_t PassEmulFlexCtrl;
 	AKxx_x_WriteData_t PassEmulStanceCtrl;
+	AKxx_x_WriteData_t ConstantImpedanceCtrl;
 	CPC_Params_t CPC_Params;
 	float position;
 	float speed;
@@ -157,7 +157,6 @@ static uint8_t ankleImuTxCplt = 0;
 static uint8_t ankleImuRxCplt = 0;
 static uint8_t isFirst = 1;
 static uint8_t isSecond = 0;
-static uint8_t isTestProgramRequired = 0;
 static uint8_t toeOff = 0;
 
 static AnkleJoint_t CM_AnkleJoint;
@@ -308,13 +307,6 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 	}
 }
 
-void RequireTestProgram(TestProgram_e option)
-{
-	testProgram = option;
-	if(testProgram != NoTestProgram)
-		isTestProgramRequired = 1;
-}
-
 void RunProsthesisControl(void)
 {
 	GetInputs();
@@ -343,11 +335,11 @@ void RunProsthesisControl(void)
 			CM_trajectory = 0.0f;
 	}
 
-	if(testProgram == NoTestProgram)
+	if((operationMode == FullProgramWithPE) || (operationMode == FullProgramWithoutPE))
 		RunStateMachine(CtrlParams);
-	else if(testProgram == BypassStateMachine)
-		SetCtrlParams(Device.Joint, 0, &CM_AnkleJoint.BypassStateMachineCtrl, &CM_KneeJoint.BypassStateMachineCtrl);
-	else if(testProgram == PassiveEmulation)
+	else if(operationMode == ConstantImpedance)
+		SetCtrlParams(Device.Joint, 0, &CM_AnkleJoint.ConstantImpedanceCtrl, &CM_KneeJoint.ConstantImpedanceCtrl);
+	else if(operationMode == PassiveEmulation)
 		RunPassiveEmulation();
 
 	CheckMotorCalls();
@@ -1107,7 +1099,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_AnkleJoint.speed = -CM_AnkleJoint.MotorReadData.speed / ANKLE_GEAR_RATIO * RAD_TO_DEG;
 		CM_AnkleJoint.torque = -CM_AnkleJoint.MotorReadData.torque * ANKLE_GEAR_RATIO;
 
-		if((testProgram == ReadOnly) || ((testProgram == NoTestProgram) && !CM__startProgram) || ((testProgram == PassiveEmulation) && !CM__startProgram))
+		if((operationMode == ReadOnly) || ((operationMode == FullProgramWithPE) && !CM__startProgram) || ((operationMode == FullProgramWithoutPE) && !CM__startProgram) || ((operationMode == PassiveEmulation) && !CM__startProgram))
 		{
 			MotorTxData.kd = 0.0f;
 			MotorTxData.kp = 0.0f;
@@ -1131,7 +1123,7 @@ static void ServiceMotor(DeviceIndex_e deviceIndex)
 		CM_KneeJoint.speed = -CM_KneeJoint.MotorReadData.speed / KNEE_GEAR_RATIO * RAD_TO_DEG;
 		CM_KneeJoint.torque = -CM_KneeJoint.MotorReadData.torque * KNEE_GEAR_RATIO / 0.6f; //divide 0.6??
 
-		if((testProgram == ReadOnly) || ((testProgram == NoTestProgram) && !CM__startProgram) || ((testProgram == PassiveEmulation) && !CM__startProgram))
+		if((operationMode == ReadOnly) || ((operationMode == FullProgramWithPE) && !CM__startProgram) || ((operationMode == FullProgramWithoutPE) && !CM__startProgram) || ((operationMode == PassiveEmulation) && !CM__startProgram))
 		{
 			MotorTxData.kd = 0.0f;
 			MotorTxData.kp = 0.0f;

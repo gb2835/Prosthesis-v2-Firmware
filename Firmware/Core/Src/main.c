@@ -233,12 +233,12 @@ int main(void)
 
 
 /*******************************************************************************
-* USER ADDED TEST PROGRAMS
+* USER ADDED OPERATION MODE
 *******************************************************************************/
 
-	RequireTestProgram(PassiveEmulation);
+	operationMode = PassiveEmulation;
 
-	if((testProgram == PassiveEmulation) && (Prosthesis_Init.Joint == Ankle))
+	if(((operationMode == PassiveEmulation) || (operationMode == FullProgramWithPE)) && (Prosthesis_Init.Joint == Ankle))
 		ErrorHandler(PassiveEmulationError);
 
 

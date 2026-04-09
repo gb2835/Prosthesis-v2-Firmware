@@ -63,11 +63,12 @@ typedef enum
 
 typedef enum
 {
-	NoTestProgram,
-	BypassStateMachine,
+	FullProgramWithPE,		// PE = Passive Emulation
+	FullProgramWithoutPE,	// PE = Passive Emulation
 	PassiveEmulation,
+	ConstantImpedance,
 	ReadOnly
-} TestProgram_e;
+} OperationMode_e;
 
 typedef struct
 {
@@ -76,10 +77,10 @@ typedef struct
 	Side_e Side;
 } Prosthesis_Init_t;
 
-extern TestProgram_e testProgram;
+extern OperationMode_e operationMode;
 
 void InitProsthesisControl(Prosthesis_Init_t *Device_Init);
-void RequireTestProgram(TestProgram_e option);
+void SetOperationMode(OperationMode_e mode);
 void RunProsthesisControl(void);
 void ActivateLED(LED_Color_e color);;
 void ErrorHandler(Error_e error);
