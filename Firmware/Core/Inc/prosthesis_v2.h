@@ -17,7 +17,7 @@ typedef enum
 
 typedef enum
 {
-	GregBerkeley,
+	Specific,
 	Winter
 } CPC_Spec_e;
 
@@ -36,7 +36,7 @@ typedef enum
 	KneeIMU_Error,
 	KneeMotorError,
 	MotorReadError,
-	PassiveEmulationError
+	OperationModeError
 } Error_e;
 
 typedef enum
@@ -63,11 +63,11 @@ typedef enum
 
 typedef enum
 {
-	StateMachineCtrlWithPE,		// PE = Passive Emulation
-	StateMachineCtrlWithoutPE,	// PE = Passive Emulation
-	PassiveEmulation,
+	ReadOnly,
 	ConstantImpedance,
-	ReadOnly
+	PassiveEmulation,
+	StateMachineWithoutPassiveEmulation,
+	StateMachineWithPassiveEmulation
 } OperationMode_e;
 
 typedef struct
