@@ -146,8 +146,8 @@ static uint8_t isSecond;
 
 static uint8_t isFirst = 1;
 
-static AnkleJoint_t CM_AnkleJoint;//verify these??
-static double CM_thighAngle[2], CM_thighAngle_unbiased[2];	// [0] = k-0, [1] = k-1 where k is the current time step
+static AnkleJoint_t CM_AnkleJoint;
+static double CM_thighAngle[2], CM_thighAngle_unbiased[2];							// [0] = k-0, [1] = k-1 where k is the current time step
 static double CM_thighIntegral_unbiased;
 static Error_e CM_ledCode;
 static float CM_cpv, CM_cpvx9;
@@ -1202,13 +1202,13 @@ static void RunPassiveEmulation(Joint_e joint)
 			{
 				CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
 				CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulFlexCtrl.torque;
-				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
+				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - (CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f);
 			}
 			else
 			{
 				CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulExtCtrl.kd;
 				CM_KneeJoint.ProsthesisCtrl.kp = CM_KneeJoint.PassEmulExtCtrl.torque;
-				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - CM_KneeJoint.PassEmulStanceCtrl.position;
+				CM_KneeJoint.ProsthesisCtrl.position = CM_KneeJoint.position - (CM_KneeJoint.PassEmulStanceCtrl.position + 1.0f);
 			}
 		}
 	}
