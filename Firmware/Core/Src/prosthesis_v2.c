@@ -163,7 +163,7 @@ static uint8_t CM_healthyStride;
 
 static float CM_threshold_ankleSpeed = -5.0f;
 static float CM_threshold_footSpeed = -5.0f;
-static float CM_threshold_intoStanceLC = 1270.0f;
+static float CM_threshold_intoStanceLC = 1325.0f;
 static float CM_threshold_intoSwingLC = 1270.0f;
 
 static void InitStateVals(void);
@@ -574,7 +574,7 @@ static void ProcessInputs(void)
 			CM_KneeJoint.IMU_Data.roll = -pitch * RAD_TO_DEG;
 		}
 
-		CM_thighAngle[0] = -(CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch);
+		CM_thighAngle[0] = CM_KneeJoint.position + CM_KneeJoint.IMU_Data.pitch;
 	}
 }
 
@@ -1197,7 +1197,6 @@ static void RunPassiveEmulation(Joint_e joint)
 		}
 		else
 		{
-			// test this??
 			if(CM_KneeJoint.speed >= 0)
 			{
 				CM_KneeJoint.ProsthesisCtrl.kd = CM_KneeJoint.PassEmulFlexCtrl.kd;
