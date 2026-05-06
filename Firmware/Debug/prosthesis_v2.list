@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  0002ddc9  00000000  00000000  000478a8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0001d5e7  00000000  00000000  00075671  2**0
+ 17 .debug_line   0001d5ec  00000000  00000000  00075671  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00111e8c  00000000  00000000  00092c58  2**0
+ 18 .debug_str    00111e8c  00000000  00000000  00092c5d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  001a4ae4  2**0
+ 19 .comment      00000050  00000000  00000000  001a4ae9  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00007620  00000000  00000000  001a4b34  2**2
+ 20 .debug_frame  00007620  00000000  00000000  001a4b3c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -6217,15 +6217,15 @@ static void GetCPV(void)
 	static float maxThighAngle_unbiased;
 	static float minThighAngle_unbiased;
 	if(isFirst)
- 800302e:	4b73      	ldr	r3, [pc, #460]	; (80031fc <GetCPV+0x1d4>)
+ 800302e:	4b86      	ldr	r3, [pc, #536]	; (8003248 <GetCPV+0x220>)
  8003030:	781b      	ldrb	r3, [r3, #0]
  8003032:	2b00      	cmp	r3, #0
  8003034:	d021      	beq.n	800307a <GetCPV+0x52>
 	{
 		maxThighAngle_unbiased = CM_thighAngle[0] - thighAngle_bias;
- 8003036:	4b72      	ldr	r3, [pc, #456]	; (8003200 <GetCPV+0x1d8>)
+ 8003036:	4b85      	ldr	r3, [pc, #532]	; (800324c <GetCPV+0x224>)
  8003038:	e9d3 0100 	ldrd	r0, r1, [r3]
- 800303c:	4b71      	ldr	r3, [pc, #452]	; (8003204 <GetCPV+0x1dc>)
+ 800303c:	4b84      	ldr	r3, [pc, #528]	; (8003250 <GetCPV+0x228>)
  800303e:	e9d3 2300 	ldrd	r2, r3, [r3]
  8003042:	f7fd f8c5 	bl	80001d0 <__aeabi_dsub>
  8003046:	4602      	mov	r2, r0
@@ -6234,12 +6234,12 @@ static void GetCPV(void)
  800304c:	4619      	mov	r1, r3
  800304e:	f7fd fd4f 	bl	8000af0 <__aeabi_d2f>
  8003052:	4603      	mov	r3, r0
- 8003054:	4a6c      	ldr	r2, [pc, #432]	; (8003208 <GetCPV+0x1e0>)
+ 8003054:	4a7f      	ldr	r2, [pc, #508]	; (8003254 <GetCPV+0x22c>)
  8003056:	6013      	str	r3, [r2, #0]
 		minThighAngle_unbiased = CM_thighAngle[0] - thighAngle_bias;
- 8003058:	4b69      	ldr	r3, [pc, #420]	; (8003200 <GetCPV+0x1d8>)
+ 8003058:	4b7c      	ldr	r3, [pc, #496]	; (800324c <GetCPV+0x224>)
  800305a:	e9d3 0100 	ldrd	r0, r1, [r3]
- 800305e:	4b69      	ldr	r3, [pc, #420]	; (8003204 <GetCPV+0x1dc>)
+ 800305e:	4b7c      	ldr	r3, [pc, #496]	; (8003250 <GetCPV+0x228>)
  8003060:	e9d3 2300 	ldrd	r2, r3, [r3]
  8003064:	f7fd f8b4 	bl	80001d0 <__aeabi_dsub>
  8003068:	4602      	mov	r2, r0
@@ -6248,526 +6248,533 @@ static void GetCPV(void)
  800306e:	4619      	mov	r1, r3
  8003070:	f7fd fd3e 	bl	8000af0 <__aeabi_d2f>
  8003074:	4603      	mov	r3, r0
- 8003076:	4a65      	ldr	r2, [pc, #404]	; (800320c <GetCPV+0x1e4>)
+ 8003076:	4a78      	ldr	r2, [pc, #480]	; (8003258 <GetCPV+0x230>)
  8003078:	6013      	str	r3, [r2, #0]
 	}
 
 	if(heelStrike)
- 800307a:	4b65      	ldr	r3, [pc, #404]	; (8003210 <GetCPV+0x1e8>)
+ 800307a:	4b78      	ldr	r3, [pc, #480]	; (800325c <GetCPV+0x234>)
  800307c:	781b      	ldrb	r3, [r3, #0]
  800307e:	2b00      	cmp	r3, #0
- 8003080:	f000 8093 	beq.w	80031aa <GetCPV+0x182>
+ 8003080:	f000 8090 	beq.w	80031a4 <GetCPV+0x17c>
 	{
-		heelStrike = 0;
- 8003084:	4b62      	ldr	r3, [pc, #392]	; (8003210 <GetCPV+0x1e8>)
- 8003086:	2200      	movs	r2, #0
- 8003088:	701a      	strb	r2, [r3, #0]
 		kneeAngleAtHeelStrike = CM_KneeJoint.position;
- 800308a:	4b62      	ldr	r3, [pc, #392]	; (8003214 <GetCPV+0x1ec>)
- 800308c:	f8d3 310c 	ldr.w	r3, [r3, #268]	; 0x10c
- 8003090:	4a61      	ldr	r2, [pc, #388]	; (8003218 <GetCPV+0x1f0>)
- 8003092:	6013      	str	r3, [r2, #0]
+ 8003084:	4b76      	ldr	r3, [pc, #472]	; (8003260 <GetCPV+0x238>)
+ 8003086:	f8d3 310c 	ldr.w	r3, [r3, #268]	; 0x10c
+ 800308a:	4a76      	ldr	r2, [pc, #472]	; (8003264 <GetCPV+0x23c>)
+ 800308c:	6013      	str	r3, [r2, #0]
 
 		if(!firstHeelStrike)
- 8003094:	4b61      	ldr	r3, [pc, #388]	; (800321c <GetCPV+0x1f4>)
- 8003096:	781b      	ldrb	r3, [r3, #0]
- 8003098:	2b00      	cmp	r3, #0
- 800309a:	d13a      	bne.n	8003112 <GetCPV+0xea>
+ 800308e:	4b76      	ldr	r3, [pc, #472]	; (8003268 <GetCPV+0x240>)
+ 8003090:	781b      	ldrb	r3, [r3, #0]
+ 8003092:	2b00      	cmp	r3, #0
+ 8003094:	d13a      	bne.n	800310c <GetCPV+0xe4>
 		{
 			if(CM_healthyStride)
- 800309c:	4b60      	ldr	r3, [pc, #384]	; (8003220 <GetCPV+0x1f8>)
- 800309e:	781b      	ldrb	r3, [r3, #0]
- 80030a0:	2b00      	cmp	r3, #0
- 80030a2:	d023      	beq.n	80030ec <GetCPV+0xc4>
+ 8003096:	4b75      	ldr	r3, [pc, #468]	; (800326c <GetCPV+0x244>)
+ 8003098:	781b      	ldrb	r3, [r3, #0]
+ 800309a:	2b00      	cmp	r3, #0
+ 800309c:	d023      	beq.n	80030e6 <GetCPV+0xbe>
 			{
 				if(maxThighIntegral_unbiased != minThighIntegral_unbiased)
- 80030a4:	4b5f      	ldr	r3, [pc, #380]	; (8003224 <GetCPV+0x1fc>)
- 80030a6:	ed93 7a00 	vldr	s14, [r3]
- 80030aa:	4b5f      	ldr	r3, [pc, #380]	; (8003228 <GetCPV+0x200>)
- 80030ac:	edd3 7a00 	vldr	s15, [r3]
- 80030b0:	eeb4 7a67 	vcmp.f32	s14, s15
- 80030b4:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80030b8:	d018      	beq.n	80030ec <GetCPV+0xc4>
+ 800309e:	4b74      	ldr	r3, [pc, #464]	; (8003270 <GetCPV+0x248>)
+ 80030a0:	ed93 7a00 	vldr	s14, [r3]
+ 80030a4:	4b73      	ldr	r3, [pc, #460]	; (8003274 <GetCPV+0x24c>)
+ 80030a6:	edd3 7a00 	vldr	s15, [r3]
+ 80030aa:	eeb4 7a67 	vcmp.f32	s14, s15
+ 80030ae:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 80030b2:	d018      	beq.n	80030e6 <GetCPV+0xbe>
 					z = fabs(maxThighAngle_unbiased - minThighAngle_unbiased) / fabs(maxThighIntegral_unbiased - minThighIntegral_unbiased);
- 80030ba:	4b53      	ldr	r3, [pc, #332]	; (8003208 <GetCPV+0x1e0>)
- 80030bc:	ed93 7a00 	vldr	s14, [r3]
- 80030c0:	4b52      	ldr	r3, [pc, #328]	; (800320c <GetCPV+0x1e4>)
- 80030c2:	edd3 7a00 	vldr	s15, [r3]
- 80030c6:	ee77 7a67 	vsub.f32	s15, s14, s15
- 80030ca:	eef0 6ae7 	vabs.f32	s13, s15
- 80030ce:	4b55      	ldr	r3, [pc, #340]	; (8003224 <GetCPV+0x1fc>)
- 80030d0:	ed93 7a00 	vldr	s14, [r3]
- 80030d4:	4b54      	ldr	r3, [pc, #336]	; (8003228 <GetCPV+0x200>)
- 80030d6:	edd3 7a00 	vldr	s15, [r3]
- 80030da:	ee77 7a67 	vsub.f32	s15, s14, s15
- 80030de:	eeb0 7ae7 	vabs.f32	s14, s15
- 80030e2:	eec6 7a87 	vdiv.f32	s15, s13, s14
- 80030e6:	4b51      	ldr	r3, [pc, #324]	; (800322c <GetCPV+0x204>)
- 80030e8:	edc3 7a00 	vstr	s15, [r3]
+ 80030b4:	4b67      	ldr	r3, [pc, #412]	; (8003254 <GetCPV+0x22c>)
+ 80030b6:	ed93 7a00 	vldr	s14, [r3]
+ 80030ba:	4b67      	ldr	r3, [pc, #412]	; (8003258 <GetCPV+0x230>)
+ 80030bc:	edd3 7a00 	vldr	s15, [r3]
+ 80030c0:	ee77 7a67 	vsub.f32	s15, s14, s15
+ 80030c4:	eef0 6ae7 	vabs.f32	s13, s15
+ 80030c8:	4b69      	ldr	r3, [pc, #420]	; (8003270 <GetCPV+0x248>)
+ 80030ca:	ed93 7a00 	vldr	s14, [r3]
+ 80030ce:	4b69      	ldr	r3, [pc, #420]	; (8003274 <GetCPV+0x24c>)
+ 80030d0:	edd3 7a00 	vldr	s15, [r3]
+ 80030d4:	ee77 7a67 	vsub.f32	s15, s14, s15
+ 80030d8:	eeb0 7ae7 	vabs.f32	s14, s15
+ 80030dc:	eec6 7a87 	vdiv.f32	s15, s13, s14
+ 80030e0:	4b65      	ldr	r3, [pc, #404]	; (8003278 <GetCPV+0x250>)
+ 80030e2:	edc3 7a00 	vstr	s15, [r3]
 			}
 
 			thighAngle_bias = thighIntegral / strideTime;
- 80030ec:	4b50      	ldr	r3, [pc, #320]	; (8003230 <GetCPV+0x208>)
- 80030ee:	e9d3 4500 	ldrd	r4, r5, [r3]
- 80030f2:	4b50      	ldr	r3, [pc, #320]	; (8003234 <GetCPV+0x20c>)
- 80030f4:	681b      	ldr	r3, [r3, #0]
- 80030f6:	4618      	mov	r0, r3
- 80030f8:	f7fd f9ca 	bl	8000490 <__aeabi_f2d>
- 80030fc:	4602      	mov	r2, r0
- 80030fe:	460b      	mov	r3, r1
- 8003100:	4620      	mov	r0, r4
- 8003102:	4629      	mov	r1, r5
- 8003104:	f7fd fb46 	bl	8000794 <__aeabi_ddiv>
- 8003108:	4602      	mov	r2, r0
- 800310a:	460b      	mov	r3, r1
- 800310c:	493d      	ldr	r1, [pc, #244]	; (8003204 <GetCPV+0x1dc>)
- 800310e:	e9c1 2300 	strd	r2, r3, [r1]
+ 80030e6:	4b65      	ldr	r3, [pc, #404]	; (800327c <GetCPV+0x254>)
+ 80030e8:	e9d3 4500 	ldrd	r4, r5, [r3]
+ 80030ec:	4b64      	ldr	r3, [pc, #400]	; (8003280 <GetCPV+0x258>)
+ 80030ee:	681b      	ldr	r3, [r3, #0]
+ 80030f0:	4618      	mov	r0, r3
+ 80030f2:	f7fd f9cd 	bl	8000490 <__aeabi_f2d>
+ 80030f6:	4602      	mov	r2, r0
+ 80030f8:	460b      	mov	r3, r1
+ 80030fa:	4620      	mov	r0, r4
+ 80030fc:	4629      	mov	r1, r5
+ 80030fe:	f7fd fb49 	bl	8000794 <__aeabi_ddiv>
+ 8003102:	4602      	mov	r2, r0
+ 8003104:	460b      	mov	r3, r1
+ 8003106:	4952      	ldr	r1, [pc, #328]	; (8003250 <GetCPV+0x228>)
+ 8003108:	e9c1 2300 	strd	r2, r3, [r1]
 		}
 
 		thighIntegral = 0.0f;
- 8003112:	4947      	ldr	r1, [pc, #284]	; (8003230 <GetCPV+0x208>)
- 8003114:	f04f 0200 	mov.w	r2, #0
- 8003118:	f04f 0300 	mov.w	r3, #0
- 800311c:	e9c1 2300 	strd	r2, r3, [r1]
+ 800310c:	495b      	ldr	r1, [pc, #364]	; (800327c <GetCPV+0x254>)
+ 800310e:	f04f 0200 	mov.w	r2, #0
+ 8003112:	f04f 0300 	mov.w	r3, #0
+ 8003116:	e9c1 2300 	strd	r2, r3, [r1]
 		CM_thighIntegral_unbiased = 0.0f;
- 8003120:	4945      	ldr	r1, [pc, #276]	; (8003238 <GetCPV+0x210>)
- 8003122:	f04f 0200 	mov.w	r2, #0
- 8003126:	f04f 0300 	mov.w	r3, #0
- 800312a:	e9c1 2300 	strd	r2, r3, [r1]
+ 800311a:	495a      	ldr	r1, [pc, #360]	; (8003284 <GetCPV+0x25c>)
+ 800311c:	f04f 0200 	mov.w	r2, #0
+ 8003120:	f04f 0300 	mov.w	r3, #0
+ 8003124:	e9c1 2300 	strd	r2, r3, [r1]
 		CM_healthyStride = 9;
- 800312e:	4b3c      	ldr	r3, [pc, #240]	; (8003220 <GetCPV+0x1f8>)
- 8003130:	2209      	movs	r2, #9
- 8003132:	701a      	strb	r2, [r3, #0]
+ 8003128:	4b50      	ldr	r3, [pc, #320]	; (800326c <GetCPV+0x244>)
+ 800312a:	2209      	movs	r2, #9
+ 800312c:	701a      	strb	r2, [r3, #0]
 		CM_cpv = 0.0f;
- 8003134:	4b41      	ldr	r3, [pc, #260]	; (800323c <GetCPV+0x214>)
- 8003136:	f04f 0200 	mov.w	r2, #0
- 800313a:	601a      	str	r2, [r3, #0]
+ 800312e:	4b56      	ldr	r3, [pc, #344]	; (8003288 <GetCPV+0x260>)
+ 8003130:	f04f 0200 	mov.w	r2, #0
+ 8003134:	601a      	str	r2, [r3, #0]
 		quadrant[0] = 0;
- 800313c:	4b40      	ldr	r3, [pc, #256]	; (8003240 <GetCPV+0x218>)
- 800313e:	2200      	movs	r2, #0
- 8003140:	701a      	strb	r2, [r3, #0]
+ 8003136:	4b55      	ldr	r3, [pc, #340]	; (800328c <GetCPV+0x264>)
+ 8003138:	2200      	movs	r2, #0
+ 800313a:	701a      	strb	r2, [r3, #0]
 		quadrant[1] = 0;
- 8003142:	4b3f      	ldr	r3, [pc, #252]	; (8003240 <GetCPV+0x218>)
- 8003144:	2200      	movs	r2, #0
- 8003146:	705a      	strb	r2, [r3, #1]
+ 800313c:	4b53      	ldr	r3, [pc, #332]	; (800328c <GetCPV+0x264>)
+ 800313e:	2200      	movs	r2, #0
+ 8003140:	705a      	strb	r2, [r3, #1]
 
 		maxThighAngle_unbiased = CM_thighAngle[0] - thighAngle_bias;
- 8003148:	4b2d      	ldr	r3, [pc, #180]	; (8003200 <GetCPV+0x1d8>)
- 800314a:	e9d3 0100 	ldrd	r0, r1, [r3]
- 800314e:	4b2d      	ldr	r3, [pc, #180]	; (8003204 <GetCPV+0x1dc>)
- 8003150:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8003154:	f7fd f83c 	bl	80001d0 <__aeabi_dsub>
- 8003158:	4602      	mov	r2, r0
- 800315a:	460b      	mov	r3, r1
- 800315c:	4610      	mov	r0, r2
- 800315e:	4619      	mov	r1, r3
- 8003160:	f7fd fcc6 	bl	8000af0 <__aeabi_d2f>
- 8003164:	4603      	mov	r3, r0
- 8003166:	4a28      	ldr	r2, [pc, #160]	; (8003208 <GetCPV+0x1e0>)
- 8003168:	6013      	str	r3, [r2, #0]
+ 8003142:	4b42      	ldr	r3, [pc, #264]	; (800324c <GetCPV+0x224>)
+ 8003144:	e9d3 0100 	ldrd	r0, r1, [r3]
+ 8003148:	4b41      	ldr	r3, [pc, #260]	; (8003250 <GetCPV+0x228>)
+ 800314a:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 800314e:	f7fd f83f 	bl	80001d0 <__aeabi_dsub>
+ 8003152:	4602      	mov	r2, r0
+ 8003154:	460b      	mov	r3, r1
+ 8003156:	4610      	mov	r0, r2
+ 8003158:	4619      	mov	r1, r3
+ 800315a:	f7fd fcc9 	bl	8000af0 <__aeabi_d2f>
+ 800315e:	4603      	mov	r3, r0
+ 8003160:	4a3c      	ldr	r2, [pc, #240]	; (8003254 <GetCPV+0x22c>)
+ 8003162:	6013      	str	r3, [r2, #0]
 		minThighAngle_unbiased = CM_thighAngle[0] - thighAngle_bias;
- 800316a:	4b25      	ldr	r3, [pc, #148]	; (8003200 <GetCPV+0x1d8>)
- 800316c:	e9d3 0100 	ldrd	r0, r1, [r3]
- 8003170:	4b24      	ldr	r3, [pc, #144]	; (8003204 <GetCPV+0x1dc>)
- 8003172:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8003176:	f7fd f82b 	bl	80001d0 <__aeabi_dsub>
- 800317a:	4602      	mov	r2, r0
- 800317c:	460b      	mov	r3, r1
- 800317e:	4610      	mov	r0, r2
- 8003180:	4619      	mov	r1, r3
- 8003182:	f7fd fcb5 	bl	8000af0 <__aeabi_d2f>
- 8003186:	4603      	mov	r3, r0
- 8003188:	4a20      	ldr	r2, [pc, #128]	; (800320c <GetCPV+0x1e4>)
- 800318a:	6013      	str	r3, [r2, #0]
+ 8003164:	4b39      	ldr	r3, [pc, #228]	; (800324c <GetCPV+0x224>)
+ 8003166:	e9d3 0100 	ldrd	r0, r1, [r3]
+ 800316a:	4b39      	ldr	r3, [pc, #228]	; (8003250 <GetCPV+0x228>)
+ 800316c:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8003170:	f7fd f82e 	bl	80001d0 <__aeabi_dsub>
+ 8003174:	4602      	mov	r2, r0
+ 8003176:	460b      	mov	r3, r1
+ 8003178:	4610      	mov	r0, r2
+ 800317a:	4619      	mov	r1, r3
+ 800317c:	f7fd fcb8 	bl	8000af0 <__aeabi_d2f>
+ 8003180:	4603      	mov	r3, r0
+ 8003182:	4a35      	ldr	r2, [pc, #212]	; (8003258 <GetCPV+0x230>)
+ 8003184:	6013      	str	r3, [r2, #0]
 		maxThighIntegral_unbiased = 0.0f;
- 800318c:	4b25      	ldr	r3, [pc, #148]	; (8003224 <GetCPV+0x1fc>)
- 800318e:	f04f 0200 	mov.w	r2, #0
- 8003192:	601a      	str	r2, [r3, #0]
+ 8003186:	4b3a      	ldr	r3, [pc, #232]	; (8003270 <GetCPV+0x248>)
+ 8003188:	f04f 0200 	mov.w	r2, #0
+ 800318c:	601a      	str	r2, [r3, #0]
 		minThighIntegral_unbiased = 0.0f;
- 8003194:	4b24      	ldr	r3, [pc, #144]	; (8003228 <GetCPV+0x200>)
- 8003196:	f04f 0200 	mov.w	r2, #0
- 800319a:	601a      	str	r2, [r3, #0]
+ 800318e:	4b39      	ldr	r3, [pc, #228]	; (8003274 <GetCPV+0x24c>)
+ 8003190:	f04f 0200 	mov.w	r2, #0
+ 8003194:	601a      	str	r2, [r3, #0]
 
 		strideTime = 0.0;
- 800319c:	4b25      	ldr	r3, [pc, #148]	; (8003234 <GetCPV+0x20c>)
- 800319e:	f04f 0200 	mov.w	r2, #0
- 80031a2:	601a      	str	r2, [r3, #0]
+ 8003196:	4b3a      	ldr	r3, [pc, #232]	; (8003280 <GetCPV+0x258>)
+ 8003198:	f04f 0200 	mov.w	r2, #0
+ 800319c:	601a      	str	r2, [r3, #0]
 
 		firstHeelStrike = 0;
- 80031a4:	4b1d      	ldr	r3, [pc, #116]	; (800321c <GetCPV+0x1f4>)
- 80031a6:	2200      	movs	r2, #0
- 80031a8:	701a      	strb	r2, [r3, #0]
+ 800319e:	4b32      	ldr	r3, [pc, #200]	; (8003268 <GetCPV+0x240>)
+ 80031a0:	2200      	movs	r2, #0
+ 80031a2:	701a      	strb	r2, [r3, #0]
 	}
 
 	CM_thighAngle_unbiased[0] = CM_thighAngle[0] - thighAngle_bias;
- 80031aa:	4b15      	ldr	r3, [pc, #84]	; (8003200 <GetCPV+0x1d8>)
- 80031ac:	e9d3 0100 	ldrd	r0, r1, [r3]
- 80031b0:	4b14      	ldr	r3, [pc, #80]	; (8003204 <GetCPV+0x1dc>)
- 80031b2:	e9d3 2300 	ldrd	r2, r3, [r3]
- 80031b6:	f7fd f80b 	bl	80001d0 <__aeabi_dsub>
- 80031ba:	4602      	mov	r2, r0
- 80031bc:	460b      	mov	r3, r1
- 80031be:	4921      	ldr	r1, [pc, #132]	; (8003244 <GetCPV+0x21c>)
- 80031c0:	e9c1 2300 	strd	r2, r3, [r1]
+ 80031a4:	4b29      	ldr	r3, [pc, #164]	; (800324c <GetCPV+0x224>)
+ 80031a6:	e9d3 0100 	ldrd	r0, r1, [r3]
+ 80031aa:	4b29      	ldr	r3, [pc, #164]	; (8003250 <GetCPV+0x228>)
+ 80031ac:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 80031b0:	f7fd f80e 	bl	80001d0 <__aeabi_dsub>
+ 80031b4:	4602      	mov	r2, r0
+ 80031b6:	460b      	mov	r3, r1
+ 80031b8:	4935      	ldr	r1, [pc, #212]	; (8003290 <GetCPV+0x268>)
+ 80031ba:	e9c1 2300 	strd	r2, r3, [r1]
 	if(CM_thighAngle_unbiased[0] > maxThighAngle_unbiased)
- 80031c4:	4b1f      	ldr	r3, [pc, #124]	; (8003244 <GetCPV+0x21c>)
- 80031c6:	e9d3 4500 	ldrd	r4, r5, [r3]
- 80031ca:	4b0f      	ldr	r3, [pc, #60]	; (8003208 <GetCPV+0x1e0>)
- 80031cc:	681b      	ldr	r3, [r3, #0]
- 80031ce:	4618      	mov	r0, r3
- 80031d0:	f7fd f95e 	bl	8000490 <__aeabi_f2d>
- 80031d4:	4602      	mov	r2, r0
- 80031d6:	460b      	mov	r3, r1
- 80031d8:	4620      	mov	r0, r4
- 80031da:	4629      	mov	r1, r5
- 80031dc:	f7fd fc40 	bl	8000a60 <__aeabi_dcmpgt>
- 80031e0:	4603      	mov	r3, r0
- 80031e2:	2b00      	cmp	r3, #0
- 80031e4:	d030      	beq.n	8003248 <GetCPV+0x220>
+ 80031be:	4b34      	ldr	r3, [pc, #208]	; (8003290 <GetCPV+0x268>)
+ 80031c0:	e9d3 4500 	ldrd	r4, r5, [r3]
+ 80031c4:	4b23      	ldr	r3, [pc, #140]	; (8003254 <GetCPV+0x22c>)
+ 80031c6:	681b      	ldr	r3, [r3, #0]
+ 80031c8:	4618      	mov	r0, r3
+ 80031ca:	f7fd f961 	bl	8000490 <__aeabi_f2d>
+ 80031ce:	4602      	mov	r2, r0
+ 80031d0:	460b      	mov	r3, r1
+ 80031d2:	4620      	mov	r0, r4
+ 80031d4:	4629      	mov	r1, r5
+ 80031d6:	f7fd fc43 	bl	8000a60 <__aeabi_dcmpgt>
+ 80031da:	4603      	mov	r3, r0
+ 80031dc:	2b00      	cmp	r3, #0
+ 80031de:	d00a      	beq.n	80031f6 <GetCPV+0x1ce>
 		maxThighAngle_unbiased = CM_thighAngle_unbiased[0];
- 80031e6:	4b17      	ldr	r3, [pc, #92]	; (8003244 <GetCPV+0x21c>)
- 80031e8:	e9d3 2300 	ldrd	r2, r3, [r3]
- 80031ec:	4610      	mov	r0, r2
- 80031ee:	4619      	mov	r1, r3
- 80031f0:	f7fd fc7e 	bl	8000af0 <__aeabi_d2f>
- 80031f4:	4603      	mov	r3, r0
- 80031f6:	4a04      	ldr	r2, [pc, #16]	; (8003208 <GetCPV+0x1e0>)
- 80031f8:	6013      	str	r3, [r2, #0]
- 80031fa:	e040      	b.n	800327e <GetCPV+0x256>
- 80031fc:	20000000 	.word	0x20000000
- 8003200:	20000308 	.word	0x20000308
- 8003204:	20000528 	.word	0x20000528
- 8003208:	20000530 	.word	0x20000530
- 800320c:	20000534 	.word	0x20000534
- 8003210:	2000021b 	.word	0x2000021b
- 8003214:	20000360 	.word	0x20000360
- 8003218:	200000f0 	.word	0x200000f0
- 800321c:	20000014 	.word	0x20000014
- 8003220:	200004d2 	.word	0x200004d2
- 8003224:	20000538 	.word	0x20000538
- 8003228:	2000053c 	.word	0x2000053c
- 800322c:	20000018 	.word	0x20000018
- 8003230:	20000540 	.word	0x20000540
- 8003234:	20000548 	.word	0x20000548
- 8003238:	20000328 	.word	0x20000328
- 800323c:	20000334 	.word	0x20000334
- 8003240:	2000054c 	.word	0x2000054c
- 8003244:	20000318 	.word	0x20000318
+ 80031e0:	4b2b      	ldr	r3, [pc, #172]	; (8003290 <GetCPV+0x268>)
+ 80031e2:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 80031e6:	4610      	mov	r0, r2
+ 80031e8:	4619      	mov	r1, r3
+ 80031ea:	f7fd fc81 	bl	8000af0 <__aeabi_d2f>
+ 80031ee:	4603      	mov	r3, r0
+ 80031f0:	4a18      	ldr	r2, [pc, #96]	; (8003254 <GetCPV+0x22c>)
+ 80031f2:	6013      	str	r3, [r2, #0]
+ 80031f4:	e01a      	b.n	800322c <GetCPV+0x204>
 	else if(CM_thighAngle_unbiased[0] < minThighAngle_unbiased)
- 8003248:	4ba7      	ldr	r3, [pc, #668]	; (80034e8 <GetCPV+0x4c0>)
- 800324a:	e9d3 4500 	ldrd	r4, r5, [r3]
- 800324e:	4ba7      	ldr	r3, [pc, #668]	; (80034ec <GetCPV+0x4c4>)
- 8003250:	681b      	ldr	r3, [r3, #0]
- 8003252:	4618      	mov	r0, r3
- 8003254:	f7fd f91c 	bl	8000490 <__aeabi_f2d>
- 8003258:	4602      	mov	r2, r0
- 800325a:	460b      	mov	r3, r1
- 800325c:	4620      	mov	r0, r4
- 800325e:	4629      	mov	r1, r5
- 8003260:	f7fd fbe0 	bl	8000a24 <__aeabi_dcmplt>
- 8003264:	4603      	mov	r3, r0
- 8003266:	2b00      	cmp	r3, #0
- 8003268:	d009      	beq.n	800327e <GetCPV+0x256>
+ 80031f6:	4b26      	ldr	r3, [pc, #152]	; (8003290 <GetCPV+0x268>)
+ 80031f8:	e9d3 4500 	ldrd	r4, r5, [r3]
+ 80031fc:	4b16      	ldr	r3, [pc, #88]	; (8003258 <GetCPV+0x230>)
+ 80031fe:	681b      	ldr	r3, [r3, #0]
+ 8003200:	4618      	mov	r0, r3
+ 8003202:	f7fd f945 	bl	8000490 <__aeabi_f2d>
+ 8003206:	4602      	mov	r2, r0
+ 8003208:	460b      	mov	r3, r1
+ 800320a:	4620      	mov	r0, r4
+ 800320c:	4629      	mov	r1, r5
+ 800320e:	f7fd fc09 	bl	8000a24 <__aeabi_dcmplt>
+ 8003212:	4603      	mov	r3, r0
+ 8003214:	2b00      	cmp	r3, #0
+ 8003216:	d009      	beq.n	800322c <GetCPV+0x204>
 		minThighAngle_unbiased = CM_thighAngle_unbiased[0];
- 800326a:	4b9f      	ldr	r3, [pc, #636]	; (80034e8 <GetCPV+0x4c0>)
- 800326c:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8003270:	4610      	mov	r0, r2
- 8003272:	4619      	mov	r1, r3
- 8003274:	f7fd fc3c 	bl	8000af0 <__aeabi_d2f>
- 8003278:	4603      	mov	r3, r0
- 800327a:	4a9c      	ldr	r2, [pc, #624]	; (80034ec <GetCPV+0x4c4>)
- 800327c:	6013      	str	r3, [r2, #0]
+ 8003218:	4b1d      	ldr	r3, [pc, #116]	; (8003290 <GetCPV+0x268>)
+ 800321a:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 800321e:	4610      	mov	r0, r2
+ 8003220:	4619      	mov	r1, r3
+ 8003222:	f7fd fc65 	bl	8000af0 <__aeabi_d2f>
+ 8003226:	4603      	mov	r3, r0
+ 8003228:	4a0b      	ldr	r2, [pc, #44]	; (8003258 <GetCPV+0x230>)
+ 800322a:	6013      	str	r3, [r2, #0]
 
 	if(!isFirst)
- 800327e:	4b9c      	ldr	r3, [pc, #624]	; (80034f0 <GetCPV+0x4c8>)
- 8003280:	781b      	ldrb	r3, [r3, #0]
- 8003282:	2b00      	cmp	r3, #0
- 8003284:	f040 8081 	bne.w	800338a <GetCPV+0x362>
+ 800322c:	4b06      	ldr	r3, [pc, #24]	; (8003248 <GetCPV+0x220>)
+ 800322e:	781b      	ldrb	r3, [r3, #0]
+ 8003230:	2b00      	cmp	r3, #0
+ 8003232:	f040 80b0 	bne.w	8003396 <GetCPV+0x36e>
 	{
-		thighIntegral += (CM_thighAngle[0] + CM_thighAngle[1]) * DT/2.0;								// trapezoidal integration used
- 8003288:	4b9a      	ldr	r3, [pc, #616]	; (80034f4 <GetCPV+0x4cc>)
- 800328a:	e9d3 0100 	ldrd	r0, r1, [r3]
- 800328e:	4b99      	ldr	r3, [pc, #612]	; (80034f4 <GetCPV+0x4cc>)
- 8003290:	e9d3 2302 	ldrd	r2, r3, [r3, #8]
- 8003294:	f7fc ff9e 	bl	80001d4 <__adddf3>
- 8003298:	4602      	mov	r2, r0
- 800329a:	460b      	mov	r3, r1
- 800329c:	4610      	mov	r0, r2
- 800329e:	4619      	mov	r1, r3
- 80032a0:	a38f      	add	r3, pc, #572	; (adr r3, 80034e0 <GetCPV+0x4b8>)
- 80032a2:	e9d3 2300 	ldrd	r2, r3, [r3]
- 80032a6:	f7fd f94b 	bl	8000540 <__aeabi_dmul>
- 80032aa:	4602      	mov	r2, r0
- 80032ac:	460b      	mov	r3, r1
- 80032ae:	4610      	mov	r0, r2
- 80032b0:	4619      	mov	r1, r3
- 80032b2:	f04f 0200 	mov.w	r2, #0
- 80032b6:	f04f 4380 	mov.w	r3, #1073741824	; 0x40000000
- 80032ba:	f7fd fa6b 	bl	8000794 <__aeabi_ddiv>
- 80032be:	4602      	mov	r2, r0
- 80032c0:	460b      	mov	r3, r1
- 80032c2:	4610      	mov	r0, r2
- 80032c4:	4619      	mov	r1, r3
- 80032c6:	4b8c      	ldr	r3, [pc, #560]	; (80034f8 <GetCPV+0x4d0>)
- 80032c8:	e9d3 2300 	ldrd	r2, r3, [r3]
- 80032cc:	f7fc ff82 	bl	80001d4 <__adddf3>
- 80032d0:	4602      	mov	r2, r0
- 80032d2:	460b      	mov	r3, r1
- 80032d4:	4988      	ldr	r1, [pc, #544]	; (80034f8 <GetCPV+0x4d0>)
- 80032d6:	e9c1 2300 	strd	r2, r3, [r1]
-		CM_thighIntegral_unbiased += (CM_thighAngle_unbiased[0] + CM_thighAngle_unbiased[1]) * DT/2.0;	// trapezoidal integration used
- 80032da:	4b83      	ldr	r3, [pc, #524]	; (80034e8 <GetCPV+0x4c0>)
- 80032dc:	e9d3 0100 	ldrd	r0, r1, [r3]
- 80032e0:	4b81      	ldr	r3, [pc, #516]	; (80034e8 <GetCPV+0x4c0>)
- 80032e2:	e9d3 2302 	ldrd	r2, r3, [r3, #8]
- 80032e6:	f7fc ff75 	bl	80001d4 <__adddf3>
- 80032ea:	4602      	mov	r2, r0
- 80032ec:	460b      	mov	r3, r1
- 80032ee:	4610      	mov	r0, r2
- 80032f0:	4619      	mov	r1, r3
- 80032f2:	a37b      	add	r3, pc, #492	; (adr r3, 80034e0 <GetCPV+0x4b8>)
- 80032f4:	e9d3 2300 	ldrd	r2, r3, [r3]
- 80032f8:	f7fd f922 	bl	8000540 <__aeabi_dmul>
- 80032fc:	4602      	mov	r2, r0
- 80032fe:	460b      	mov	r3, r1
- 8003300:	4610      	mov	r0, r2
- 8003302:	4619      	mov	r1, r3
- 8003304:	f04f 0200 	mov.w	r2, #0
- 8003308:	f04f 4380 	mov.w	r3, #1073741824	; 0x40000000
- 800330c:	f7fd fa42 	bl	8000794 <__aeabi_ddiv>
- 8003310:	4602      	mov	r2, r0
- 8003312:	460b      	mov	r3, r1
- 8003314:	4610      	mov	r0, r2
- 8003316:	4619      	mov	r1, r3
- 8003318:	4b78      	ldr	r3, [pc, #480]	; (80034fc <GetCPV+0x4d4>)
- 800331a:	e9d3 2300 	ldrd	r2, r3, [r3]
- 800331e:	f7fc ff59 	bl	80001d4 <__adddf3>
- 8003322:	4602      	mov	r2, r0
- 8003324:	460b      	mov	r3, r1
- 8003326:	4975      	ldr	r1, [pc, #468]	; (80034fc <GetCPV+0x4d4>)
- 8003328:	e9c1 2300 	strd	r2, r3, [r1]
-		if(CM_thighIntegral_unbiased > maxThighIntegral_unbiased)
- 800332c:	4b74      	ldr	r3, [pc, #464]	; (8003500 <GetCPV+0x4d8>)
- 800332e:	681b      	ldr	r3, [r3, #0]
- 8003330:	4618      	mov	r0, r3
- 8003332:	f7fd f8ad 	bl	8000490 <__aeabi_f2d>
- 8003336:	4b71      	ldr	r3, [pc, #452]	; (80034fc <GetCPV+0x4d4>)
- 8003338:	e9d3 2300 	ldrd	r2, r3, [r3]
- 800333c:	f7fd fb72 	bl	8000a24 <__aeabi_dcmplt>
- 8003340:	4603      	mov	r3, r0
- 8003342:	2b00      	cmp	r3, #0
- 8003344:	d00a      	beq.n	800335c <GetCPV+0x334>
-			maxThighIntegral_unbiased = CM_thighIntegral_unbiased;
- 8003346:	4b6d      	ldr	r3, [pc, #436]	; (80034fc <GetCPV+0x4d4>)
- 8003348:	e9d3 2300 	ldrd	r2, r3, [r3]
- 800334c:	4610      	mov	r0, r2
- 800334e:	4619      	mov	r1, r3
- 8003350:	f7fd fbce 	bl	8000af0 <__aeabi_d2f>
- 8003354:	4603      	mov	r3, r0
- 8003356:	4a6a      	ldr	r2, [pc, #424]	; (8003500 <GetCPV+0x4d8>)
- 8003358:	6013      	str	r3, [r2, #0]
- 800335a:	e016      	b.n	800338a <GetCPV+0x362>
-		else if(CM_thighIntegral_unbiased < minThighIntegral_unbiased)
- 800335c:	4b69      	ldr	r3, [pc, #420]	; (8003504 <GetCPV+0x4dc>)
- 800335e:	681b      	ldr	r3, [r3, #0]
- 8003360:	4618      	mov	r0, r3
- 8003362:	f7fd f895 	bl	8000490 <__aeabi_f2d>
- 8003366:	4b65      	ldr	r3, [pc, #404]	; (80034fc <GetCPV+0x4d4>)
- 8003368:	e9d3 2300 	ldrd	r2, r3, [r3]
- 800336c:	f7fd fb78 	bl	8000a60 <__aeabi_dcmpgt>
- 8003370:	4603      	mov	r3, r0
- 8003372:	2b00      	cmp	r3, #0
- 8003374:	d009      	beq.n	800338a <GetCPV+0x362>
-			minThighIntegral_unbiased = CM_thighIntegral_unbiased;
- 8003376:	4b61      	ldr	r3, [pc, #388]	; (80034fc <GetCPV+0x4d4>)
- 8003378:	e9d3 2300 	ldrd	r2, r3, [r3]
- 800337c:	4610      	mov	r0, r2
- 800337e:	4619      	mov	r1, r3
- 8003380:	f7fd fbb6 	bl	8000af0 <__aeabi_d2f>
- 8003384:	4603      	mov	r3, r0
- 8003386:	4a5f      	ldr	r2, [pc, #380]	; (8003504 <GetCPV+0x4dc>)
- 8003388:	6013      	str	r3, [r2, #0]
+		if(heelStrike)
+ 8003236:	4b09      	ldr	r3, [pc, #36]	; (800325c <GetCPV+0x234>)
+ 8003238:	781b      	ldrb	r3, [r3, #0]
+ 800323a:	2b00      	cmp	r3, #0
+ 800323c:	d02a      	beq.n	8003294 <GetCPV+0x26c>
+			heelStrike = 0;
+ 800323e:	4b07      	ldr	r3, [pc, #28]	; (800325c <GetCPV+0x234>)
+ 8003240:	2200      	movs	r2, #0
+ 8003242:	701a      	strb	r2, [r3, #0]
+ 8003244:	e0a7      	b.n	8003396 <GetCPV+0x36e>
+ 8003246:	bf00      	nop
+ 8003248:	20000000 	.word	0x20000000
+ 800324c:	20000308 	.word	0x20000308
+ 8003250:	20000528 	.word	0x20000528
+ 8003254:	20000530 	.word	0x20000530
+ 8003258:	20000534 	.word	0x20000534
+ 800325c:	2000021b 	.word	0x2000021b
+ 8003260:	20000360 	.word	0x20000360
+ 8003264:	200000f0 	.word	0x200000f0
+ 8003268:	20000014 	.word	0x20000014
+ 800326c:	200004d2 	.word	0x200004d2
+ 8003270:	20000538 	.word	0x20000538
+ 8003274:	2000053c 	.word	0x2000053c
+ 8003278:	20000018 	.word	0x20000018
+ 800327c:	20000540 	.word	0x20000540
+ 8003280:	20000548 	.word	0x20000548
+ 8003284:	20000328 	.word	0x20000328
+ 8003288:	20000334 	.word	0x20000334
+ 800328c:	2000054c 	.word	0x2000054c
+ 8003290:	20000318 	.word	0x20000318
+		else
+		{
+			thighIntegral += (CM_thighAngle[0] + CM_thighAngle[1]) * DT/2.0;								// trapezoidal integration used
+ 8003294:	4b96      	ldr	r3, [pc, #600]	; (80034f0 <GetCPV+0x4c8>)
+ 8003296:	e9d3 0100 	ldrd	r0, r1, [r3]
+ 800329a:	4b95      	ldr	r3, [pc, #596]	; (80034f0 <GetCPV+0x4c8>)
+ 800329c:	e9d3 2302 	ldrd	r2, r3, [r3, #8]
+ 80032a0:	f7fc ff98 	bl	80001d4 <__adddf3>
+ 80032a4:	4602      	mov	r2, r0
+ 80032a6:	460b      	mov	r3, r1
+ 80032a8:	4610      	mov	r0, r2
+ 80032aa:	4619      	mov	r1, r3
+ 80032ac:	a38e      	add	r3, pc, #568	; (adr r3, 80034e8 <GetCPV+0x4c0>)
+ 80032ae:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 80032b2:	f7fd f945 	bl	8000540 <__aeabi_dmul>
+ 80032b6:	4602      	mov	r2, r0
+ 80032b8:	460b      	mov	r3, r1
+ 80032ba:	4610      	mov	r0, r2
+ 80032bc:	4619      	mov	r1, r3
+ 80032be:	f04f 0200 	mov.w	r2, #0
+ 80032c2:	f04f 4380 	mov.w	r3, #1073741824	; 0x40000000
+ 80032c6:	f7fd fa65 	bl	8000794 <__aeabi_ddiv>
+ 80032ca:	4602      	mov	r2, r0
+ 80032cc:	460b      	mov	r3, r1
+ 80032ce:	4610      	mov	r0, r2
+ 80032d0:	4619      	mov	r1, r3
+ 80032d2:	4b88      	ldr	r3, [pc, #544]	; (80034f4 <GetCPV+0x4cc>)
+ 80032d4:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 80032d8:	f7fc ff7c 	bl	80001d4 <__adddf3>
+ 80032dc:	4602      	mov	r2, r0
+ 80032de:	460b      	mov	r3, r1
+ 80032e0:	4984      	ldr	r1, [pc, #528]	; (80034f4 <GetCPV+0x4cc>)
+ 80032e2:	e9c1 2300 	strd	r2, r3, [r1]
+			CM_thighIntegral_unbiased += (CM_thighAngle_unbiased[0] + CM_thighAngle_unbiased[1]) * DT/2.0;	// trapezoidal integration used
+ 80032e6:	4b84      	ldr	r3, [pc, #528]	; (80034f8 <GetCPV+0x4d0>)
+ 80032e8:	e9d3 0100 	ldrd	r0, r1, [r3]
+ 80032ec:	4b82      	ldr	r3, [pc, #520]	; (80034f8 <GetCPV+0x4d0>)
+ 80032ee:	e9d3 2302 	ldrd	r2, r3, [r3, #8]
+ 80032f2:	f7fc ff6f 	bl	80001d4 <__adddf3>
+ 80032f6:	4602      	mov	r2, r0
+ 80032f8:	460b      	mov	r3, r1
+ 80032fa:	4610      	mov	r0, r2
+ 80032fc:	4619      	mov	r1, r3
+ 80032fe:	a37a      	add	r3, pc, #488	; (adr r3, 80034e8 <GetCPV+0x4c0>)
+ 8003300:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8003304:	f7fd f91c 	bl	8000540 <__aeabi_dmul>
+ 8003308:	4602      	mov	r2, r0
+ 800330a:	460b      	mov	r3, r1
+ 800330c:	4610      	mov	r0, r2
+ 800330e:	4619      	mov	r1, r3
+ 8003310:	f04f 0200 	mov.w	r2, #0
+ 8003314:	f04f 4380 	mov.w	r3, #1073741824	; 0x40000000
+ 8003318:	f7fd fa3c 	bl	8000794 <__aeabi_ddiv>
+ 800331c:	4602      	mov	r2, r0
+ 800331e:	460b      	mov	r3, r1
+ 8003320:	4610      	mov	r0, r2
+ 8003322:	4619      	mov	r1, r3
+ 8003324:	4b75      	ldr	r3, [pc, #468]	; (80034fc <GetCPV+0x4d4>)
+ 8003326:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 800332a:	f7fc ff53 	bl	80001d4 <__adddf3>
+ 800332e:	4602      	mov	r2, r0
+ 8003330:	460b      	mov	r3, r1
+ 8003332:	4972      	ldr	r1, [pc, #456]	; (80034fc <GetCPV+0x4d4>)
+ 8003334:	e9c1 2300 	strd	r2, r3, [r1]
+			if(CM_thighIntegral_unbiased > maxThighIntegral_unbiased)
+ 8003338:	4b71      	ldr	r3, [pc, #452]	; (8003500 <GetCPV+0x4d8>)
+ 800333a:	681b      	ldr	r3, [r3, #0]
+ 800333c:	4618      	mov	r0, r3
+ 800333e:	f7fd f8a7 	bl	8000490 <__aeabi_f2d>
+ 8003342:	4b6e      	ldr	r3, [pc, #440]	; (80034fc <GetCPV+0x4d4>)
+ 8003344:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8003348:	f7fd fb6c 	bl	8000a24 <__aeabi_dcmplt>
+ 800334c:	4603      	mov	r3, r0
+ 800334e:	2b00      	cmp	r3, #0
+ 8003350:	d00a      	beq.n	8003368 <GetCPV+0x340>
+				maxThighIntegral_unbiased = CM_thighIntegral_unbiased;
+ 8003352:	4b6a      	ldr	r3, [pc, #424]	; (80034fc <GetCPV+0x4d4>)
+ 8003354:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8003358:	4610      	mov	r0, r2
+ 800335a:	4619      	mov	r1, r3
+ 800335c:	f7fd fbc8 	bl	8000af0 <__aeabi_d2f>
+ 8003360:	4603      	mov	r3, r0
+ 8003362:	4a67      	ldr	r2, [pc, #412]	; (8003500 <GetCPV+0x4d8>)
+ 8003364:	6013      	str	r3, [r2, #0]
+ 8003366:	e016      	b.n	8003396 <GetCPV+0x36e>
+			else if(CM_thighIntegral_unbiased < minThighIntegral_unbiased)
+ 8003368:	4b66      	ldr	r3, [pc, #408]	; (8003504 <GetCPV+0x4dc>)
+ 800336a:	681b      	ldr	r3, [r3, #0]
+ 800336c:	4618      	mov	r0, r3
+ 800336e:	f7fd f88f 	bl	8000490 <__aeabi_f2d>
+ 8003372:	4b62      	ldr	r3, [pc, #392]	; (80034fc <GetCPV+0x4d4>)
+ 8003374:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8003378:	f7fd fb72 	bl	8000a60 <__aeabi_dcmpgt>
+ 800337c:	4603      	mov	r3, r0
+ 800337e:	2b00      	cmp	r3, #0
+ 8003380:	d009      	beq.n	8003396 <GetCPV+0x36e>
+				minThighIntegral_unbiased = CM_thighIntegral_unbiased;
+ 8003382:	4b5e      	ldr	r3, [pc, #376]	; (80034fc <GetCPV+0x4d4>)
+ 8003384:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8003388:	4610      	mov	r0, r2
+ 800338a:	4619      	mov	r1, r3
+ 800338c:	f7fd fbb0 	bl	8000af0 <__aeabi_d2f>
+ 8003390:	4603      	mov	r3, r0
+ 8003392:	4a5c      	ldr	r2, [pc, #368]	; (8003504 <GetCPV+0x4dc>)
+ 8003394:	6013      	str	r3, [r2, #0]
+		}
 	}
 
 	CM_xPhaseAngle = -CM_thighAngle_unbiased[0];
- 800338a:	4b57      	ldr	r3, [pc, #348]	; (80034e8 <GetCPV+0x4c0>)
- 800338c:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8003390:	4610      	mov	r0, r2
- 8003392:	4619      	mov	r1, r3
- 8003394:	f7fd fbac 	bl	8000af0 <__aeabi_d2f>
- 8003398:	4603      	mov	r3, r0
- 800339a:	ee07 3a90 	vmov	s15, r3
- 800339e:	eef1 7a67 	vneg.f32	s15, s15
- 80033a2:	4b59      	ldr	r3, [pc, #356]	; (8003508 <GetCPV+0x4e0>)
- 80033a4:	edc3 7a00 	vstr	s15, [r3]
+ 8003396:	4b58      	ldr	r3, [pc, #352]	; (80034f8 <GetCPV+0x4d0>)
+ 8003398:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 800339c:	4610      	mov	r0, r2
+ 800339e:	4619      	mov	r1, r3
+ 80033a0:	f7fd fba6 	bl	8000af0 <__aeabi_d2f>
+ 80033a4:	4603      	mov	r3, r0
+ 80033a6:	ee07 3a90 	vmov	s15, r3
+ 80033aa:	eef1 7a67 	vneg.f32	s15, s15
+ 80033ae:	4b56      	ldr	r3, [pc, #344]	; (8003508 <GetCPV+0x4e0>)
+ 80033b0:	edc3 7a00 	vstr	s15, [r3]
 	CM_yPhaseAngle = -z * CM_thighIntegral_unbiased;
- 80033a8:	4b58      	ldr	r3, [pc, #352]	; (800350c <GetCPV+0x4e4>)
- 80033aa:	edd3 7a00 	vldr	s15, [r3]
- 80033ae:	eef1 7a67 	vneg.f32	s15, s15
- 80033b2:	ee17 3a90 	vmov	r3, s15
- 80033b6:	4618      	mov	r0, r3
- 80033b8:	f7fd f86a 	bl	8000490 <__aeabi_f2d>
- 80033bc:	4b4f      	ldr	r3, [pc, #316]	; (80034fc <GetCPV+0x4d4>)
- 80033be:	e9d3 2300 	ldrd	r2, r3, [r3]
- 80033c2:	f7fd f8bd 	bl	8000540 <__aeabi_dmul>
- 80033c6:	4602      	mov	r2, r0
- 80033c8:	460b      	mov	r3, r1
- 80033ca:	4610      	mov	r0, r2
- 80033cc:	4619      	mov	r1, r3
- 80033ce:	f7fd fb8f 	bl	8000af0 <__aeabi_d2f>
- 80033d2:	4603      	mov	r3, r0
- 80033d4:	4a4e      	ldr	r2, [pc, #312]	; (8003510 <GetCPV+0x4e8>)
- 80033d6:	6013      	str	r3, [r2, #0]
+ 80033b4:	4b55      	ldr	r3, [pc, #340]	; (800350c <GetCPV+0x4e4>)
+ 80033b6:	edd3 7a00 	vldr	s15, [r3]
+ 80033ba:	eef1 7a67 	vneg.f32	s15, s15
+ 80033be:	ee17 3a90 	vmov	r3, s15
+ 80033c2:	4618      	mov	r0, r3
+ 80033c4:	f7fd f864 	bl	8000490 <__aeabi_f2d>
+ 80033c8:	4b4c      	ldr	r3, [pc, #304]	; (80034fc <GetCPV+0x4d4>)
+ 80033ca:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 80033ce:	f7fd f8b7 	bl	8000540 <__aeabi_dmul>
+ 80033d2:	4602      	mov	r2, r0
+ 80033d4:	460b      	mov	r3, r1
+ 80033d6:	4610      	mov	r0, r2
+ 80033d8:	4619      	mov	r1, r3
+ 80033da:	f7fd fb89 	bl	8000af0 <__aeabi_d2f>
+ 80033de:	4603      	mov	r3, r0
+ 80033e0:	4a4b      	ldr	r2, [pc, #300]	; (8003510 <GetCPV+0x4e8>)
+ 80033e2:	6013      	str	r3, [r2, #0]
 
 	if((CM_xPhaseAngle < 0.0f) && (CM_yPhaseAngle <= 0.0f))
- 80033d8:	4b4b      	ldr	r3, [pc, #300]	; (8003508 <GetCPV+0x4e0>)
- 80033da:	edd3 7a00 	vldr	s15, [r3]
- 80033de:	eef5 7ac0 	vcmpe.f32	s15, #0.0
- 80033e2:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80033e6:	d50e      	bpl.n	8003406 <GetCPV+0x3de>
- 80033e8:	4b49      	ldr	r3, [pc, #292]	; (8003510 <GetCPV+0x4e8>)
- 80033ea:	edd3 7a00 	vldr	s15, [r3]
- 80033ee:	eef5 7ac0 	vcmpe.f32	s15, #0.0
- 80033f2:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 80033f6:	d806      	bhi.n	8003406 <GetCPV+0x3de>
+ 80033e4:	4b48      	ldr	r3, [pc, #288]	; (8003508 <GetCPV+0x4e0>)
+ 80033e6:	edd3 7a00 	vldr	s15, [r3]
+ 80033ea:	eef5 7ac0 	vcmpe.f32	s15, #0.0
+ 80033ee:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 80033f2:	d50e      	bpl.n	8003412 <GetCPV+0x3ea>
+ 80033f4:	4b46      	ldr	r3, [pc, #280]	; (8003510 <GetCPV+0x4e8>)
+ 80033f6:	edd3 7a00 	vldr	s15, [r3]
+ 80033fa:	eef5 7ac0 	vcmpe.f32	s15, #0.0
+ 80033fe:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 8003402:	d806      	bhi.n	8003412 <GetCPV+0x3ea>
 	{
 		CM_state_quadrant = 0;
- 80033f8:	4b46      	ldr	r3, [pc, #280]	; (8003514 <GetCPV+0x4ec>)
- 80033fa:	2200      	movs	r2, #0
- 80033fc:	701a      	strb	r2, [r3, #0]
+ 8003404:	4b43      	ldr	r3, [pc, #268]	; (8003514 <GetCPV+0x4ec>)
+ 8003406:	2200      	movs	r2, #0
+ 8003408:	701a      	strb	r2, [r3, #0]
 		quadrant[0] = 1;
- 80033fe:	4b46      	ldr	r3, [pc, #280]	; (8003518 <GetCPV+0x4f0>)
- 8003400:	2201      	movs	r2, #1
- 8003402:	701a      	strb	r2, [r3, #0]
- 8003404:	e050      	b.n	80034a8 <GetCPV+0x480>
+ 800340a:	4b43      	ldr	r3, [pc, #268]	; (8003518 <GetCPV+0x4f0>)
+ 800340c:	2201      	movs	r2, #1
+ 800340e:	701a      	strb	r2, [r3, #0]
+ 8003410:	e050      	b.n	80034b4 <GetCPV+0x48c>
 	}
 	else if((CM_xPhaseAngle >= 0.0f) && (CM_yPhaseAngle < 0.0f))
- 8003406:	4b40      	ldr	r3, [pc, #256]	; (8003508 <GetCPV+0x4e0>)
- 8003408:	edd3 7a00 	vldr	s15, [r3]
- 800340c:	eef5 7ac0 	vcmpe.f32	s15, #0.0
- 8003410:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003414:	db0e      	blt.n	8003434 <GetCPV+0x40c>
- 8003416:	4b3e      	ldr	r3, [pc, #248]	; (8003510 <GetCPV+0x4e8>)
- 8003418:	edd3 7a00 	vldr	s15, [r3]
- 800341c:	eef5 7ac0 	vcmpe.f32	s15, #0.0
- 8003420:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003424:	d506      	bpl.n	8003434 <GetCPV+0x40c>
+ 8003412:	4b3d      	ldr	r3, [pc, #244]	; (8003508 <GetCPV+0x4e0>)
+ 8003414:	edd3 7a00 	vldr	s15, [r3]
+ 8003418:	eef5 7ac0 	vcmpe.f32	s15, #0.0
+ 800341c:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 8003420:	db0e      	blt.n	8003440 <GetCPV+0x418>
+ 8003422:	4b3b      	ldr	r3, [pc, #236]	; (8003510 <GetCPV+0x4e8>)
+ 8003424:	edd3 7a00 	vldr	s15, [r3]
+ 8003428:	eef5 7ac0 	vcmpe.f32	s15, #0.0
+ 800342c:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 8003430:	d506      	bpl.n	8003440 <GetCPV+0x418>
 	{
 		CM_state_quadrant = 3;
- 8003426:	4b3b      	ldr	r3, [pc, #236]	; (8003514 <GetCPV+0x4ec>)
- 8003428:	2203      	movs	r2, #3
- 800342a:	701a      	strb	r2, [r3, #0]
+ 8003432:	4b38      	ldr	r3, [pc, #224]	; (8003514 <GetCPV+0x4ec>)
+ 8003434:	2203      	movs	r2, #3
+ 8003436:	701a      	strb	r2, [r3, #0]
 		quadrant[0] = 2;
- 800342c:	4b3a      	ldr	r3, [pc, #232]	; (8003518 <GetCPV+0x4f0>)
- 800342e:	2202      	movs	r2, #2
- 8003430:	701a      	strb	r2, [r3, #0]
- 8003432:	e039      	b.n	80034a8 <GetCPV+0x480>
+ 8003438:	4b37      	ldr	r3, [pc, #220]	; (8003518 <GetCPV+0x4f0>)
+ 800343a:	2202      	movs	r2, #2
+ 800343c:	701a      	strb	r2, [r3, #0]
+ 800343e:	e039      	b.n	80034b4 <GetCPV+0x48c>
 	}
 	else if((CM_xPhaseAngle > 0.0f) && (CM_yPhaseAngle >= 0.0f))
- 8003434:	4b34      	ldr	r3, [pc, #208]	; (8003508 <GetCPV+0x4e0>)
- 8003436:	edd3 7a00 	vldr	s15, [r3]
- 800343a:	eef5 7ac0 	vcmpe.f32	s15, #0.0
- 800343e:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003442:	dd0e      	ble.n	8003462 <GetCPV+0x43a>
- 8003444:	4b32      	ldr	r3, [pc, #200]	; (8003510 <GetCPV+0x4e8>)
- 8003446:	edd3 7a00 	vldr	s15, [r3]
- 800344a:	eef5 7ac0 	vcmpe.f32	s15, #0.0
- 800344e:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003452:	db06      	blt.n	8003462 <GetCPV+0x43a>
+ 8003440:	4b31      	ldr	r3, [pc, #196]	; (8003508 <GetCPV+0x4e0>)
+ 8003442:	edd3 7a00 	vldr	s15, [r3]
+ 8003446:	eef5 7ac0 	vcmpe.f32	s15, #0.0
+ 800344a:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 800344e:	dd0e      	ble.n	800346e <GetCPV+0x446>
+ 8003450:	4b2f      	ldr	r3, [pc, #188]	; (8003510 <GetCPV+0x4e8>)
+ 8003452:	edd3 7a00 	vldr	s15, [r3]
+ 8003456:	eef5 7ac0 	vcmpe.f32	s15, #0.0
+ 800345a:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 800345e:	db06      	blt.n	800346e <GetCPV+0x446>
 	{
 		CM_state_quadrant = 6;
- 8003454:	4b2f      	ldr	r3, [pc, #188]	; (8003514 <GetCPV+0x4ec>)
- 8003456:	2206      	movs	r2, #6
- 8003458:	701a      	strb	r2, [r3, #0]
+ 8003460:	4b2c      	ldr	r3, [pc, #176]	; (8003514 <GetCPV+0x4ec>)
+ 8003462:	2206      	movs	r2, #6
+ 8003464:	701a      	strb	r2, [r3, #0]
 		quadrant[0] = 3;
- 800345a:	4b2f      	ldr	r3, [pc, #188]	; (8003518 <GetCPV+0x4f0>)
- 800345c:	2203      	movs	r2, #3
- 800345e:	701a      	strb	r2, [r3, #0]
- 8003460:	e022      	b.n	80034a8 <GetCPV+0x480>
+ 8003466:	4b2c      	ldr	r3, [pc, #176]	; (8003518 <GetCPV+0x4f0>)
+ 8003468:	2203      	movs	r2, #3
+ 800346a:	701a      	strb	r2, [r3, #0]
+ 800346c:	e022      	b.n	80034b4 <GetCPV+0x48c>
 	}
 	else if((CM_xPhaseAngle <= 0.0f) && (CM_yPhaseAngle > 0.0f))
- 8003462:	4b29      	ldr	r3, [pc, #164]	; (8003508 <GetCPV+0x4e0>)
- 8003464:	edd3 7a00 	vldr	s15, [r3]
- 8003468:	eef5 7ac0 	vcmpe.f32	s15, #0.0
- 800346c:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003470:	d80e      	bhi.n	8003490 <GetCPV+0x468>
- 8003472:	4b27      	ldr	r3, [pc, #156]	; (8003510 <GetCPV+0x4e8>)
- 8003474:	edd3 7a00 	vldr	s15, [r3]
- 8003478:	eef5 7ac0 	vcmpe.f32	s15, #0.0
- 800347c:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003480:	dd06      	ble.n	8003490 <GetCPV+0x468>
+ 800346e:	4b26      	ldr	r3, [pc, #152]	; (8003508 <GetCPV+0x4e0>)
+ 8003470:	edd3 7a00 	vldr	s15, [r3]
+ 8003474:	eef5 7ac0 	vcmpe.f32	s15, #0.0
+ 8003478:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 800347c:	d80e      	bhi.n	800349c <GetCPV+0x474>
+ 800347e:	4b24      	ldr	r3, [pc, #144]	; (8003510 <GetCPV+0x4e8>)
+ 8003480:	edd3 7a00 	vldr	s15, [r3]
+ 8003484:	eef5 7ac0 	vcmpe.f32	s15, #0.0
+ 8003488:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 800348c:	dd06      	ble.n	800349c <GetCPV+0x474>
 	{
 		CM_state_quadrant = 9;
- 8003482:	4b24      	ldr	r3, [pc, #144]	; (8003514 <GetCPV+0x4ec>)
- 8003484:	2209      	movs	r2, #9
- 8003486:	701a      	strb	r2, [r3, #0]
+ 800348e:	4b21      	ldr	r3, [pc, #132]	; (8003514 <GetCPV+0x4ec>)
+ 8003490:	2209      	movs	r2, #9
+ 8003492:	701a      	strb	r2, [r3, #0]
 		quadrant[0] = 4;
- 8003488:	4b23      	ldr	r3, [pc, #140]	; (8003518 <GetCPV+0x4f0>)
- 800348a:	2204      	movs	r2, #4
- 800348c:	701a      	strb	r2, [r3, #0]
- 800348e:	e00b      	b.n	80034a8 <GetCPV+0x480>
+ 8003494:	4b20      	ldr	r3, [pc, #128]	; (8003518 <GetCPV+0x4f0>)
+ 8003496:	2204      	movs	r2, #4
+ 8003498:	701a      	strb	r2, [r3, #0]
+ 800349a:	e00b      	b.n	80034b4 <GetCPV+0x48c>
 	}
 	else
 	{
 		CM_healthyStride = 0;
- 8003490:	4b22      	ldr	r3, [pc, #136]	; (800351c <GetCPV+0x4f4>)
- 8003492:	2200      	movs	r2, #0
- 8003494:	701a      	strb	r2, [r3, #0]
-		CM_state_quadrant = -1;
- 8003496:	4b1f      	ldr	r3, [pc, #124]	; (8003514 <GetCPV+0x4ec>)
- 8003498:	22ff      	movs	r2, #255	; 0xff
- 800349a:	701a      	strb	r2, [r3, #0]
-		quadrant[0] = 0;
- 800349c:	4b1e      	ldr	r3, [pc, #120]	; (8003518 <GetCPV+0x4f0>)
+ 800349c:	4b1f      	ldr	r3, [pc, #124]	; (800351c <GetCPV+0x4f4>)
  800349e:	2200      	movs	r2, #0
  80034a0:	701a      	strb	r2, [r3, #0]
+		CM_state_quadrant = -1;
+ 80034a2:	4b1c      	ldr	r3, [pc, #112]	; (8003514 <GetCPV+0x4ec>)
+ 80034a4:	22ff      	movs	r2, #255	; 0xff
+ 80034a6:	701a      	strb	r2, [r3, #0]
+		quadrant[0] = 0;
+ 80034a8:	4b1b      	ldr	r3, [pc, #108]	; (8003518 <GetCPV+0x4f0>)
+ 80034aa:	2200      	movs	r2, #0
+ 80034ac:	701a      	strb	r2, [r3, #0]
 		quadrant[1] = 0;
- 80034a2:	4b1d      	ldr	r3, [pc, #116]	; (8003518 <GetCPV+0x4f0>)
- 80034a4:	2200      	movs	r2, #0
- 80034a6:	705a      	strb	r2, [r3, #1]
+ 80034ae:	4b1a      	ldr	r3, [pc, #104]	; (8003518 <GetCPV+0x4f0>)
+ 80034b0:	2200      	movs	r2, #0
+ 80034b2:	705a      	strb	r2, [r3, #1]
 	}
 
 	if((quadrant[0] == 1) && (quadrant[1] == 4))
- 80034a8:	4b1b      	ldr	r3, [pc, #108]	; (8003518 <GetCPV+0x4f0>)
- 80034aa:	781b      	ldrb	r3, [r3, #0]
- 80034ac:	2b01      	cmp	r3, #1
- 80034ae:	d106      	bne.n	80034be <GetCPV+0x496>
- 80034b0:	4b19      	ldr	r3, [pc, #100]	; (8003518 <GetCPV+0x4f0>)
- 80034b2:	785b      	ldrb	r3, [r3, #1]
- 80034b4:	2b04      	cmp	r3, #4
- 80034b6:	d102      	bne.n	80034be <GetCPV+0x496>
+ 80034b4:	4b18      	ldr	r3, [pc, #96]	; (8003518 <GetCPV+0x4f0>)
+ 80034b6:	781b      	ldrb	r3, [r3, #0]
+ 80034b8:	2b01      	cmp	r3, #1
+ 80034ba:	d106      	bne.n	80034ca <GetCPV+0x4a2>
+ 80034bc:	4b16      	ldr	r3, [pc, #88]	; (8003518 <GetCPV+0x4f0>)
+ 80034be:	785b      	ldrb	r3, [r3, #1]
+ 80034c0:	2b04      	cmp	r3, #4
+ 80034c2:	d102      	bne.n	80034ca <GetCPV+0x4a2>
 		quadrant[0] = 4;
- 80034b8:	4b17      	ldr	r3, [pc, #92]	; (8003518 <GetCPV+0x4f0>)
- 80034ba:	2204      	movs	r2, #4
- 80034bc:	701a      	strb	r2, [r3, #0]
+ 80034c4:	4b14      	ldr	r3, [pc, #80]	; (8003518 <GetCPV+0x4f0>)
+ 80034c6:	2204      	movs	r2, #4
+ 80034c8:	701a      	strb	r2, [r3, #0]
 
 	if(CM_healthyStride)
- 80034be:	4b17      	ldr	r3, [pc, #92]	; (800351c <GetCPV+0x4f4>)
- 80034c0:	781b      	ldrb	r3, [r3, #0]
- 80034c2:	2b00      	cmp	r3, #0
- 80034c4:	d02f      	beq.n	8003526 <GetCPV+0x4fe>
+ 80034ca:	4b14      	ldr	r3, [pc, #80]	; (800351c <GetCPV+0x4f4>)
+ 80034cc:	781b      	ldrb	r3, [r3, #0]
+ 80034ce:	2b00      	cmp	r3, #0
+ 80034d0:	d029      	beq.n	8003526 <GetCPV+0x4fe>
 	{
 		if(quadrant[0] >= quadrant[1])
- 80034c6:	4b14      	ldr	r3, [pc, #80]	; (8003518 <GetCPV+0x4f0>)
- 80034c8:	781a      	ldrb	r2, [r3, #0]
- 80034ca:	4b13      	ldr	r3, [pc, #76]	; (8003518 <GetCPV+0x4f0>)
- 80034cc:	785b      	ldrb	r3, [r3, #1]
- 80034ce:	429a      	cmp	r2, r3
- 80034d0:	d326      	bcc.n	8003520 <GetCPV+0x4f8>
+ 80034d2:	4b11      	ldr	r3, [pc, #68]	; (8003518 <GetCPV+0x4f0>)
+ 80034d4:	781a      	ldrb	r2, [r3, #0]
+ 80034d6:	4b10      	ldr	r3, [pc, #64]	; (8003518 <GetCPV+0x4f0>)
+ 80034d8:	785b      	ldrb	r3, [r3, #1]
+ 80034da:	429a      	cmp	r2, r3
+ 80034dc:	d320      	bcc.n	8003520 <GetCPV+0x4f8>
 			CM_healthyStride = 9;
- 80034d2:	4b12      	ldr	r3, [pc, #72]	; (800351c <GetCPV+0x4f4>)
- 80034d4:	2209      	movs	r2, #9
- 80034d6:	701a      	strb	r2, [r3, #0]
- 80034d8:	e025      	b.n	8003526 <GetCPV+0x4fe>
- 80034da:	bf00      	nop
- 80034dc:	f3af 8000 	nop.w
- 80034e0:	d2f1a9fc 	.word	0xd2f1a9fc
- 80034e4:	3f60624d 	.word	0x3f60624d
- 80034e8:	20000318 	.word	0x20000318
- 80034ec:	20000534 	.word	0x20000534
- 80034f0:	20000000 	.word	0x20000000
- 80034f4:	20000308 	.word	0x20000308
- 80034f8:	20000540 	.word	0x20000540
+ 80034de:	4b0f      	ldr	r3, [pc, #60]	; (800351c <GetCPV+0x4f4>)
+ 80034e0:	2209      	movs	r2, #9
+ 80034e2:	701a      	strb	r2, [r3, #0]
+ 80034e4:	e01f      	b.n	8003526 <GetCPV+0x4fe>
+ 80034e6:	bf00      	nop
+ 80034e8:	d2f1a9fc 	.word	0xd2f1a9fc
+ 80034ec:	3f60624d 	.word	0x3f60624d
+ 80034f0:	20000308 	.word	0x20000308
+ 80034f4:	20000540 	.word	0x20000540
+ 80034f8:	20000318 	.word	0x20000318
  80034fc:	20000328 	.word	0x20000328
  8003500:	20000538 	.word	0x20000538
  8003504:	2000053c 	.word	0x2000053c

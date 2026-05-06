@@ -712,7 +712,6 @@ static void GetCPV(void)
 
 	if(heelStrike)
 	{
-		heelStrike = 0;
 		kneeAngleAtHeelStrike = CM_KneeJoint.position;
 
 		if(!firstHeelStrike)
@@ -751,12 +750,17 @@ static void GetCPV(void)
 
 	if(!isFirst)
 	{
-		thighIntegral += (CM_thighAngle[0] + CM_thighAngle[1]) * DT/2.0;								// trapezoidal integration used
-		CM_thighIntegral_unbiased += (CM_thighAngle_unbiased[0] + CM_thighAngle_unbiased[1]) * DT/2.0;	// trapezoidal integration used
-		if(CM_thighIntegral_unbiased > maxThighIntegral_unbiased)
-			maxThighIntegral_unbiased = CM_thighIntegral_unbiased;
-		else if(CM_thighIntegral_unbiased < minThighIntegral_unbiased)
-			minThighIntegral_unbiased = CM_thighIntegral_unbiased;
+		if(heelStrike)
+			heelStrike = 0;
+		else
+		{
+			thighIntegral += (CM_thighAngle[0] + CM_thighAngle[1]) * DT/2.0;								// trapezoidal integration used
+			CM_thighIntegral_unbiased += (CM_thighAngle_unbiased[0] + CM_thighAngle_unbiased[1]) * DT/2.0;	// trapezoidal integration used
+			if(CM_thighIntegral_unbiased > maxThighIntegral_unbiased)
+				maxThighIntegral_unbiased = CM_thighIntegral_unbiased;
+			else if(CM_thighIntegral_unbiased < minThighIntegral_unbiased)
+				minThighIntegral_unbiased = CM_thighIntegral_unbiased;
+		}
 	}
 
 	CM_xPhaseAngle = -CM_thighAngle_unbiased[0];
