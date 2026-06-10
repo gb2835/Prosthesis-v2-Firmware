@@ -226,7 +226,13 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		switch(Device.CPC_Spec)
 		{
 		case Specific:
-			// ??
+			CM_KneeJoint.CPC_Params.CPV_1 = 0.772569158398214f;
+			CM_KneeJoint.CPC_Params.CPV_2 = 0.795576681151677f;
+			CM_KneeJoint.CPC_Params.CPV_3 = 0.950889051162379f;
+			CM_KneeJoint.CPC_Params.P_1 = 68.262804756164540f;
+			CM_KneeJoint.CPC_Params.P_2 = 70.215346721649180f;
+			CM_KneeJoint.CPC_Params.P_3 = -0.438150704652071f;
+			CM_KneeJoint.CPC_Params.P_4 = -0.929495002329350f;
 			break;
 		case Winter:
 			CM_KneeJoint.CPC_Params.CPV_1 = 0.717203740538403f;
@@ -611,7 +617,7 @@ static StateMachine_e RunStateMachine(void)
 	case LateStance:
 		SetStateVals(Device.Joint, state);
 
-		if(CM_AnkleJoint.speed > 0.0f) // can we use load cell??
+		if(CM_AnkleJoint.speed > 0.0f)
 		{
 			toeOff = 1;
 
@@ -693,11 +699,12 @@ static void SetStateVals(Joint_e joint, StateMachine_e state)
 
 static void GetCPV(void)
 {
-	static double thighAngle_bias = 0.0;
-	static double thighIntegral = 0.0;
-	static float maxThighIntegral_unbiased = 0.0f;
-	static float minThighIntegral_unbiased = 0.0f;
-	static float strideTime = 0.0f;
+	static double thighAngle_bias;
+	static double thighIntegral;
+	static float maxThighIntegral_unbiased;
+	static float minThighIntegral_unbiased;
+	static float strideTime;
+
 	static float z = 1.0f;
 	static uint8_t firstHeelStrike = 1;
 	static uint8_t quadrant[2] = {0, 0};
@@ -712,6 +719,7 @@ static void GetCPV(void)
 
 	if(heelStrike)
 	{
+		heelStrike = 0;
 		kneeAngleAtHeelStrike = CM_KneeJoint.position;
 
 		if(!firstHeelStrike)
@@ -722,7 +730,7 @@ static void GetCPV(void)
 					z = fabs(maxThighAngle_unbiased - minThighAngle_unbiased) / fabs(maxThighIntegral_unbiased - minThighIntegral_unbiased);
 			}
 
-			thighAngle_bias = thighIntegral / strideTime;
+			thighAngle_bias += copysign(1.0, CM_thighIntegral_unbiased);
 		}
 
 		thighIntegral = 0.0f;
@@ -750,9 +758,7 @@ static void GetCPV(void)
 
 	if(!isFirst)
 	{
-		if(heelStrike)
-			heelStrike = 0;
-		else
+		if(!heelStrike)
 		{
 			thighIntegral += (CM_thighAngle[0] + CM_thighAngle[1]) * DT/2.0;								// trapezoidal integration used
 			CM_thighIntegral_unbiased += (CM_thighAngle_unbiased[0] + CM_thighAngle_unbiased[1]) * DT/2.0;	// trapezoidal integration used

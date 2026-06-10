@@ -161,7 +161,7 @@ int main(void)
 	AnkleIMU_Init.csPin = ANKLE_IMU_CS_Pin;
 
 	Prosthesis_Init_t Prosthesis_Init;
-	Prosthesis_Init.CPC_Spec = Winter;
+	Prosthesis_Init.CPC_Spec = Specific;
 	Prosthesis_Init.Joint = Combined;
 	Prosthesis_Init.Side = Right;
 
