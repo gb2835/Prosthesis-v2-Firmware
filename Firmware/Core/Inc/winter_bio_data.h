@@ -3,10 +3,10 @@
 * TITLE: Winter Bio Data
 *
 * NOTES
-* 1. The provided data is from  The Biomechanics and Motor Control of Human Gait by David Winter.
+* 1. The provided data is from The Biomechanics and Motor Control of Human Gait by David Winter.
 *
 *******************************************************************************/
-
+//do i actually use this file??
 #ifndef INC_WINTER_BIO_DATA_H_
 #define INC_WINTER_BIO_DATA_H_
 
@@ -19,7 +19,7 @@ typedef enum
 } Winter_ColumnData_e;
 
 // Joint Angles
-float winterBioData[51][4] = {
+const float winterBioData[51][4] = {
 	// Stride	// Hip		// Knee		//Ankle
 	{0.0f,		 19.33f,	3.97f,		 0.02f},
 	{2.0f,		 18.92f,	7.0f,		-2.06f},
@@ -71,7 +71,7 @@ float winterBioData[51][4] = {
 	{94.0f,		 20.09f,	4.31f,		 0.36f},
 	{96.0f,		 19.5f,		1.12f,		 1.0f},
 	{98.0f,		 19.18f,	0.54f,		 1.2f},
-	{100.0f,	 19.01f,	2.21f,		 0.58f},
+	{100.0f,	 19.01f,	2.21f,		 0.58f}
 };
 
 /*******************************************************************************
