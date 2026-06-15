@@ -3420,9 +3420,9 @@ int main(void)
 * USER ADDED OPERATION MODE
 *******************************************************************************/
 
-	operationMode = ReadOnly;
+	operationMode = PassiveEmulation;
  8001aca:	4b13      	ldr	r3, [pc, #76]	; (8001b18 <main+0x290>)
- 8001acc:	2200      	movs	r2, #0
+ 8001acc:	2202      	movs	r2, #2
  8001ace:	701a      	strb	r2, [r3, #0]
 
 	if(((operationMode == PassiveEmulation) || (operationMode == StateMachineWithPassiveEmulation)) && (Prosthesis_Init.Joint == Ankle))
@@ -7749,125 +7749,126 @@ static void GetTimeBasedTrajectory(void)//??
 	float strideTime = 1.5f;
  8003eae:	f04f 537f 	mov.w	r3, #1069547520	; 0x3fc00000
  8003eb2:	60bb      	str	r3, [r7, #8]
-	float dCpv = DT * strideTime;
+	float dCpv = DT / strideTime;
  8003eb4:	68b8      	ldr	r0, [r7, #8]
  8003eb6:	f7fc faeb 	bl	8000490 <__aeabi_f2d>
- 8003eba:	a344      	add	r3, pc, #272	; (adr r3, 8003fcc <GetTimeBasedTrajectory+0x124>)
- 8003ebc:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8003ec0:	f7fc fb3e 	bl	8000540 <__aeabi_dmul>
- 8003ec4:	4602      	mov	r2, r0
- 8003ec6:	460b      	mov	r3, r1
- 8003ec8:	4610      	mov	r0, r2
- 8003eca:	4619      	mov	r1, r3
- 8003ecc:	f7fc fe10 	bl	8000af0 <__aeabi_d2f>
- 8003ed0:	4603      	mov	r3, r0
- 8003ed2:	607b      	str	r3, [r7, #4]
+ 8003eba:	4602      	mov	r2, r0
+ 8003ebc:	460b      	mov	r3, r1
+ 8003ebe:	a143      	add	r1, pc, #268	; (adr r1, 8003fcc <GetTimeBasedTrajectory+0x124>)
+ 8003ec0:	e9d1 0100 	ldrd	r0, r1, [r1]
+ 8003ec4:	f7fc fc66 	bl	8000794 <__aeabi_ddiv>
+ 8003ec8:	4602      	mov	r2, r0
+ 8003eca:	460b      	mov	r3, r1
+ 8003ecc:	4610      	mov	r0, r2
+ 8003ece:	4619      	mov	r1, r3
+ 8003ed0:	f7fc fe0e 	bl	8000af0 <__aeabi_d2f>
+ 8003ed4:	4603      	mov	r3, r0
+ 8003ed6:	607b      	str	r3, [r7, #4]
 
 	static float cpv;
 	static uint8_t firstCall = 1;
 	if(firstCall)
- 8003ed4:	4b36      	ldr	r3, [pc, #216]	; (8003fb0 <GetTimeBasedTrajectory+0x108>)
- 8003ed6:	781b      	ldrb	r3, [r3, #0]
- 8003ed8:	2b00      	cmp	r3, #0
- 8003eda:	d007      	beq.n	8003eec <GetTimeBasedTrajectory+0x44>
+ 8003ed8:	4b35      	ldr	r3, [pc, #212]	; (8003fb0 <GetTimeBasedTrajectory+0x108>)
+ 8003eda:	781b      	ldrb	r3, [r3, #0]
+ 8003edc:	2b00      	cmp	r3, #0
+ 8003ede:	d007      	beq.n	8003ef0 <GetTimeBasedTrajectory+0x48>
 	{
 		firstCall = 0;
- 8003edc:	4b34      	ldr	r3, [pc, #208]	; (8003fb0 <GetTimeBasedTrajectory+0x108>)
- 8003ede:	2200      	movs	r2, #0
- 8003ee0:	701a      	strb	r2, [r3, #0]
+ 8003ee0:	4b33      	ldr	r3, [pc, #204]	; (8003fb0 <GetTimeBasedTrajectory+0x108>)
+ 8003ee2:	2200      	movs	r2, #0
+ 8003ee4:	701a      	strb	r2, [r3, #0]
 		cpv = CM_timeBasedCpv;
- 8003ee2:	4b34      	ldr	r3, [pc, #208]	; (8003fb4 <GetTimeBasedTrajectory+0x10c>)
- 8003ee4:	681b      	ldr	r3, [r3, #0]
- 8003ee6:	4a34      	ldr	r2, [pc, #208]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
- 8003ee8:	6013      	str	r3, [r2, #0]
- 8003eea:	e009      	b.n	8003f00 <GetTimeBasedTrajectory+0x58>
+ 8003ee6:	4b33      	ldr	r3, [pc, #204]	; (8003fb4 <GetTimeBasedTrajectory+0x10c>)
+ 8003ee8:	681b      	ldr	r3, [r3, #0]
+ 8003eea:	4a33      	ldr	r2, [pc, #204]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
+ 8003eec:	6013      	str	r3, [r2, #0]
+ 8003eee:	e009      	b.n	8003f04 <GetTimeBasedTrajectory+0x5c>
 	}
 	else
 		cpv += dCpv;
- 8003eec:	4b32      	ldr	r3, [pc, #200]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
- 8003eee:	ed93 7a00 	vldr	s14, [r3]
- 8003ef2:	edd7 7a01 	vldr	s15, [r7, #4]
- 8003ef6:	ee77 7a27 	vadd.f32	s15, s14, s15
- 8003efa:	4b2f      	ldr	r3, [pc, #188]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
- 8003efc:	edc3 7a00 	vstr	s15, [r3]
+ 8003ef0:	4b31      	ldr	r3, [pc, #196]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
+ 8003ef2:	ed93 7a00 	vldr	s14, [r3]
+ 8003ef6:	edd7 7a01 	vldr	s15, [r7, #4]
+ 8003efa:	ee77 7a27 	vadd.f32	s15, s14, s15
+ 8003efe:	4b2e      	ldr	r3, [pc, #184]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
+ 8003f00:	edc3 7a00 	vstr	s15, [r3]
 
 	if(cpv > 1.0f)
- 8003f00:	4b2d      	ldr	r3, [pc, #180]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
- 8003f02:	edd3 7a00 	vldr	s15, [r3]
- 8003f06:	eeb7 7a00 	vmov.f32	s14, #112	; 0x3f800000  1.0
- 8003f0a:	eef4 7ac7 	vcmpe.f32	s15, s14
- 8003f0e:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003f12:	dd03      	ble.n	8003f1c <GetTimeBasedTrajectory+0x74>
+ 8003f04:	4b2c      	ldr	r3, [pc, #176]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
+ 8003f06:	edd3 7a00 	vldr	s15, [r3]
+ 8003f0a:	eeb7 7a00 	vmov.f32	s14, #112	; 0x3f800000  1.0
+ 8003f0e:	eef4 7ac7 	vcmpe.f32	s15, s14
+ 8003f12:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 8003f16:	dd03      	ble.n	8003f20 <GetTimeBasedTrajectory+0x78>
 		cpv = 1.0f;
- 8003f14:	4b28      	ldr	r3, [pc, #160]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
- 8003f16:	f04f 527e 	mov.w	r2, #1065353216	; 0x3f800000
- 8003f1a:	601a      	str	r2, [r3, #0]
+ 8003f18:	4b27      	ldr	r3, [pc, #156]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
+ 8003f1a:	f04f 527e 	mov.w	r2, #1065353216	; 0x3f800000
+ 8003f1e:	601a      	str	r2, [r3, #0]
 
 	uint8_t index = gregN_Elements - 1;
- 8003f1c:	4b27      	ldr	r3, [pc, #156]	; (8003fbc <GetTimeBasedTrajectory+0x114>)
- 8003f1e:	781b      	ldrb	r3, [r3, #0]
- 8003f20:	3b01      	subs	r3, #1
- 8003f22:	73fb      	strb	r3, [r7, #15]
+ 8003f20:	4b26      	ldr	r3, [pc, #152]	; (8003fbc <GetTimeBasedTrajectory+0x114>)
+ 8003f22:	781b      	ldrb	r3, [r3, #0]
+ 8003f24:	3b01      	subs	r3, #1
+ 8003f26:	73fb      	strb	r3, [r7, #15]
 	while(cpv < gregStride[index])
- 8003f24:	e002      	b.n	8003f2c <GetTimeBasedTrajectory+0x84>
+ 8003f28:	e002      	b.n	8003f30 <GetTimeBasedTrajectory+0x88>
 	{
 		index--;
- 8003f26:	7bfb      	ldrb	r3, [r7, #15]
- 8003f28:	3b01      	subs	r3, #1
- 8003f2a:	73fb      	strb	r3, [r7, #15]
+ 8003f2a:	7bfb      	ldrb	r3, [r7, #15]
+ 8003f2c:	3b01      	subs	r3, #1
+ 8003f2e:	73fb      	strb	r3, [r7, #15]
 	while(cpv < gregStride[index])
- 8003f2c:	7bfb      	ldrb	r3, [r7, #15]
- 8003f2e:	4a24      	ldr	r2, [pc, #144]	; (8003fc0 <GetTimeBasedTrajectory+0x118>)
- 8003f30:	009b      	lsls	r3, r3, #2
- 8003f32:	4413      	add	r3, r2
- 8003f34:	ed93 7a00 	vldr	s14, [r3]
- 8003f38:	4b1f      	ldr	r3, [pc, #124]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
- 8003f3a:	edd3 7a00 	vldr	s15, [r3]
- 8003f3e:	eeb4 7ae7 	vcmpe.f32	s14, s15
- 8003f42:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
- 8003f46:	dcee      	bgt.n	8003f26 <GetTimeBasedTrajectory+0x7e>
+ 8003f30:	7bfb      	ldrb	r3, [r7, #15]
+ 8003f32:	4a23      	ldr	r2, [pc, #140]	; (8003fc0 <GetTimeBasedTrajectory+0x118>)
+ 8003f34:	009b      	lsls	r3, r3, #2
+ 8003f36:	4413      	add	r3, r2
+ 8003f38:	ed93 7a00 	vldr	s14, [r3]
+ 8003f3c:	4b1e      	ldr	r3, [pc, #120]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
+ 8003f3e:	edd3 7a00 	vldr	s15, [r3]
+ 8003f42:	eeb4 7ae7 	vcmpe.f32	s14, s15
+ 8003f46:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 8003f4a:	dcee      	bgt.n	8003f2a <GetTimeBasedTrajectory+0x82>
 	}
 
 	CM_timeBasedTrajectory = Utils_LinearInterpolate(cpv, gregStride[index], gregKneeAngle[index], gregStride[index + 1], gregKneeAngle[index + 1]);
- 8003f48:	4b1b      	ldr	r3, [pc, #108]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
- 8003f4a:	edd3 7a00 	vldr	s15, [r3]
- 8003f4e:	7bfb      	ldrb	r3, [r7, #15]
- 8003f50:	4a1b      	ldr	r2, [pc, #108]	; (8003fc0 <GetTimeBasedTrajectory+0x118>)
- 8003f52:	009b      	lsls	r3, r3, #2
- 8003f54:	4413      	add	r3, r2
- 8003f56:	ed93 7a00 	vldr	s14, [r3]
- 8003f5a:	7bfb      	ldrb	r3, [r7, #15]
- 8003f5c:	4a19      	ldr	r2, [pc, #100]	; (8003fc4 <GetTimeBasedTrajectory+0x11c>)
- 8003f5e:	009b      	lsls	r3, r3, #2
- 8003f60:	4413      	add	r3, r2
- 8003f62:	edd3 6a00 	vldr	s13, [r3]
- 8003f66:	7bfb      	ldrb	r3, [r7, #15]
- 8003f68:	3301      	adds	r3, #1
- 8003f6a:	4a15      	ldr	r2, [pc, #84]	; (8003fc0 <GetTimeBasedTrajectory+0x118>)
- 8003f6c:	009b      	lsls	r3, r3, #2
- 8003f6e:	4413      	add	r3, r2
- 8003f70:	ed93 6a00 	vldr	s12, [r3]
- 8003f74:	7bfb      	ldrb	r3, [r7, #15]
- 8003f76:	3301      	adds	r3, #1
- 8003f78:	4a12      	ldr	r2, [pc, #72]	; (8003fc4 <GetTimeBasedTrajectory+0x11c>)
- 8003f7a:	009b      	lsls	r3, r3, #2
- 8003f7c:	4413      	add	r3, r2
- 8003f7e:	edd3 5a00 	vldr	s11, [r3]
- 8003f82:	eeb0 2a65 	vmov.f32	s4, s11
- 8003f86:	eef0 1a46 	vmov.f32	s3, s12
- 8003f8a:	eeb0 1a66 	vmov.f32	s2, s13
- 8003f8e:	eef0 0a47 	vmov.f32	s1, s14
- 8003f92:	eeb0 0a67 	vmov.f32	s0, s15
- 8003f96:	f001 fbf5 	bl	8005784 <Utils_LinearInterpolate>
- 8003f9a:	eef0 7a40 	vmov.f32	s15, s0
- 8003f9e:	4b0a      	ldr	r3, [pc, #40]	; (8003fc8 <GetTimeBasedTrajectory+0x120>)
- 8003fa0:	edc3 7a00 	vstr	s15, [r3]
+ 8003f4c:	4b1a      	ldr	r3, [pc, #104]	; (8003fb8 <GetTimeBasedTrajectory+0x110>)
+ 8003f4e:	edd3 7a00 	vldr	s15, [r3]
+ 8003f52:	7bfb      	ldrb	r3, [r7, #15]
+ 8003f54:	4a1a      	ldr	r2, [pc, #104]	; (8003fc0 <GetTimeBasedTrajectory+0x118>)
+ 8003f56:	009b      	lsls	r3, r3, #2
+ 8003f58:	4413      	add	r3, r2
+ 8003f5a:	ed93 7a00 	vldr	s14, [r3]
+ 8003f5e:	7bfb      	ldrb	r3, [r7, #15]
+ 8003f60:	4a18      	ldr	r2, [pc, #96]	; (8003fc4 <GetTimeBasedTrajectory+0x11c>)
+ 8003f62:	009b      	lsls	r3, r3, #2
+ 8003f64:	4413      	add	r3, r2
+ 8003f66:	edd3 6a00 	vldr	s13, [r3]
+ 8003f6a:	7bfb      	ldrb	r3, [r7, #15]
+ 8003f6c:	3301      	adds	r3, #1
+ 8003f6e:	4a14      	ldr	r2, [pc, #80]	; (8003fc0 <GetTimeBasedTrajectory+0x118>)
+ 8003f70:	009b      	lsls	r3, r3, #2
+ 8003f72:	4413      	add	r3, r2
+ 8003f74:	ed93 6a00 	vldr	s12, [r3]
+ 8003f78:	7bfb      	ldrb	r3, [r7, #15]
+ 8003f7a:	3301      	adds	r3, #1
+ 8003f7c:	4a11      	ldr	r2, [pc, #68]	; (8003fc4 <GetTimeBasedTrajectory+0x11c>)
+ 8003f7e:	009b      	lsls	r3, r3, #2
+ 8003f80:	4413      	add	r3, r2
+ 8003f82:	edd3 5a00 	vldr	s11, [r3]
+ 8003f86:	eeb0 2a65 	vmov.f32	s4, s11
+ 8003f8a:	eef0 1a46 	vmov.f32	s3, s12
+ 8003f8e:	eeb0 1a66 	vmov.f32	s2, s13
+ 8003f92:	eef0 0a47 	vmov.f32	s1, s14
+ 8003f96:	eeb0 0a67 	vmov.f32	s0, s15
+ 8003f9a:	f001 fbf3 	bl	8005784 <Utils_LinearInterpolate>
+ 8003f9e:	eef0 7a40 	vmov.f32	s15, s0
+ 8003fa2:	4b09      	ldr	r3, [pc, #36]	; (8003fc8 <GetTimeBasedTrajectory+0x120>)
+ 8003fa4:	edc3 7a00 	vstr	s15, [r3]
 }
- 8003fa4:	bf00      	nop
- 8003fa6:	3710      	adds	r7, #16
- 8003fa8:	46bd      	mov	sp, r7
- 8003faa:	bd80      	pop	{r7, pc}
- 8003fac:	f3af 8000 	nop.w
+ 8003fa8:	bf00      	nop
+ 8003faa:	3710      	adds	r7, #16
+ 8003fac:	46bd      	mov	sp, r7
+ 8003fae:	bd80      	pop	{r7, pc}
  8003fb0:	2000001c 	.word	0x2000001c
  8003fb4:	2000067c 	.word	0x2000067c
  8003fb8:	20000700 	.word	0x20000700
@@ -8941,7 +8942,7 @@ static void SetCtrlParams(StateMachine_e state)
  800471a:	2b01      	cmp	r3, #1
  800471c:	d12b      	bne.n	8004776 <SetCtrlParams+0x7a2>
 			{
-				if((CM_AnkleJoint.SwingCtrl.kd == 0.0f) && (CM_AnkleJoint.SwingCtrl.kp == 0.0f) && (CM_AnkleJoint.SwingCtrl.position == 0.0f) && (!timeBasedCpvValid))
+				if((CM_AnkleJoint.SwingCtrl.kd == 0.0f) && (CM_AnkleJoint.SwingCtrl.kp == 0.0f) && (CM_AnkleJoint.SwingCtrl.position == 0.0f) && (!timeBasedCpvValid))//should !timeBasedCpvValid be here??
  800471e:	4b38      	ldr	r3, [pc, #224]	; (8004800 <SetCtrlParams+0x82c>)
  8004720:	edd3 7a19 	vldr	s15, [r3, #100]	; 0x64
  8004724:	eef5 7a40 	vcmp.f32	s15, #0.0
