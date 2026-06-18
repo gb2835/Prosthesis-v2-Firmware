@@ -404,26 +404,17 @@ static void InitStateVals(void)
 	const float state_loadCell_min = 1100.0f;
 
 	uint8_t nStates = 6;
-	for(uint8_t j = 0; j < nStates-1; j++)
+	for(uint8_t j = 0; j < nStates; j++)
 	{
 		for(uint8_t i = 0; i < 3; i++)
 		{
-			state_angle[i][j] = (state_angle_max[i] - state_angle_min[i]) / (float)(nStates - 2) * j + state_angle_min[i];
-			state_torque[i][j] = (state_torque_max[i] - state_torque_min[i]) / (float)(nStates - 2) * j + state_torque_min[i];
-			state_speed[i][j] = (state_speed_max[i] - state_speed_min[i]) / (float)(nStates - 2) * j + state_speed_min[i];
+			state_angle[i][j] = (state_angle_max[i] - state_angle_min[i]) / (float)(nStates - 1) * j + state_angle_min[i];
+			state_torque[i][j] = (state_torque_max[i] - state_torque_min[i]) / (float)(nStates - 1) * j + state_torque_min[i];
+			state_speed[i][j] = (state_speed_max[i] - state_speed_min[i]) / (float)(nStates - 1) * j + state_speed_min[i];
 		}
 
-		state_loadCell[j] = (state_loadCell_max - state_loadCell_min) / (float)(nStates - 2) * j + state_loadCell_min;
+		state_loadCell[j] = (state_loadCell_max - state_loadCell_min) / (float)(nStates - 1) * j + state_loadCell_min;
 	}
-
-	for(uint8_t i = 0; i < 3; i++)
-	{
-		state_angle[i][nStates-1] = state_angle_max[i];
-		state_torque[i][nStates-1] = state_torque_max[i];
-		state_speed[i][nStates-1] = state_speed_max[i];
-	}
-
-	state_loadCell[nStates-1] = state_loadCell_max;
 }
 
 static void GetInputs(void)
@@ -649,7 +640,7 @@ static StateMachine_e RunStateMachine(void)
 	case MidStance:
 		SetStateVals(Device.Joint, state);
 
-		if(CM_AnkleJoint.speed < CM_threshold_ankleSpeed)
+		if(CM_AnkleJoint.speed <= CM_threshold_ankleSpeed)
 			state = LateStance;
 
 		break;
@@ -657,7 +648,7 @@ static StateMachine_e RunStateMachine(void)
 	case LateStance:
 		SetStateVals(Device.Joint, state);
 
-		if(CM_AnkleJoint.speed > 0.0f)
+		if(CM_AnkleJoint.speed >= 0.0f)
 		{
 			toeOff = 1;
 
@@ -1247,7 +1238,7 @@ static void SetCtrlParams(StateMachine_e state)
 		case CPC:
 			if(Device.Joint == Combined)
 			{
-				if((CM_AnkleJoint.SwingCtrl.kd == 0.0f) && (CM_AnkleJoint.SwingCtrl.kp == 0.0f) && (CM_AnkleJoint.SwingCtrl.position == 0.0f) && (!timeBasedCpvValid))//should !timeBasedCpvValid be here??
+				if((CM_AnkleJoint.SwingCtrl.kd == 0.0f) && (CM_AnkleJoint.SwingCtrl.kp == 0.0f) && (CM_AnkleJoint.SwingCtrl.position == 0.0f))
 					RunPassiveEmulation(Ankle);
 				else
 				{
@@ -1258,7 +1249,7 @@ static void SetCtrlParams(StateMachine_e state)
 			}
 			if((Device.Joint == Knee) || (Device.Joint == Combined))
 			{
-				if((CM_KneeJoint.CPC_Ctrl.kd == 0.0f) && (CM_KneeJoint.CPC_Ctrl.kp == 0.0f) && (!timeBasedCpvValid))
+				if((CM_KneeJoint.CPC_Ctrl.kd == 0.0f) && (CM_KneeJoint.CPC_Ctrl.kp == 0.0f))
 					RunPassiveEmulation(Knee);
 				else
 				{

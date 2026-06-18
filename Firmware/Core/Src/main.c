@@ -236,7 +236,7 @@ int main(void)
 * USER ADDED OPERATION MODE
 *******************************************************************************/
 
-	operationMode = PassiveEmulation;
+	operationMode = StateMachineWithPassiveEmulation;
 
 	if(((operationMode == PassiveEmulation) || (operationMode == StateMachineWithPassiveEmulation)) && (Prosthesis_Init.Joint == Ankle))
 		ErrorHandler(OperationModeError);
