@@ -17,7 +17,6 @@
 
 #include "akxx-x.h"
 #include "bno08x_spi_hal.h"
-#include "greg_bio_data.h"//??
 #include "main.h"
 #include "mpu925x_spi_hal.h"
 #include "prosthesis_v2.h"
@@ -146,12 +145,9 @@ static uint8_t ankleImuTxCplt, ankleImuRxCplt;
 static uint8_t isSecond;
 
 //??
-static float gregKneeAngle[51];
-static float gregMaxKneeAngle;
-static float gregMinKneeAngle;
-static float gregStride[51];
-static uint8_t gregN_Elements;
 static uint8_t timeBasedCpvValid;
+static uint8_t timeBasedHeelStrike;
+static uint8_t timeBasedToeOff;
 
 static uint8_t isFirst = 1;
 
@@ -175,9 +171,10 @@ static float CM_timeBasedCpv;
 static float CM_timeBasedCpvx9;
 static float CM_timeBasedTrajectory;
 
-static float CM_threshold_ankleSpeed = -5.0f;
 static float CM_threshold_footSpeed = -5.0f;
+static float CM_threshold_intoLateStanceAnkleSpeed = -5.0f;
 static float CM_threshold_intoStanceLC = 1325.0f;
+static float CM_threshold_intoSwingAnkleSpeed = 0.0f;
 static float CM_threshold_intoSwingLC = 1270.0f;
 
 static void InitStateVals(void);
@@ -191,7 +188,7 @@ static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3);
 static void GetThirdOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float v_2, float *a);
 static void GetSecondOrderSegmentConstants(float cpv_1, float cpv_2, float p_1, float p_2, float v_1, float *a);
 static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3);
-static void GetTimeBasedTrajectory(void);//??
+static void GetTimeBasedTrajectory(float *cpv, float *a1, float *a2, float *a3);//??
 static void SetStateVals(Joint_e joint, StateMachine_e state);
 static void SetCtrlParams(StateMachine_e state);
 static void RunPassiveEmulation(Joint_e joint);
@@ -239,44 +236,18 @@ void InitProsthesisControl(Prosthesis_Init_t *Device_Init)
 		CM_KneeJoint.PassEmulExtCtrl.kd = 0.01f;
 		CM_KneeJoint.PassEmulExtCtrl.torque = 10.0f;
 
-		switch(Device.CPC_Spec)
-		{
-		case Specific:
-			CM_KneeJoint.CPC_Params.CPV_1 = 0.772569158398214f;
-			CM_KneeJoint.CPC_Params.CPV_2 = 0.795576681151677f;
-			CM_KneeJoint.CPC_Params.CPV_3 = 0.950889051162379f;
-			CM_KneeJoint.CPC_Params.P_1 = 68.262804756164540f;
-			CM_KneeJoint.CPC_Params.P_2 = 70.215346721649180f;
-			CM_KneeJoint.CPC_Params.P_3 = -0.438150704652071f;
-			CM_KneeJoint.CPC_Params.P_4 = -0.929495002329350f;
-			break;
-		case Winter:
-			CM_KneeJoint.CPC_Params.CPV_1 = 0.717203740538403f;
-			CM_KneeJoint.CPC_Params.CPV_2 = 0.786907375601145f;
-			CM_KneeJoint.CPC_Params.CPV_3 = 0.980305166790268f;
-			CM_KneeJoint.CPC_Params.P_1 = 57.540000000000000f;
-			CM_KneeJoint.CPC_Params.P_2 = 64.860000000000000f;
-			CM_KneeJoint.CPC_Params.P_3 = 0.540000000000000f;
-			CM_KneeJoint.CPC_Params.P_4 = 3.970000000000000f;
-			break;
-		}
+		CM_KneeJoint.CPC_Params.CPV_1 = 0.66f;
+		CM_KneeJoint.CPC_Params.CPV_2 = 0.72f;
+		CM_KneeJoint.CPC_Params.CPV_3 = 0.98f;
+		CM_KneeJoint.CPC_Params.P_1 = 57.54f;
+		CM_KneeJoint.CPC_Params.P_2 = 64.86f;
+		CM_KneeJoint.CPC_Params.P_3 = 0.54f;
+		CM_KneeJoint.CPC_Params.P_4 = 3.97f;
 
 		if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
 			ErrorHandler(CAN_Error);
 		if(AKxx_x_EnterMotorCtrlMode(KneeIndex, &txMailbox))
 			ErrorHandler(KneeMotorError);
-
-		//??
-		gregN_Elements = 17;
-		for(uint8_t i = 0; i < gregN_Elements; i++)
-		{
-			gregStride[i] = gregBioData[i][Greg_Stride];
-			gregKneeAngle[i] = gregBioData[i][Greg_KneeAngle];
-			if(gregMaxKneeAngle < gregKneeAngle[i])
-				gregMaxKneeAngle = gregKneeAngle[i];
-			if(gregMinKneeAngle > gregKneeAngle[i])
-				gregMinKneeAngle = gregKneeAngle[i];
-		}
 	}
 }
 
@@ -291,6 +262,7 @@ void RunProsthesisControl(void)
 	if(Device.Joint != Ankle)
 	{
 		GetCPV();
+		GetTimeBasedCPV();//??
 
 		static float cpv[3];
 		static float a1[4];
@@ -300,16 +272,15 @@ void RunProsthesisControl(void)
 		{
 			toeOff = 0;
 			GetSegmentConstants(cpv, a1, a2, a3);
-			GetTimeBasedCPV();//??
 		}
 
 		if((state == SwingFlexion) || (state == SwingExtension) || (state == CPC))
 		{
 			GetTrajectory(cpv, a1, a2, a3);
-			if(timeBasedCpvValid)//??
-				GetTimeBasedTrajectory();
+			if(timeBasedCpvValid)
+				GetTimeBasedTrajectory(cpv, a1, a2, a3);//??
 			else
-				CM_timeBasedTrajectory = 0.0f;
+				CM_timeBasedTrajectory = 0.0f;//??
 		}
 		else
 		{
@@ -632,6 +603,7 @@ static StateMachine_e RunStateMachine(void)
 			if(CM_LoadCell.Filtered.bot[0] < CM_threshold_intoSwingLC)
 			{
 				toeOff = 1;
+				timeBasedToeOff = 1;
 				state = SwingFlexion;
 			}
 
@@ -640,7 +612,7 @@ static StateMachine_e RunStateMachine(void)
 	case MidStance:
 		SetStateVals(Device.Joint, state);
 
-		if(CM_AnkleJoint.speed <= CM_threshold_ankleSpeed)
+		if(CM_AnkleJoint.speed <= CM_threshold_intoLateStanceAnkleSpeed)
 			state = LateStance;
 
 		break;
@@ -648,9 +620,10 @@ static StateMachine_e RunStateMachine(void)
 	case LateStance:
 		SetStateVals(Device.Joint, state);
 
-		if(CM_AnkleJoint.speed >= 0.0f)
+		if(CM_AnkleJoint.speed >= CM_threshold_intoSwingAnkleSpeed)
 		{
 			toeOff = 1;
+			timeBasedToeOff = 1;
 
 			if(CM__startCPC)
 				state = CPC;
@@ -668,6 +641,7 @@ static StateMachine_e RunStateMachine(void)
 			if(CM_LoadCell.Filtered.bot[0] > CM_threshold_intoStanceLC)
 			{
 				heelStrike = 1;
+				timeBasedHeelStrike = 1;
 				state = EarlyStance;
 			}
 
@@ -684,6 +658,7 @@ static StateMachine_e RunStateMachine(void)
 		if(CM_LoadCell.Filtered.bot[0] > CM_threshold_intoStanceLC)
 		{
 			heelStrike = 1;
+			timeBasedHeelStrike = 1;
 			state = EarlyStance;
 		}
 
@@ -695,6 +670,7 @@ static StateMachine_e RunStateMachine(void)
 		if(CM_LoadCell.Filtered.bot[0] > CM_threshold_intoStanceLC)
 		{
 			heelStrike = 1;
+			timeBasedHeelStrike = 1;
 			state = EarlyStance;
 		}
 
@@ -854,21 +830,26 @@ static void GetCPV(void)
 
 static void GetTimeBasedCPV(void)//??
 {
-	if(CM_KneeJoint.position <= gregMaxKneeAngle)
+	if(timeBasedHeelStrike)
 	{
+		timeBasedHeelStrike = 0;
 		timeBasedCpvValid = 1;
-
-		uint8_t index = gregN_Elements - 1;
-		while(CM_KneeJoint.position < gregKneeAngle[index])
-		{
-			index--;
-		}
-
-		CM_timeBasedCpv = Utils_LinearInterpolate(CM_KneeJoint.position, gregKneeAngle[index], gregStride[index], gregKneeAngle[index + 1], gregStride[index + 1]);
-		CM_timeBasedCpvx9 = CM_timeBasedCpv * 9.0f;
+		CM_timeBasedCpv = 0.0f;
 	}
-	else
-		timeBasedCpvValid = 0;
+	if(timeBasedToeOff)
+	{
+		timeBasedToeOff = 0;
+		if(CM_KneeJoint.position > CM_KneeJoint.CPC_Params.P_2)
+			timeBasedCpvValid = 0;
+	}
+
+	const float totalStrideTime = 1.8f;
+	CM_timeBasedCpv += DT / totalStrideTime;
+
+	if(CM_timeBasedCpv > 1.0f)
+		CM_timeBasedCpv = 1.0f;
+
+	CM_timeBasedCpvx9 = CM_timeBasedCpv * 9.0f;
 }
 
 static void GetSegmentConstants(float *cpv, float *a1, float *a2, float *a3)
@@ -931,31 +912,14 @@ static void GetTrajectory(float *cpv, float *a1, float *a2, float *a3)
 		CM_trajectory = a3[0] + a3[1]*(CM_cpv-cpv[2]) + a3[2]*(CM_cpv-cpv[2])*(CM_cpv-cpv[2]);
 }
 
-static void GetTimeBasedTrajectory(void)//??
+static void GetTimeBasedTrajectory(float *cpv, float *a1, float *a2, float *a3)//??
 {
-	float strideTime = 1.5f;
-	float dCpv = DT / strideTime;
-
-	static float cpv;
-	static uint8_t firstCall = 1;
-	if(firstCall)
-	{
-		firstCall = 0;
-		cpv = CM_timeBasedCpv;
-	}
-	else
-		cpv += dCpv;
-
-	if(cpv > 1.0f)
-		cpv = 1.0f;
-
-	uint8_t index = gregN_Elements - 1;
-	while(cpv < gregStride[index])
-	{
-		index--;
-	}
-
-	CM_timeBasedTrajectory = Utils_LinearInterpolate(cpv, gregStride[index], gregKneeAngle[index], gregStride[index + 1], gregKneeAngle[index + 1]);
+	if((CM_timeBasedCpv >= cpv[0]) && (CM_timeBasedCpv < cpv[1]))
+		CM_timeBasedTrajectory = a1[0] + a1[1]*(CM_timeBasedCpv-cpv[0]) + a1[2]*(CM_timeBasedCpv-cpv[0])*(CM_timeBasedCpv-cpv[0]) + a1[3]*(CM_timeBasedCpv-cpv[0])*(CM_timeBasedCpv-cpv[0])*(CM_timeBasedCpv-cpv[0]);
+	else if((CM_timeBasedCpv >= cpv[1]) && (CM_timeBasedCpv < cpv[2]))
+		CM_timeBasedTrajectory = a2[0] + a2[1]*(CM_timeBasedCpv-cpv[1]) + a2[2]*(CM_timeBasedCpv-cpv[1])*(CM_timeBasedCpv-cpv[1]) + a2[3]*(CM_timeBasedCpv-cpv[1])*(CM_timeBasedCpv-cpv[1])*(CM_timeBasedCpv-cpv[1]);
+	else if((CM_timeBasedCpv >= cpv[2]) && (CM_timeBasedCpv <= 1.0f))
+		CM_timeBasedTrajectory = a3[0] + a3[1]*(CM_timeBasedCpv-cpv[2]) + a3[2]*(CM_timeBasedCpv-cpv[2])*(CM_timeBasedCpv-cpv[2]);
 }
 
 static void SetCtrlParams(StateMachine_e state)
